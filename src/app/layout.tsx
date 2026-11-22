@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://lasbarberstudio.com.br";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://barbeariadonoah.vercel.app";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -28,46 +28,43 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "LAS Barber Studio | Lucas Augusto • Barbearia Privada & Alta Precisão",
-  description: "Atendimento exclusivo e individual em estúdio privado com Lucas Augusto em Comodoro - MT. Cortes de alta precisão, barboterapia, alinhamento de barba e ambiente reservado para você.",
+  title: "Barbearia do Noah | Estilo, Precisão & Atendimento Exclusivo",
+  description: "Atendimento exclusivo na Barbearia do Noah. Cortes modernos e clássicos de alta precisão, barba alinhada na navalha e ambiente reservado.",
   keywords: [
-    "LAS Barber Studio",
-    "Lucas Augusto Barbeiro",
-    "Barbearia Comodoro",
-    "Barbearia em Comodoro MT",
-    "Barbearia Privada",
-    "Estúdio de Barba e Cabelo",
+    "Barbearia do Noah",
+    "Noah Barber",
+    "Barbearia",
     "Corte Masculino de Alta Precisão",
     "Corte Masculino Premium",
-    "Barboterapia Exclusiva",
+    "Barba e Cabelo",
     "Agendamento Barbearia",
   ],
-  authors: [{ name: "Lucas Augusto • LAS Barber Studio" }],
+  authors: [{ name: "Barbearia do Noah" }],
   icons: {
     icon: [
-      { url: "/brand/logo-square-512.png?v=las-gold-2026", sizes: "512x512", type: "image/png" },
-      { url: "/icon-512.png?v=las-gold-2026", sizes: "512x512", type: "image/png" },
-      { url: "/icon-192.png?v=las-gold-2026", sizes: "192x192", type: "image/png" },
-      { url: "/icon.png?v=las-gold-2026", sizes: "32x32", type: "image/png" },
-      { url: "/favicon.ico?v=las-gold-2026", sizes: "any" },
+      { url: "/brand/logo-square-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
     ],
     apple: [
-      { url: "/apple-icon.png?v=las-gold-2026", sizes: "180x180", type: "image/png" },
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
     ],
-    shortcut: "/favicon.ico?v=las-gold-2026",
+    shortcut: "/favicon.ico",
   },
   manifest: "/manifest.json",
   openGraph: {
-    title: "LAS Barber Studio | Lucas Augusto • Barbearia Privada & Alta Precisão",
-    description: "Atendimento exclusivo e individual em estúdio privado com Lucas Augusto em Comodoro - MT. Conforto térmico, lounge executivo, corte de precisão e barboterapia.",
+    title: "Barbearia do Noah | Estilo, Precisão & Atendimento Exclusivo",
+    description: "Atendimento exclusivo na Barbearia do Noah. Conforto, cortes de alta precisão e cuidado completo para você.",
     url: SITE_URL,
-    siteName: "LAS Barber Studio",
+    siteName: "Barbearia do Noah",
     images: [
       {
-        url: `${SITE_URL}/opengraph-image.png?v=las-gold-2026`,
+        url: `${SITE_URL}/opengraph-image.png`,
         width: 1200,
         height: 630,
-        alt: "LAS Barber Studio - Lucas Augusto",
+        alt: "Barbearia do Noah",
       },
     ],
     locale: "pt_BR",
@@ -75,9 +72,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "LAS Barber Studio | Lucas Augusto",
-    description: "Estúdio privado de barbearia e cortes de alta precisão com Lucas Augusto em Comodoro - MT.",
-    images: [`${SITE_URL}/twitter-image.png?v=las-gold-2026`],
+    title: "Barbearia do Noah",
+    description: "Estúdio de barbearia e cortes de alta precisão na Barbearia do Noah.",
+    images: [`${SITE_URL}/twitter-image.png`],
   },
   alternates: {
     canonical: SITE_URL,
@@ -87,50 +84,19 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "BarberShop",
-  "name": "LAS Barber Studio - Lucas Augusto",
+  "name": "Barbearia do Noah",
   "image": `${SITE_URL}/brand/logo-square-512.png`,
   "@id": SITE_URL,
   "url": SITE_URL,
-  "telephone": "+55-69-99378-3204",
+  "telephone": "+55-00-00000-0000",
   "priceRange": "$$",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Rua dos Ipês, Nº 365E",
-    "addressLocality": "Comodoro",
-    "addressRegion": "MT",
-    "postalCode": "78310-000",
-    "addressCountry": "BR"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": -13.6631,
-    "longitude": -59.7864
-  },
   "openingHoursSpecification": [
     {
       "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      "opens": "08:30",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "opens": "09:00",
       "closes": "20:00"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Saturday",
-      "opens": "08:30",
-      "closes": "18:00"
     }
-  ],
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "5.0",
-    "bestRating": "5",
-    "ratingCount": "48"
-  },
-  "hasMap": "https://share.google/chfF9rq5kwguwJSIE",
-  "sameAs": [
-    "https://www.instagram.com/lasbarberstudio_",
-    "https://share.google/chfF9rq5kwguwJSIE",
-    "https://www.google.com/search?kgmid=/g/11_0284hx4&q=Las+Barber+Studio"
   ]
 };
 
@@ -144,7 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#050608" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="LAS Studio" />
+        <meta name="apple-mobile-web-app-title" content="Barbearia do Noah" />
         <link rel="icon" type="image/png" sizes="512x512" href="/brand/logo-square-512.png?v=las-gold-2026" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=las-gold-2026" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icon.png?v=las-gold-2026" />
