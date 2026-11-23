@@ -18,6 +18,12 @@ const HERO_IMAGES = [
   "/studio/hero-3.jpg",
 ];
 
+const HERO_POSITIONS = [
+  "center 35%", // Foto 1: Barbeiros em ação (inalterada conforme pedido)
+  "center 75%", // Foto 2: Foco mais pra baixo (cadeiras, capas Noah e piso)
+  "center 75%", // Foto 3: Foco mais pra baixo (cadeiras, espelho em arco e bancada)
+];
+
 // --- CARDS DE DESTAQUE (MODELO MR BASTOS COM DADOS DO NOAH) ---
 const SERVICES_HIGHLIGHT = [
   { 
@@ -551,7 +557,7 @@ export default function Home() {
                 }`}
                 style={{
                   backgroundImage: `url(${img})`,
-                  backgroundPosition: "center 35%",
+                  backgroundPosition: HERO_POSITIONS[idx] || "center 70%",
                   transform: "translate3d(0, 0, 0)",
                   backfaceVisibility: "hidden",
                   WebkitBackfaceVisibility: "hidden",
