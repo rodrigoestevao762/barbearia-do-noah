@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, ArrowRight, ChevronLeft, CheckCircle, X, Sparkles, Shield } from "lucide-react";
 import Link from "next/link";
-import LogoLasBarber from "@/components/LogoLasBarber";
+import LogoNoahBarber from "@/components/LogoLasBarber";
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
@@ -127,10 +127,10 @@ export default function LoginPage() {
         >
           <div className="mb-8 text-center lg:text-left">
             <div className="flex items-center gap-4 justify-center lg:justify-start mb-5">
-              <LogoLasBarber variant="emblem" size={54} />
+              <LogoNoahBarber variant="emblem" size={54} />
               <div>
-                <span className="text-xl font-serif tracking-[0.2em] uppercase text-white block">LAS BARBER STUDIO</span>
-                <span className="text-[10px] font-mono tracking-[0.25em] text-[#DFBA73] uppercase font-bold">LUCAS AUGUSTO</span>
+                <span className="text-xl font-serif tracking-[0.2em] uppercase text-white block">NOAH BARBER STUDIO</span>
+                <span className="text-[10px] font-mono tracking-[0.25em] text-[#DFBA73] uppercase font-bold">NOAH FERREIRA</span>
               </div>
             </div>
             <h1 className="text-3xl font-serif text-white tracking-wide uppercase mb-2">Acesso ao Painel</h1>
@@ -238,7 +238,7 @@ export default function LoginPage() {
         
         <div className="absolute bottom-12 left-12 right-12 z-10 max-w-lg">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#DFBA73]/40 bg-black/70 text-[#F5D799] text-xs font-mono uppercase tracking-widest mb-3 shadow-md shadow-[#DFBA73]/10">
-            <Sparkles className="w-3.5 h-3.5 text-[#DFBA73]" /> Lucas Augusto • Master Barber
+            <Sparkles className="w-3.5 h-3.5 text-[#DFBA73]" /> Noah Ferreira • Master Barber
           </div>
           <h2 className="text-3xl font-serif text-white leading-tight mb-3">
             Atendimento 100% Privativo e Individualizado.

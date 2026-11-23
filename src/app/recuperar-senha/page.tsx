@@ -67,7 +67,7 @@ function ResetPasswordForm() {
           </div>
         </Link>
         <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#DFBA73] font-bold">
-          LAS BARBER STUDIO
+          NOAH BARBER STUDIO
         </p>
         <h2 className="text-2xl font-serif text-white tracking-wide mt-1">Redefinir Senha</h2>
         <p className="text-gray-400 text-xs mt-1">Crie uma nova senha de acesso para sua conta</p>

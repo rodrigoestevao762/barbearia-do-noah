@@ -107,7 +107,7 @@ export default function ClientesClientView({ initialClients }: { initialClients:
             const hasPhone = cleanPhone.length >= 10;
             const waNumber = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
             const waUrl = hasPhone 
-              ? `https://wa.me/${waNumber}?text=Olá%20${encodeURIComponent(client.name)},%20tudo%20bem?%20Aqui%20é%20o%20Lucas%20Augusto%20da%20LAS%20Barber%20Studio!`
+              ? `https://wa.me/${waNumber}?text=Olá%20${encodeURIComponent(client.name)},%20tudo%20bem?%20Aqui%20é%20o%20Noah%20Ferreira%20do%20Noah%20Barber%20Studio!`
               : null;
 
             let formattedDate = "Data não informada";

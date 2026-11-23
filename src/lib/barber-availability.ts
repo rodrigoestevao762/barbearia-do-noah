@@ -1,5 +1,5 @@
 /**
- * Gerenciador Oficial de Disponibilidade, Escala e Pausa para Almoço do LAS Barber Studio.
+ * Gerenciador Oficial de Disponibilidade, Escala e Pausa para Almoço do Noah Barber Studio.
  * Gerencia o status por DATA ESPECÍFICA com persistência em disco (/tmp em produção).
  */
 
@@ -70,7 +70,7 @@ if (!global.__studio_closed_dates) {
 }
 
 /**
- * Verifica se uma data específica ("YYYY-MM-DD") está marcada como Fechada por Lucas Augusto.
+ * Verifica se uma data específica ("YYYY-MM-DD") está marcada como Fechada por Noah Ferreira.
  */
 export function isDateClosed(dateStr: string): boolean {
   if (!global.__studio_closed_dates) global.__studio_closed_dates = {};
@@ -193,7 +193,7 @@ export function getAllClosedDates(): Record<string, boolean> {
 }
 
 /**
- * Compatibilidade legada: Lucas Augusto é sempre elegível para agendamentos.
+ * Compatibilidade legada: Noah Ferreira é sempre elegível para agendamentos.
  * A disponibilidade diária real é checada por data via isDateClosed(dateStr).
  */
 export function isBarberAvailable(barberId: string, dateStr?: string): boolean {
@@ -212,6 +212,6 @@ export function setBarberAvailable(barberId: string, available: boolean, dateStr
 
 export function getAllBarberAvailabilities(): Record<string, boolean> {
   return {
-    "barbeiro-lucas": true,
+    "barbeiro-noah": true,
   };
 }

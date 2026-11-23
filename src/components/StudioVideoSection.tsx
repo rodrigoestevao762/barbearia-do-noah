@@ -58,7 +58,7 @@ export default function StudioVideoSection() {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#DFBA73]/40 bg-[#DFBA73]/10 text-[#F5D799] text-xs font-mono uppercase tracking-[0.3em] mb-6 shadow-md shadow-[#DFBA73]/10 font-bold"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#DFBA73]" />
-            Tour Pelo Studio • Lucas Augusto
+            Tour Pelo Studio • Noah Ferreira
           </motion.div>
 
           <motion.h2
@@ -161,7 +161,7 @@ export default function StudioVideoSection() {
 
                 <div className="flex items-center gap-3">
                   <span className="text-[11px] font-mono text-[#F5D799] uppercase tracking-wider bg-[#DFBA73]/15 px-3 py-1 rounded-full border border-[#DFBA73]/40 font-bold">
-                    LAS Barber Studio
+                    Noah Barber Studio
                   </span>
                   <button
                     onClick={toggleFullscreen}

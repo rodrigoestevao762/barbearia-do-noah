@@ -18,7 +18,7 @@ import { LunchBreakControl } from "@/components/LunchBreakControl";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
-  const userName = session?.user?.name || "Lucas Augusto";
+  const userName = session?.user?.name || "Noah Ferreira";
 
   const [dashboardData, setDashboardData] = useState<any>({
     revenue: 0,
@@ -59,7 +59,7 @@ export default function DashboardPage() {
     return `${year}-${month}-${day}`;
   });
 
-  // Disponibilidade de Lucas Augusto no Site (persistida no Supabase PostgreSQL)
+  // Disponibilidade de Noah Ferreira no Site (persistida no Supabase PostgreSQL)
   const [isOwnerAvailable, setIsOwnerAvailable] = useState(true);
   const [earlyClosing, setEarlyClosing] = useState<string | null>(null);
   const [lunchBreak, setLunchBreak] = useState<string | null>(null);
@@ -83,7 +83,7 @@ export default function DashboardPage() {
       .then((res) => res.json())
       .then((data) => {
         const list = Array.isArray(data) ? data : (data?.barbers || []);
-        const owner = list.find((b: any) => b.id === "barbeiro-lucas" || b.id === "barbeiro-dono");
+        const owner = list.find((b: any) => b.id === "barbeiro-noah" || b.id === "barbeiro-dono");
         if (owner) {
           setIsOwnerAvailable(owner.isAvailable !== false);
           setEarlyClosing(owner.earlyClosingTime || null);
@@ -106,7 +106,7 @@ export default function DashboardPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          barberId: "barbeiro-lucas", 
+          barberId: "barbeiro-noah", 
           isAvailable: newStatus,
           date: selectedDate 
         })
@@ -131,7 +131,7 @@ export default function DashboardPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          barberId: "barbeiro-lucas", 
+          barberId: "barbeiro-noah", 
           date: selectedDate, 
           earlyClosingTime: time 
         })
@@ -158,7 +158,7 @@ export default function DashboardPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          barberId: "barbeiro-lucas",
+          barberId: "barbeiro-noah",
           date: selectedDate,
           lunchBreakTime: time,
           lunchBreakScope: scope,
@@ -194,17 +194,17 @@ export default function DashboardPage() {
   };
 
   const getCancelMessage = (apt: any, preset: "imprevisto" | "ajuste" | "cliente") => {
-    const barberName = "Lucas Augusto";
+    const barberName = "Noah Ferreira";
     const aptTime = getDisplayTime(apt.date);
     const aptDate = apt.date ? apt.date.substring(0, 10).split("-").reverse().join("/") : "";
     const clientName = apt.user?.name || "Cliente";
 
     if (preset === "imprevisto") {
-      return `Olá, ${clientName}! Sou o ${barberName} da LAS Barber Studio. Tive um imprevisto urgente hoje e precisei cancelar o seu horário das ${aptTime} (${aptDate}). Peço sinceras desculpas pelo ocorrido! Poderíamos reagendar para um outro horário ou dia que fique bom para você?`;
+      return `Olá, ${clientName}! Sou o ${barberName} da Noah Barber Studio. Tive um imprevisto urgente hoje e precisei cancelar o seu horário das ${aptTime} (${aptDate}). Peço sinceras desculpas pelo ocorrido! Poderíamos reagendar para um outro horário ou dia que fique bom para você?`;
     } else if (preset === "ajuste") {
-      return `Olá, ${clientName}! Informamos que seu horário das ${aptTime} (${aptDate}) na LAS Barber Studio precisou ser cancelado para ajuste da nossa agenda. O horário já está liberado caso queira remarcar pelo site ou por aqui!`;
+      return `Olá, ${clientName}! Informamos que seu horário das ${aptTime} (${aptDate}) na Noah Barber Studio precisou ser cancelado para ajuste da nossa agenda. O horário já está liberado caso queira remarcar pelo site ou por aqui!`;
     } else {
-      return `Olá, ${clientName}! Confirmamos o cancelamento do seu agendamento no LAS Barber Studio para o dia ${aptDate} às ${aptTime}. Estamos à disposição para quando desejar agendar um novo atendimento!`;
+      return `Olá, ${clientName}! Confirmamos o cancelamento do seu agendamento no Noah Barber Studio para o dia ${aptDate} às ${aptTime}. Estamos à disposição para quando desejar agendar um novo atendimento!`;
     }
   };
 
@@ -290,12 +290,12 @@ export default function DashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           serviceId: serviceToUse.id, 
-          barberId: "barbeiro-lucas", 
+          barberId: "barbeiro-noah", 
           date: `${selectedDate}T${timeStr}-03:00`, 
           isWalkIn: true,
           status: "COMPLETED",
           clientName: walkInClientName.trim() || "Cliente Balcão",
-          clientPhone: walkInClientPhone.trim() || "69993783204",
+          clientPhone: walkInClientPhone.trim() || "27992693638",
           paymentMethod,
         })
       });
@@ -305,7 +305,7 @@ export default function DashboardPage() {
         setWalkInClientName("Cliente Balcão");
         setWalkInClientPhone("");
         await fetchDashboard();
-        setToastMessage(`Atendimento de R$ ${serviceToUse.price.toFixed(2)} registrado com sucesso no caixa de Lucas Augusto!`);
+        setToastMessage(`Atendimento de R$ ${serviceToUse.price.toFixed(2)} registrado com sucesso no caixa de Noah Ferreira!`);
       }
     } catch (e) {
       console.error("Erro ao registrar balcão:", e);
@@ -382,7 +382,7 @@ export default function DashboardPage() {
           </div>
 
           <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
-            Painel do Studio • <span className="text-[#F5D799] italic">Lucas Augusto</span>
+            Painel do Studio • <span className="text-[#F5D799] italic">Noah Ferreira</span>
           </h2>
           <p className="text-xs text-gray-400 mt-1">
             Acompanhamento em tempo real do faturamento integral do studio, clientes atendidos e agenda.
@@ -409,13 +409,13 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ━━━ CARD DO MASTER BARBER COM FOTO REAL DE LUCAS AUGUSTO ━━━ */}
+      {/* ━━━ CARD DO MASTER BARBER COM FOTO REAL DE NOAH FERREIRA ━━━ */}
       <div className="p-5 md:p-6 bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-2xl">
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-lg shadow-[#DFBA73]/25 shrink-0">
             <Image
-              src="/barbers/lucas-augusto.jpg"
-              alt="Lucas Augusto"
+              src="/barbers/noah-ferreira.jpg"
+              alt="Noah Ferreira"
               fill
               className="object-cover object-top"
               priority
@@ -452,7 +452,7 @@ export default function DashboardPage() {
               )}
             </div>
             <h3 className="text-xl font-serif text-white mt-1">
-              Lucas Augusto — LAS Barber Studio
+              Noah Ferreira — Noah Barber Studio
             </h3>
             <p className="text-xs text-gray-300 mt-0.5 max-w-xl leading-relaxed font-light">
               {isOwnerAvailable 
@@ -564,7 +564,7 @@ export default function DashboardPage() {
               {nextApt.user?.phone && (
                 <a
                   href={`https://wa.me/${nextApt.user.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                    `Olá ${nextApt.user.name || 'Cliente'}! Aqui é o Lucas Augusto do LAS Barber Studio. Confirmando seu horário de ${nextApt.service?.name} às ${getDisplayTime(nextApt.date)} no estúdio privativo.`
+                    `Olá ${nextApt.user.name || 'Cliente'}! Aqui é o Noah Ferreira do Noah Barber Studio. Confirmando seu horário de ${nextApt.service?.name} às ${getDisplayTime(nextApt.date)} no estúdio privativo.`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -712,7 +712,7 @@ export default function DashboardPage() {
               Atendimentos do Studio • {selectedDate.split("-").reverse().join("/")}
             </h3>
             <p className="text-xs text-gray-400 font-light mt-0.5">
-              Horários agendados e atendidos exclusivamente por Lucas Augusto.
+              Horários agendados e atendidos exclusivamente por Noah Ferreira.
             </p>
           </div>
           <span className="text-xs text-[#DFBA73] font-mono">
@@ -753,7 +753,7 @@ export default function DashboardPage() {
                           {apt.user?.name || "Cliente"}
                         </h4>
                         <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#F5D799] shrink-0 font-mono">
-                          Lucas Augusto
+                          Noah Ferreira
                         </span>
                       </div>
 
@@ -787,7 +787,7 @@ export default function DashboardPage() {
                       {/* WhatsApp do cliente */}
                       {apt.user?.phone && (
                         <a
-                          href={`https://wa.me/55${apt.user.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá, ${apt.user.name}! Sou o Lucas da LAS Barber Studio. Confirmando seu horário para hoje às ${aptTime}!`)}`}
+                          href={`https://wa.me/55${apt.user.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá, ${apt.user.name}! Sou o Noah da Noah Barber Studio. Confirmando seu horário para hoje às ${aptTime}!`)}`}
                           target="_blank"
                           rel="noreferrer"
                           className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-black transition-all shrink-0 cursor-pointer"
@@ -879,7 +879,7 @@ export default function DashboardPage() {
                   type="text" 
                   value={walkInClientPhone}
                   onChange={(e) => setWalkInClientPhone(e.target.value)}
-                  placeholder="Ex: (69) 99378-3204"
+                  placeholder="Ex: (27) 99269-3638"
                   className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-2.5 px-4 text-white text-sm focus:border-[#DFBA73] focus:outline-none font-mono"
                 />
               </div>
@@ -891,10 +891,10 @@ export default function DashboardPage() {
                 <div className="p-3 bg-white/[0.03] border border-[#DFBA73]/30 rounded-xl flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#DFBA73]/50 shrink-0">
-                      <Image src="/barbers/lucas-augusto.jpg" alt="Lucas Augusto" fill className="object-cover object-top" />
+                      <Image src="/barbers/noah-ferreira.jpg" alt="Noah Ferreira" fill className="object-cover object-top" />
                     </div>
                     <div>
-                      <h5 className="text-white text-sm font-medium">Lucas Augusto</h5>
+                      <h5 className="text-white text-sm font-medium">Noah Ferreira</h5>
                       <p className="text-[10px] text-[#DFBA73] font-mono">Master Barber & Proprietário</p>
                     </div>
                   </div>

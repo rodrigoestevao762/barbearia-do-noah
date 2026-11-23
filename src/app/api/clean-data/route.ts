@@ -27,18 +27,18 @@ export async function GET(req: Request) {
     // 4. Limpa despesas de teste
     try { await prisma.expense.deleteMany(); } catch (_) {}
 
-    // 5. Apaga todas as contas temporárias exceto a conta oficial do proprietário (Lucas Augusto)
+    // 5. Apaga todas as contas temporárias exceto a conta oficial do proprietário (Noah Ferreira)
     try {
       await prisma.user.deleteMany({
         where: {
           NOT: {
-            email: "lucastj609@gmail.com",
+            email: "noahbarberstudio@gmail.com",
           },
         },
       });
     } catch (_) {}
 
-    // 6. Garante apenas o barbeiro oficial (Lucas Augusto) cadastrado
+    // 6. Garante apenas o barbeiro oficial (Noah Ferreira) cadastrado
     const officialBarberIds = BARBERS.map((b) => b.id);
     try {
       await prisma.barber.deleteMany({

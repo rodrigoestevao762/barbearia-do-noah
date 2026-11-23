@@ -51,9 +51,9 @@ export async function getFechamentoData(dateStr?: string) {
     }
 
     let totalRevenue = 0;
-    const masterBarber = BARBERS[0] || { id: "barbeiro-lucas", name: "Lucas Augusto" };
+    const masterBarber = BARBERS[0] || { id: "barbeiro-noah", name: "Noah Ferreira" };
     
-    // LAS Barber Studio possui modelo 100% exclusivo com o proprietário Lucas Augusto
+    // Noah Barber Studio possui modelo 100% exclusivo com o proprietário Noah Ferreira
     const barberRevenue = {
       id: masterBarber.id,
       name: masterBarber.name,
@@ -73,7 +73,7 @@ export async function getFechamentoData(dateStr?: string) {
     const sanitizedClosings = closings.map((c: any) => ({
       ...c,
       closedBy: (!c.closedBy || c.closedBy.includes("Bastos") || c.closedBy.includes("Mr."))
-        ? "Lucas Augusto (Master Barber)"
+        ? "Noah Ferreira (Master Barber)"
         : c.closedBy,
     }));
 
@@ -93,7 +93,7 @@ export async function getFechamentoData(dateStr?: string) {
     const rawClosings = getStoredClosingsForDate(targetDateStr);
 
     let totalRevenue = 0;
-    const masterBarber = BARBERS[0] || { id: "barbeiro-lucas", name: "Lucas Augusto" };
+    const masterBarber = BARBERS[0] || { id: "barbeiro-noah", name: "Noah Ferreira" };
     const barberRevenue = {
       id: masterBarber.id,
       name: masterBarber.name,
@@ -113,7 +113,7 @@ export async function getFechamentoData(dateStr?: string) {
     const sanitizedClosings = rawClosings.map((c: any) => ({
       ...c,
       closedBy: (!c.closedBy || c.closedBy.includes("Bastos") || c.closedBy.includes("Mr."))
-        ? "Lucas Augusto (Master Barber)"
+        ? "Noah Ferreira (Master Barber)"
         : c.closedBy,
     }));
 

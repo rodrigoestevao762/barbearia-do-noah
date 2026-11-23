@@ -20,19 +20,19 @@ const DISK_FILE =
     ? path.join("/tmp", "las_users.json")
     : path.join(process.cwd(), "src", "data", "users.json");
 
-// Usuários iniciais oficiais pré-configurados (Apenas Lucas Augusto - Dono/Gestor)
+// Usuários iniciais oficiais pré-configurados (Apenas Noah Ferreira - Dono/Gestor)
 const INITIAL_USERS: StoredUser[] = [
-  // 1. Lucas Augusto (Proprietário e Barbeiro Gestor Solo)
+  // 1. Noah Ferreira (Proprietário e Barbeiro Gestor Solo)
   {
-    id: "barbeiro-lucas",
-    name: "Lucas Augusto",
-    email: "lucastj609@gmail.com",
-    phone: "5569993783204",
+    id: "barbeiro-noah",
+    name: "Noah Ferreira",
+    email: "noahbarberstudio@gmail.com",
+    phone: "5527992693638",
     passwordHash: "$2b$10$3nbfFPEGUEz5IOBYGT4GXOax0/yVHF25z9UJHNc8qTYD9aDCU5ulO", // LasStudio#2026
     plainPasswordFallback: "123",
     role: "ADMIN",
     createdAt: "2026-01-01T00:00:00.000Z",
-    aliases: ["69993783204", "993783204", "6999378-3204", "(69) 99378-3204"],
+    aliases: ["27992693638", "993783204", "6999378-3204", "(27) 99269-3638"],
   },
 ];
 

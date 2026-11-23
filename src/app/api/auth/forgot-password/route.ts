@@ -25,8 +25,8 @@ export async function POST(req: Request) {
     const cleanEmail = email.trim().toLowerCase();
 
     // Localiza o usuário correspondente
-    let userName = "Lucas Augusto";
-    let targetPhone = "5569993783204";
+    let userName = "Noah Ferreira";
+    let targetPhone = "5527992693638";
     const matchedBarber = getBarberByEmail(cleanEmail);
 
     if (matchedBarber) {
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     const origin = process.env.NEXTAUTH_URL || "https://las-barber-studio.vercel.app";
     const resetUrl = `${origin}/recuperar-senha?token=${token}`;
 
-    const whatsappMsg = `Olá, ${userName}! Segue o link seguro para redefinir sua senha de acesso no LAS Barber Studio:\n\n${resetUrl}\n\n(Válido por 1 hora)`;
+    const whatsappMsg = `Olá, ${userName}! Segue o link seguro para redefinir sua senha de acesso no Noah Barber Studio:\n\n${resetUrl}\n\n(Válido por 1 hora)`;
     const whatsappUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(whatsappMsg)}`;
 
     let resendResult: any = null;

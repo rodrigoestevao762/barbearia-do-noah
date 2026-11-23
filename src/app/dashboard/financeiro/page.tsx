@@ -65,7 +65,7 @@ export default function FinanceiroPage() {
     return `${year}-${month}-${day}`;
   });
 
-  // Estado do Caixa de Lucas Augusto
+  // Estado do Caixa de Noah Ferreira
   const [cutsToday, setCutsToday] = useState(0);
   const [grossRevenue, setGrossRevenue] = useState(0);
   const [isCaixaClosed, setIsCaixaClosed] = useState(false);
@@ -151,7 +151,7 @@ export default function FinanceiroPage() {
     }
   };
 
-  // Registrar Atendimento Balcão diretamente no caixa de Lucas Augusto
+  // Registrar Atendimento Balcão diretamente no caixa de Noah Ferreira
   const handleRegisterWalkIn = async () => {
     if (isCaixaClosed) {
       alert("O caixa deste dia está fechado. Reabra o caixa para registrar novos atendimentos.");
@@ -274,7 +274,7 @@ export default function FinanceiroPage() {
               <Shield className="w-3 h-3 text-black" /> Gestão Solo • 100% Studio
             </span>
             <span className="text-[10px] bg-white/5 border border-white/10 text-gray-400 uppercase tracking-widest px-2.5 py-1 rounded-full font-mono">
-              Lucas Augusto • Fundador
+              Noah Ferreira • Fundador
             </span>
           </div>
 
@@ -408,12 +408,12 @@ export default function FinanceiroPage() {
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
           
-          {/* Informações de Lucas Augusto */}
+          {/* Informações de Noah Ferreira */}
           <div className="flex items-center gap-5">
             <div className="relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-lg shadow-[#DFBA73]/20 shrink-0">
               <Image 
                 src={BARBERS[0].avatar} 
-                alt="Lucas Augusto" 
+                alt="Noah Ferreira" 
                 fill 
                 className="object-cover object-top" 
                 sizes="80px"
@@ -671,7 +671,7 @@ export default function FinanceiroPage() {
                   Registrar <span className="text-[#DFBA73] italic">Serviço Balcão</span>
                 </h2>
                 <p className="text-gray-400 text-xs mt-1 font-light">
-                  Lançar atendimento diretamente no caixa de <strong className="text-white">Lucas Augusto</strong> para o dia {selectedDate.split("-").reverse().join("/")}.
+                  Lançar atendimento diretamente no caixa de <strong className="text-white">Noah Ferreira</strong> para o dia {selectedDate.split("-").reverse().join("/")}.
                 </p>
               </div>
 

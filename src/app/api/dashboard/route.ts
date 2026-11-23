@@ -110,7 +110,7 @@ export async function GET(req: Request) {
       }
     }
 
-    // 2. FLUXO DO DONO / ADMINISTRADOR (LUCAS AUGUSTO TRABALHA SOZINHO - 100% STUDIO)
+    // 2. FLUXO DO DONO / ADMINISTRADOR (NOAH BARBER STUDIO - 100% STUDIO)
     const startOfDay = new Date(`${dateParam}T00:00:00-03:00`);
     const endOfDay = new Date(`${dateParam}T23:59:59-03:00`);
 
@@ -175,7 +175,7 @@ export async function GET(req: Request) {
       .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(0, 20);
 
-    // Como Lucas Augusto trabalha sozinho, 100% da receita é dele / do Studio
+    // Como Noah Ferreira trabalha sozinho, 100% da receita é dele / do Studio
     const soloBarber = BARBERS[0];
     const bApts = allDayAppointments;
     const completedList = bApts.filter((apt) => apt.status === "COMPLETED");

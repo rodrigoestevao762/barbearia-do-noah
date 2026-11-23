@@ -158,7 +158,7 @@ export default function ClientDashboard() {
   const handleContactBarber = (barberPhone?: string, barberName?: string) => {
     const phone = barberPhone || BARBERS[0].phone;
     const name = barberName || BARBERS[0].name;
-    const msg = `Olá, ${name}! Sou o ${clientName}, cliente do LAS Barber Studio. Gostaria de tirar uma dúvida sobre meu horário.`;
+    const msg = `Olá, ${name}! Sou o ${clientName}, cliente do Noah Barber Studio. Gostaria de tirar uma dúvida sobre meu horário.`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
@@ -172,7 +172,7 @@ export default function ClientDashboard() {
         return;
       }
 
-      const barberId = rescheduleApt.barberId || rescheduleApt.barber?.id || "barbeiro-lucas";
+      const barberId = rescheduleApt.barberId || rescheduleApt.barber?.id || "barbeiro-noah";
       fetch(`/api/appointments/available?date=${newRescheduleDate}&barberId=${barberId}&t=${Date.now()}`, { cache: "no-store" })
         .then((res) => res.json())
         .then((data) => {
@@ -188,7 +188,7 @@ export default function ClientDashboard() {
 
   // Ação de Cancelamento pelo Cliente (Regra dos 30 minutos)
   const handleClientCancel = async (apt: any) => {
-    if (!confirm("Deseja realmente cancelar este agendamento?\n\n• Dentro de 30 minutos: o cancelamento é imediato e libera a vaga no sistema.\n• Após 30 minutos: será enviada uma solicitação para Lucas Augusto aprovar.")) {
+    if (!confirm("Deseja realmente cancelar este agendamento?\n\n• Dentro de 30 minutos: o cancelamento é imediato e libera a vaga no sistema.\n• Após 30 minutos: será enviada uma solicitação para Noah Ferreira aprovar.")) {
       return;
     }
 
@@ -202,7 +202,7 @@ export default function ClientDashboard() {
 
       const data = await res.json();
       if (res.ok) {
-        const barberName = apt.barber?.name || "Lucas Augusto";
+        const barberName = apt.barber?.name || "Noah Ferreira";
         const barberPhone = apt.barber?.phone || BARBERS[0].phone;
         const aptDateStr = new Date(apt.date).toLocaleDateString("pt-BR");
         const aptTimeStr = getDisplayTime(apt.date);
@@ -218,7 +218,7 @@ export default function ClientDashboard() {
           title: isDirect ? "Agendamento Cancelado!" : "Cancelamento Solicitado!",
           description: isDirect
             ? `Seu agendamento de ${apt.service?.name || "serviço"} foi cancelado com sucesso e a vaga foi liberada no estúdio.`
-            : `Como já se passaram mais de 30 minutos do agendamento, sua solicitação foi enviada para Lucas Augusto confirmar.`,
+            : `Como já se passaram mais de 30 minutos do agendamento, sua solicitação foi enviada para Noah Ferreira confirmar.`,
           serviceName: apt.service?.name,
           barberName,
           barberPhone,
@@ -269,14 +269,14 @@ export default function ClientDashboard() {
 
       const data = await res.json();
       if (res.ok) {
-        const barberName = rescheduleApt.barber?.name || "Lucas Augusto";
+        const barberName = rescheduleApt.barber?.name || "Noah Ferreira";
         const barberPhone = rescheduleApt.barber?.phone || BARBERS[0].phone;
         const oldDateStr = new Date(rescheduleApt.date).toLocaleDateString("pt-BR");
         const oldTimeStr = getDisplayTime(rescheduleApt.date);
         const newDateParts = newRescheduleDate.split("-");
         const newDateFormatted = `${newDateParts[2]}/${newDateParts[1]}/${newDateParts[0]}`;
 
-        const msg = `Olá, ${barberName}! Sou o ${clientName}. Solicitei o reagendamento do meu horário no LAS Barber Studio de ${oldDateStr} às ${oldTimeStr} para ${newDateFormatted} às ${newRescheduleTime}. Poderia confirmar para mim?`;
+        const msg = `Olá, ${barberName}! Sou o ${clientName}. Solicitei o reagendamento do meu horário no Noah Barber Studio de ${oldDateStr} às ${oldTimeStr} para ${newDateFormatted} às ${newRescheduleTime}. Poderia confirmar para mim?`;
         const whatsappUrl = `https://wa.me/${barberPhone}?text=${encodeURIComponent(msg)}`;
 
         setActionSuccessModal({
@@ -352,7 +352,7 @@ export default function ClientDashboard() {
             </div>
             <div>
               <p className="text-[9px] uppercase tracking-[0.3em] text-[#DFBA73] font-bold font-mono">
-                LAS BARBER STUDIO
+                NOAH BARBER STUDIO
               </p>
               <h1 className="text-lg font-serif text-white tracking-wide">{greeting}, {clientName}</h1>
             </div>
@@ -405,19 +405,19 @@ export default function ClientDashboard() {
                   Agendamento Confirmado com Sucesso!
                 </h3>
                 <p className="text-xs text-gray-300 font-light mt-0.5">
-                  Bem-vindo ao seu Painel VIP! Seu horário já está garantido na agenda oficial de Lucas Augusto.
+                  Bem-vindo ao seu Painel VIP! Seu horário já está garantido na agenda oficial de Noah Ferreira.
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2.5 self-end sm:self-auto shrink-0">
               {upcomingApt && (
                 <a
-                  href={`https://wa.me/5569993783204?text=${encodeURIComponent(`Olá, Lucas! Sou ${clientName}. Meu agendamento para o dia ${new Date(upcomingApt.date).toLocaleDateString("pt-BR")} às ${getDisplayTime(upcomingApt.date)} já está garantido no painel!`)}`}
+                  href={`https://wa.me/5527992693638?text=${encodeURIComponent(`Olá, Noah! Sou ${clientName}. Meu agendamento para o dia ${new Date(upcomingApt.date).toLocaleDateString("pt-BR")} às ${getDisplayTime(upcomingApt.date)} já está garantido no painel!`)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="bg-[#25D366] text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-[#128C7E] transition-all shadow-md shadow-[#25D366]/20 cursor-pointer"
                 >
-                  <MessageCircle className="w-4 h-4" /> Notificar Lucas no WhatsApp
+                  <MessageCircle className="w-4 h-4" /> Notificar Noah no WhatsApp
                 </a>
               )}
               <button
@@ -494,7 +494,7 @@ export default function ClientDashboard() {
                     {clientEmail && <span>· E-mail: <strong className="text-white">{clientEmail}</strong></span>}
                   </p>
                   <p className="text-[11px] text-[#DFBA73]/90 mt-1 font-light">
-                    Atendimento exclusivo individualizado com Master Barber Lucas Augusto
+                    Atendimento exclusivo individualizado com Master Barber Noah Ferreira
                   </p>
                 </div>
               </div>
@@ -519,11 +519,11 @@ export default function ClientDashboard() {
               >
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
                   <div className="flex items-start gap-4">
-                    {/* Foto de Lucas Augusto */}
+                    {/* Foto de Noah Ferreira */}
                     <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-md shadow-[#DFBA73]/20 shrink-0 hidden sm:block">
                       <Image
-                        src="/barbers/lucas-augusto.jpg"
-                        alt="Lucas Augusto"
+                        src="/barbers/noah-ferreira.jpg"
+                        alt="Noah Ferreira"
                         fill
                         className="object-cover object-top"
                         sizes="64px"
@@ -551,7 +551,7 @@ export default function ClientDashboard() {
                       </p>
 
                       <p className="text-xs text-gray-300 mt-2">
-                        Barbeiro responsável: <strong className="text-white">{upcomingApt.barber?.name || "Lucas Augusto (Master Barber)"}</strong> ·{" "}
+                        Barbeiro responsável: <strong className="text-white">{upcomingApt.barber?.name || "Noah Ferreira (Master Barber)"}</strong> ·{" "}
                         <a
                           href="https://www.google.com/maps/search/?api=1&query=Rua+dos+Yp%C3%AAs,+365E+-+Centro"
                           target="_blank"
@@ -597,7 +597,7 @@ export default function ClientDashboard() {
               </motion.div>
             )}
 
-            {/* ── CARD 3: OPÇÃO DE REPETIR ÚLTIMO CORTE COM LUCAS AUGUSTO ── */}
+            {/* ── CARD 3: OPÇÃO DE REPETIR ÚLTIMO CORTE COM NOAH FERREIRA ── */}
             {lastApt && (
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
@@ -607,8 +607,8 @@ export default function ClientDashboard() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-[#DFBA73]/40 shadow-md shrink-0 hidden sm:block">
                     <Image
-                      src="/barbers/lucas-augusto.jpg"
-                      alt="Lucas Augusto"
+                      src="/barbers/noah-ferreira.jpg"
+                      alt="Noah Ferreira"
                       fill
                       className="object-cover object-top"
                       sizes="56px"
@@ -623,7 +623,7 @@ export default function ClientDashboard() {
                       Deseja repetir o mesmo corte?
                     </h3>
                     <p className="text-xs text-gray-300 mt-1 max-w-lg leading-relaxed">
-                      Você fez <strong className="text-white">{lastApt.service?.name}</strong> com <strong className="text-[#F5D799]">{lastApt.barber?.name || "Lucas Augusto"}</strong> no dia {new Date(lastApt.date).toLocaleDateString("pt-BR")}. Escolha a nova data e horário para confirmar.
+                      Você fez <strong className="text-white">{lastApt.service?.name}</strong> com <strong className="text-[#F5D799]">{lastApt.barber?.name || "Noah Ferreira"}</strong> no dia {new Date(lastApt.date).toLocaleDateString("pt-BR")}. Escolha a nova data e horário para confirmar.
                     </p>
                   </div>
                 </div>
@@ -643,7 +643,7 @@ export default function ClientDashboard() {
                 <div>
                   <h3 className="text-xl font-serif text-white">Registro de Serviços & Histórico</h3>
                   <p className="text-xs text-gray-400 font-light mt-0.5">
-                    Seus atendimentos anteriores no LAS Barber Studio.
+                    Seus atendimentos anteriores no Noah Barber Studio.
                   </p>
                 </div>
                 <span className="text-xs font-mono text-[#DFBA73] px-3 py-1 rounded-full bg-[#DFBA73]/10 border border-[#DFBA73]/30">
@@ -675,7 +675,7 @@ export default function ClientDashboard() {
                               {getStatusBadge(apt.status)}
                             </div>
                             <p className="text-xs text-gray-400 mt-0.5">
-                              Barbeiro: <strong className="text-gray-300">{apt.barber?.name || "Lucas Augusto (Master Barber)"}</strong>
+                              Barbeiro: <strong className="text-gray-300">{apt.barber?.name || "Noah Ferreira (Master Barber)"}</strong>
                             </p>
                           </div>
                         </div>
@@ -766,10 +766,10 @@ export default function ClientDashboard() {
                   Horário atual: <strong className="text-white">{new Date(rescheduleApt.date).toLocaleDateString("pt-BR")} às {getDisplayTime(rescheduleApt.date)}</strong>
                 </p>
                 <p className="text-gray-400">
-                  Barbeiro: <strong className="text-white">{rescheduleApt.barber?.name || "Lucas Augusto"}</strong>
+                  Barbeiro: <strong className="text-white">{rescheduleApt.barber?.name || "Noah Ferreira"}</strong>
                 </p>
                 <p className="text-[11px] text-[#F5D799] pt-1">
-                  💡 A solicitação será atualizada e você poderá notificar Lucas no WhatsApp com 1 clique.
+                  💡 A solicitação será atualizada e você poderá notificar Noah no WhatsApp com 1 clique.
                 </p>
               </div>
 
@@ -785,7 +785,7 @@ export default function ClientDashboard() {
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 bg-[#25D366] text-white px-3 py-2 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-[#128C7E] transition-all"
                     >
-                      <MessageCircle className="w-4 h-4" /> Notificar Lucas no WhatsApp
+                      <MessageCircle className="w-4 h-4" /> Notificar Noah no WhatsApp
                     </a>
                   )}
                 </div>
@@ -941,12 +941,12 @@ export default function ClientDashboard() {
                 </div>
               </div>
 
-              {/* Card de Envio Oficial no WhatsApp de Lucas Augusto */}
+              {/* Card de Envio Oficial no WhatsApp de Noah Ferreira */}
               <div className="w-full bg-white/[0.03] border border-[#25D366]/40 rounded-2xl p-5 mb-6 text-left shadow-xl">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-3 h-3 rounded-full bg-[#25D366] animate-pulse" />
                   <p className="text-xs font-semibold text-[#25D366] uppercase tracking-wider font-mono">
-                    Notificar Lucas Augusto no WhatsApp
+                    Notificar Noah Ferreira no WhatsApp
                   </p>
                 </div>
                 <p className="text-xs text-gray-300 leading-relaxed mb-4">

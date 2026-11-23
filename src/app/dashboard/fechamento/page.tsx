@@ -56,7 +56,7 @@ export default function FechamentoPage() {
     const result = await closeCashRegister({
       totalRevenue: data.totalRevenue,
       barberRevenues: JSON.stringify(data.barberRevenues),
-      closedBy: session?.user?.name || "Lucas Augusto (Master Barber)",
+      closedBy: session?.user?.name || "Noah Ferreira (Master Barber)",
       dateStr: selectedDate
     });
     
@@ -76,7 +76,7 @@ export default function FechamentoPage() {
         <div>
           <h2 className="text-3xl font-serif text-white">Acesso Restrito ao Gestor</h2>
           <p className="text-gray-400 text-sm mt-2 max-w-md mx-auto leading-relaxed">
-            O fechamento oficial do caixa do estúdio é uma função exclusiva de Lucas Augusto.
+            O fechamento oficial do caixa do estúdio é uma função exclusiva de Noah Ferreira.
           </p>
         </div>
         <Link 
@@ -105,7 +105,7 @@ export default function FechamentoPage() {
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="text-[10px] bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm font-mono">
-              <Shield className="w-3 h-3 text-black" /> Gestão Exclusiva Lucas Augusto
+              <Shield className="w-3 h-3 text-black" /> Gestão Exclusiva Noah Ferreira
             </span>
             <span className="text-[10px] bg-white/5 border border-white/10 text-gray-400 uppercase tracking-widest px-2.5 py-1 rounded-full font-mono">
               Solo Owner • 100% Studio
@@ -115,7 +115,7 @@ export default function FechamentoPage() {
             Fechamento Diário <span className="bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] bg-clip-text text-transparent italic">de Caixa</span>
           </h2>
           <p className="text-xs text-gray-400 mt-1 font-light">
-            Conferência final do dia do LAS Barber Studio (100% de rendimento retido pelo Master Barber).
+            Conferência final do dia do Noah Barber Studio (100% de rendimento retido pelo Master Barber).
           </p>
         </div>
 
@@ -173,7 +173,7 @@ export default function FechamentoPage() {
           <p className="text-xs text-gray-500 font-light">Soma de todos os cortes e atendimentos realizados no estúdio.</p>
         </motion.div>
 
-        {/* Produção Líquida Lucas Augusto (100% Dono) */}
+        {/* Produção Líquida Noah Ferreira (100% Dono) */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -192,11 +192,11 @@ export default function FechamentoPage() {
               </h3>
             </div>
           </div>
-          <p className="text-xs text-gray-400 font-light">Modelo solo: 100% retido pelo Master Barber Lucas Augusto.</p>
+          <p className="text-xs text-gray-400 font-light">Modelo solo: 100% retido pelo Master Barber Noah Ferreira.</p>
         </motion.div>
       </div>
 
-      {/* DETALHAMENTO DO PROFISSIONAL (COM A FOTO E DADOS DE LUCAS AUGUSTO) */}
+      {/* DETALHAMENTO DO PROFISSIONAL (COM A FOTO E DADOS DE NOAH FERREIRA) */}
       <div className="space-y-4">
         <h3 className="text-xl font-serif text-white flex items-center gap-2">
           <Shield className="w-5 h-5 text-[#DFBA73]" /> Detalhamento do Profissional
@@ -217,7 +217,7 @@ export default function FechamentoPage() {
                 className="bg-[#080A0E] border border-white/10 hover:border-[#DFBA73]/40 rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all shadow-lg"
               >
                 <div className="flex items-center gap-4">
-                  {/* Foto de Lucas Augusto */}
+                  {/* Foto de Noah Ferreira */}
                   <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-md shadow-[#DFBA73]/20 shrink-0">
                     <Image
                       src={BARBERS[0].avatar}
@@ -236,7 +236,7 @@ export default function FechamentoPage() {
                       </span>
                     </div>
                     <p className="text-xs text-gray-400 mt-0.5 font-light">
-                      Master Barber & Proprietário • LAS Barber Studio
+                      Master Barber & Proprietário • Noah Barber Studio
                     </p>
                   </div>
                 </div>

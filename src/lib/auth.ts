@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
         const cleanPhone = input.replace(/\D/g, "");
         const lowerInput = input.toLowerCase();
 
-        // 1. Validação Segura da Conta do Proprietário (Lucas Augusto)
+        // 1. Validação Segura da Conta do Proprietário (Noah Ferreira)
         const isOwnerEmail = OWNER_ACCOUNT.email.toLowerCase() === lowerInput;
         const isOwnerPhone = Boolean(
           cleanPhone && (

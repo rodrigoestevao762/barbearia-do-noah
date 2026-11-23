@@ -244,8 +244,8 @@ export async function POST(req: Request) {
         }).catch((err) => console.error("Erro assíncrono envio e-mail cliente:", err));
       }
 
-      // 5.2 Envia alerta imediato de novo agendamento para o Barbeiro Mestre Lucas
-      const barberEmail = assignedBarber.email || "lucastj609@gmail.com";
+      // 5.2 Envia alerta imediato de novo agendamento para o Master Barber Noah
+      const barberEmail = assignedBarber.email || "noahbarberstudio@gmail.com";
       sendNewBookingNotificationToBarber({
         barberEmail,
         barberName: assignedBarber.name,

@@ -136,7 +136,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { id: "/dashboard/settings", icon: Settings, label: "Meu Perfil", shortLabel: "Perfil" },
       ];
 
-  const userName = (session?.user?.name || "Lucas Augusto").toUpperCase();
+  const userName = (session?.user?.name || "Noah Ferreira").toUpperCase();
   const userInitial = (session?.user?.name || "L")[0].toUpperCase();
 
   return (
@@ -286,7 +286,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             transition={{ delay: 0.1 }}
             className="text-gray-300 text-xs md:text-sm mt-1.5 font-light"
           >
-            Painel do Studio • LAS Barber Studio • Gestão solo, agenda e faturamento de Lucas Augusto.
+            Painel do Studio • Noah Barber Studio • Gestão solo, agenda e faturamento de Noah Ferreira.
           </motion.p>
         </div>
 

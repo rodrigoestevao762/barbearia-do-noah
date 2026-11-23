@@ -4,8 +4,8 @@ const resendApiKey = process.env.RESEND_API_KEY;
 
 export const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://lasbarberstudio.com.br";
-const DEFAULT_FROM = process.env.RESEND_FROM || "LAS Barber Studio <agendamento@lasbarberstudio.com.br>";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://barbeariadonoah.com.br";
+const DEFAULT_FROM = process.env.RESEND_FROM || "Noah Barber Studio <agendamento@barbeariadonoah.com.br>";
 
 /**
  * 1. Confirmação de Agendamento Enviada para o Cliente VIP
@@ -44,14 +44,14 @@ export async function sendAppointmentConfirmationEmail({
     const { data, error } = await resend.emails.send({
       from: DEFAULT_FROM,
       to,
-      subject: `Atendimento Confirmado • LAS Barber Studio — ${appointmentDate} às ${appointmentTime}`,
+      subject: `Atendimento Confirmado • Noah Barber Studio — ${appointmentDate} às ${appointmentTime}`,
       html: `
         <!DOCTYPE html>
         <html lang="pt-BR">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Atendimento Confirmado — LAS Barber Studio</title>
+          <title>Atendimento Confirmado — Noah Barber Studio</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #050608; color: #FFFFFF; margin: 0; padding: 40px 16px; }
             .container { max-width: 580px; margin: 0 auto; background: linear-gradient(180deg, #0A0D14 0%, #050608 100%); border: 1px solid rgba(223, 186, 115, 0.45); border-radius: 24px; padding: 40px 28px; box-shadow: 0 25px 70px rgba(0,0,0,0.95); }
@@ -83,8 +83,8 @@ export async function sendAppointmentConfirmationEmail({
               <div class="diamond">
                 <span class="diamond-text">L</span>
               </div>
-              <h1 class="logo-text">LAS BARBER STUDIO</h1>
-              <p class="tagline">Lucas Augusto • Estúdio Privativo</p>
+              <h1 class="logo-text">NOAH BARBER STUDIO</h1>
+              <p class="tagline">Noah Ferreira • Estúdio Privativo</p>
             </div>
             
             <div class="divider"></div>
@@ -92,7 +92,7 @@ export async function sendAppointmentConfirmationEmail({
             <div style="text-align: center;">
               <span class="badge-success">✓ Agendamento Confirmado</span>
               <h2>Olá, ${clientName}!</h2>
-              <p>Seu atendimento privativo 1 a 1 no <strong>LAS Barber Studio</strong> foi reservado com sucesso e está na agenda exclusiva do Master Barber.</p>
+              <p>Seu atendimento privativo 1 a 1 no <strong>Noah Barber Studio</strong> foi reservado com sucesso e está na agenda exclusiva do Master Barber.</p>
             </div>
 
             <div class="card-details">
@@ -122,7 +122,7 @@ export async function sendAppointmentConfirmationEmail({
               </div>
               <div class="detail-row">
                 <span class="detail-label">Localização</span>
-                <span class="detail-value">Rua dos Ipês, Nº 365E · Centro, Comodoro - MT</span>
+                <span class="detail-value">Av. Paulo Pereira Gomes, 281 - Loja 9 · Morada de Laranjeiras, Serra - ES</span>
               </div>
             </div>
 
@@ -147,7 +147,7 @@ export async function sendAppointmentConfirmationEmail({
           </div>
 
           <div class="footer">
-            &copy; ${new Date().getFullYear()} LAS Barber Studio • Rua dos Ipês, Nº 365E, Centro — Comodoro - MT
+            &copy; ${new Date().getFullYear()} Noah Barber Studio • Av. Paulo Pereira Gomes, 281 - Loja 9 · Morada de Laranjeiras, Serra - ES
           </div>
         </body>
         </html>
@@ -166,7 +166,7 @@ export async function sendAppointmentConfirmationEmail({
 }
 
 /**
- * 2. Notificação Imediata de Novo Agendamento Enviada para o Barbeiro / Dono (Lucas Augusto)
+ * 2. Notificação Imediata de Novo Agendamento Enviada para o Barbeiro / Dono (Noah Ferreira)
  */
 export async function sendNewBookingNotificationToBarber({
   to,
@@ -193,7 +193,7 @@ export async function sendNewBookingNotificationToBarber({
   appointmentTime: string;
   paymentMethod: string;
 }) {
-  const recipient = to || barberEmail || "lucastj609@gmail.com";
+  const recipient = to || barberEmail || "noahbarberstudio@gmail.com";
   if (!resend) {
     console.warn("⚠️ RESEND_API_KEY não configurada. Simulação de notificação para barbeiro:", recipient);
     return { success: true, simulated: true };
@@ -210,7 +210,7 @@ export async function sendNewBookingNotificationToBarber({
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Novo Agendamento — LAS Barber Studio</title>
+          <title>Novo Agendamento — Noah Barber Studio</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #050608; color: #FFFFFF; margin: 0; padding: 40px 16px; }
             .container { max-width: 580px; margin: 0 auto; background: linear-gradient(180deg, #0A0D14 0%, #050608 100%); border: 1px solid rgba(223, 186, 115, 0.45); border-radius: 24px; padding: 40px 28px; box-shadow: 0 25px 70px rgba(0,0,0,0.95); }
@@ -229,7 +229,7 @@ export async function sendNewBookingNotificationToBarber({
         </head>
         <body>
           <div class="container">
-            <h1 class="logo-text">LAS BARBER STUDIO</h1>
+            <h1 class="logo-text">NOAH BARBER STUDIO</h1>
             <p class="tagline">Painel de Notificações do Master Barber</p>
             
             <div class="divider"></div>
@@ -274,7 +274,7 @@ export async function sendNewBookingNotificationToBarber({
           </div>
 
           <div class="footer">
-            &copy; ${new Date().getFullYear()} LAS Barber Studio • Sistema Privativo
+            &copy; ${new Date().getFullYear()} Noah Barber Studio • Sistema Privativo
           </div>
         </body>
         </html>
@@ -313,14 +313,14 @@ export async function sendPasswordResetEmail({
     const { data, error } = await resend.emails.send({
       from: DEFAULT_FROM,
       to,
-      subject: "LAS Barber Studio — Redefinição de Senha",
+      subject: "Noah Barber Studio — Redefinição de Senha",
       html: `
         <!DOCTYPE html>
         <html lang="pt-BR">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Redefinição de Senha — LAS Barber Studio</title>
+          <title>Redefinição de Senha — Noah Barber Studio</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #050608; color: #FFFFFF; margin: 0; padding: 40px 16px; }
             .container { max-width: 560px; margin: 0 auto; background: linear-gradient(180deg, #0A0D14 0%, #050608 100%); border: 1px solid rgba(223, 186, 115, 0.4); border-radius: 24px; padding: 44px 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
@@ -345,14 +345,14 @@ export async function sendPasswordResetEmail({
               <div class="diamond">
                 <span class="diamond-text">L</span>
               </div>
-              <h1 class="logo-text">LAS BARBER STUDIO</h1>
-              <p class="tagline">Lucas Augusto • Estúdio Privativo</p>
+              <h1 class="logo-text">NOAH BARBER STUDIO</h1>
+              <p class="tagline">Noah Ferreira • Estúdio Privativo</p>
             </div>
             
             <div class="divider"></div>
 
             <h2>Olá, ${name}!</h2>
-            <p>Recebemos uma solicitação para redefinir a senha da sua conta no sistema do <strong>LAS Barber Studio</strong>.</p>
+            <p>Recebemos uma solicitação para redefinir a senha da sua conta no sistema do <strong>Noah Barber Studio</strong>.</p>
             <p>Para criar uma nova senha com total segurança, clique no botão dourado abaixo:</p>
 
             <div class="btn-wrap">
@@ -371,7 +371,7 @@ export async function sendPasswordResetEmail({
           </div>
 
           <div class="footer">
-            &copy; ${new Date().getFullYear()} LAS Barber Studio • Rua dos Ipês, Nº 365E, Centro — Comodoro - MT
+            &copy; ${new Date().getFullYear()} Noah Barber Studio • Av. Paulo Pereira Gomes, 281 - Loja 9 · Morada de Laranjeiras, Serra - ES
           </div>
         </body>
         </html>

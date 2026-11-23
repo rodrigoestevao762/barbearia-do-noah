@@ -138,7 +138,7 @@ export function addStoredAppointment(aptData: Partial<StoredAppointment>): Store
     user: aptData.user || {
       id: `u-${Date.now()}`,
       name: "Cliente VIP",
-      phone: "(69) 99378-3204",
+      phone: "(27) 99269-3638",
       email: "cliente@teste.com",
     },
     paymentMethod: aptData.paymentMethod || "PIX",

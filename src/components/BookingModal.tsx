@@ -399,7 +399,7 @@ export default function BookingModal({
             <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#DFBA73]/50 shrink-0 shadow-lg shadow-[#DFBA73]/20">
               <Image
                 src="/brand/logo-square-512.png"
-                alt="LAS Barber Studio"
+                alt="Noah Barber Studio"
                 fill
                 className="object-cover"
                 priority
@@ -525,12 +525,12 @@ export default function BookingModal({
                 </p>
               </div>
 
-              {/* Card de Envio Oficial no WhatsApp de Lucas Augusto */}
+              {/* Card de Envio Oficial no WhatsApp de Noah Ferreira */}
               <div className="w-full max-w-md bg-white/[0.03] border border-[#25D366]/40 rounded-2xl p-5 mb-5 text-left shadow-xl">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-3 h-3 rounded-full bg-[#25D366] animate-pulse" />
                   <p className="text-xs font-semibold text-[#25D366] uppercase tracking-wider font-mono">
-                    Notificar Lucas Augusto no WhatsApp
+                    Notificar Noah Ferreira no WhatsApp
                   </p>
                 </div>
                 <p className="text-xs text-gray-400 leading-relaxed mb-4">
@@ -541,7 +541,7 @@ export default function BookingModal({
                   onClick={handleNotifyWhatsappAndRedirect}
                   className="w-full bg-[#25D366] text-white py-3.5 px-4 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-[#128C7E] transition-all duration-300 shadow-lg shadow-[#25D366]/20 hover:scale-[1.02] cursor-pointer"
                 >
-                  <span>Enviar para WhatsApp de Lucas</span>
+                  <span>Enviar para WhatsApp de Noah</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -623,7 +623,7 @@ export default function BookingModal({
                 </motion.div>
               )}
 
-              {/* STEP 2: ATENDIMENTO EXCLUSIVO COM LUCAS AUGUSTO */}
+              {/* STEP 2: ATENDIMENTO EXCLUSIVO COM NOAH FERREIRA */}
               {step === 2 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
                   <div className="flex justify-between items-baseline border-b border-white/5 pb-2">
@@ -658,7 +658,7 @@ export default function BookingModal({
                           }`}
                         >
                           <div className="flex items-center gap-4">
-                            {/* FOTO OFICIAL DE LUCAS AUGUSTO */}
+                            {/* FOTO OFICIAL DO PROFISSIONAL */}
                             <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-lg shadow-[#DFBA73]/25 shrink-0">
                               <Image
                                 src={barber.avatar}
@@ -854,7 +854,7 @@ export default function BookingModal({
                                 required
                                 value={clientPhone}
                                 onChange={(e) => setClientPhone(e.target.value)}
-                                placeholder="Ex: (69) 99378-3204"
+                                placeholder="Ex: (27) 99269-3638"
                                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-2.5 px-3.5 text-white text-base sm:text-xs font-mono focus:border-[#DFBA73] focus:outline-none transition-colors"
                               />
                             </div>
@@ -944,7 +944,7 @@ export default function BookingModal({
                           /* Grade de Horários */
                           <div className="space-y-1.5">
                             <label className="text-xs font-mono uppercase tracking-widest text-[#DFBA73] font-bold flex items-center gap-1.5">
-                              <Clock className="w-3.5 h-3.5" /> Horários Livres de Lucas *
+                              <Clock className="w-3.5 h-3.5" /> Horários Livres *
                             </label>
 
                             {!selectedDate ? (

@@ -64,7 +64,7 @@ export default function CookieConsentBanner() {
               </div>
 
               <p className="text-xs text-gray-300 leading-relaxed font-light">
-                Utilizamos cookies e tecnologias essenciais para garantir o funcionamento seguro do sistema de agendamentos, login e proteção dos seus dados pessoais no <strong>LAS Barber Studio</strong>, em conformidade com a <strong>LGPD (Lei 13.709/2018)</strong>. Seus dados nunca são comercializados.
+                Utilizamos cookies e tecnologias essenciais para garantir o funcionamento seguro do sistema de agendamentos, login e proteção dos seus dados pessoais no <strong>Noah Barber Studio</strong>, em conformidade com a <strong>LGPD (Lei 13.709/2018)</strong>. Seus dados nunca são comercializados.
               </p>
 
               <div className="pt-2 flex flex-wrap items-center gap-2.5">

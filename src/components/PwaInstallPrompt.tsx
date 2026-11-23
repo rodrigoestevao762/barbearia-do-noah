@@ -119,7 +119,7 @@ export default function PwaInstallPrompt() {
             {/* Texto Descritivo Sem Risco de Sobreposição */}
             <div className="flex-1 min-w-0 pr-1">
               <h4 className="text-xs font-bold text-white tracking-wide truncate">
-                App LAS Barber Studio
+                App Noah Barber Studio
               </h4>
               <p className="text-[11px] text-gray-300 leading-tight mt-0.5">
                 Instale no seu celular para agendar com 1 toque
@@ -170,7 +170,7 @@ export default function PwaInstallPrompt() {
                     <h3 className="text-base font-serif font-bold text-white uppercase tracking-wider">
                       Instalar Aplicativo
                     </h3>
-                    <p className="text-[11px] text-[#DFBA73] font-mono">LAS Barber Studio Oficial</p>
+                    <p className="text-[11px] text-[#DFBA73] font-mono">Noah Barber Studio Oficial</p>
                   </div>
                 </div>
                 <button
@@ -224,7 +224,7 @@ export default function PwaInstallPrompt() {
                 /* INSTRUÇÕES PARA ANDROID / COMPUTADOR */
                 <div className="space-y-4">
                   <p className="text-xs text-gray-300 leading-relaxed">
-                    Você pode instalar o LAS Barber Studio como um aplicativo completo no seu dispositivo com suporte a tela cheia e agendamentos instantâneos.
+                    Você pode instalar o Noah Barber Studio como um aplicativo completo no seu dispositivo com suporte a tela cheia e agendamentos instantâneos.
                   </p>
 
                   <div className="p-4 rounded-2xl bg-[#DFBA73]/10 border border-[#DFBA73]/30 flex items-center gap-3">

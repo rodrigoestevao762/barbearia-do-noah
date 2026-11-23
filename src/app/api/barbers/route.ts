@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
   const schedule = await getDayScheduleDB(dateParam);
 
-  // Lucas Augusto está sempre disponível na lista de profissionais.
+  // Noah Ferreira está sempre disponível na lista de profissionais.
   // O status de aberto/fechado é avaliado para a data consultada no banco PostgreSQL.
   const barbersWithStatus = BARBERS.map((b) => ({
     ...b,
@@ -76,7 +76,7 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({
       success: true,
-      barberId: barberId || "barbeiro-lucas",
+      barberId: barberId || "barbeiro-noah",
       date: targetDate,
       isAvailable: !schedule.isClosed,
       isDateClosed: schedule.isClosed,

@@ -53,7 +53,7 @@ export async function GET(req: Request) {
       }
     }
 
-    // Sincroniza o barbeiro oficial (Lucas Augusto)
+    // Sincroniza o barbeiro oficial (Noah Ferreira)
     for (const b of BARBERS) {
       try {
         await prisma.barber.upsert({

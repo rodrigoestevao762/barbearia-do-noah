@@ -36,7 +36,7 @@ const CATEGORIES: { id: CategoryType; label: string; icon: any; count: number }[
   { id: "estetica", label: "Estética & Cuidado", icon: ShieldCheck, count: 3 },
 ];
 
-const WHATSAPP_CONCIERGE = "https://wa.me/5569993783204?text=Ol%C3%A1%20Lucas!%20Gostaria%20de%20tirar%20d%C3%BAvidas%20sobre%20os%20servi%C3%A7os%20do%20LAS%20Barber%20Studio.";
+const WHATSAPP_CONCIERGE = "https://wa.me/5527992693638?text=Ol%C3%A1%20Noah!%20Gostaria%20de%20tirar%20d%C3%BAvidas%20sobre%20os%20servi%C3%A7os%20do%20Noah%20Barber%20Studio.";
 
 export default function ServicesMenuSection({ onSelectService }: ServicesMenuSectionProps) {
   const [activeCategory, setActiveCategory] = useState<CategoryType>("todos");
@@ -72,7 +72,7 @@ export default function ServicesMenuSection({ onSelectService }: ServicesMenuSec
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#DFBA73]/15 border border-[#DFBA73]/40 backdrop-blur-md shadow-lg shadow-[#DFBA73]/10">
               <span className="w-2 h-2 rounded-full bg-[#DFBA73] animate-pulse" />
               <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#F5D799] font-bold">
-                Lucas Augusto • Haute Barbiere
+                Noah Ferreira • Haute Barbiere
               </span>
             </div>
 
@@ -490,7 +490,7 @@ export default function ServicesMenuSection({ onSelectService }: ServicesMenuSec
                 Dúvidas sobre o melhor ritual para sua imagem?
               </h5>
               <p className="text-xs sm:text-sm text-gray-300 font-light">
-                Fale diretamente com o barbeiro Lucas Augusto pelo WhatsApp e receba uma orientação personalizada.
+                Fale diretamente com o barbeiro Noah Ferreira pelo WhatsApp e receba uma orientação personalizada.
               </p>
             </div>
           </div>
@@ -502,7 +502,7 @@ export default function ServicesMenuSection({ onSelectService }: ServicesMenuSec
             className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 font-mono text-xs font-bold tracking-wider uppercase transition-all shrink-0 shadow-lg shadow-emerald-500/10"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>Falar no WhatsApp (69) 99378-3204</span>
+            <span>Falar no WhatsApp (27) 99269-3638</span>
           </a>
         </div>
 

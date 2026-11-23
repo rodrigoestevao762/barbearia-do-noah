@@ -4,8 +4,8 @@ import { ChevronLeft, ShieldCheck, Lock, Eye, FileText, CheckCircle2, Mail, Phon
 import { LogoLasBarber } from "@/components/LogoLasBarber";
 
 export const metadata: Metadata = {
-  title: "Política de Privacidade e Proteção de Dados (LGPD) | LAS Barber Studio",
-  description: "Entenda como o LAS Barber Studio protege e respeita a privacidade de seus dados pessoais em total conformidade com a LGPD (Lei 13.709/2018).",
+  title: "Política de Privacidade e Proteção de Dados (LGPD) | Noah Barber Studio",
+  description: "Entenda como o Noah Barber Studio protege e respeita a privacidade de seus dados pessoais em total conformidade com a LGPD (Lei 13.709/2018).",
 };
 
 export default function PoliticaPrivacidadePage() {
@@ -23,7 +23,7 @@ export default function PoliticaPrivacidadePage() {
 
           <Link href="/" className="flex items-center gap-2.5">
             <LogoLasBarber size={32} color="#F59E0B" />
-            <span className="text-lg font-serif tracking-[0.25em] text-white uppercase">LAS BARBER STUDIO</span>
+            <span className="text-lg font-serif tracking-[0.25em] text-white uppercase">NOAH BARBER STUDIO</span>
           </Link>
         </div>
       </header>
@@ -39,7 +39,7 @@ export default function PoliticaPrivacidadePage() {
             Política de Privacidade & Termos de Proteção de Dados
           </h1>
           <p className="text-gray-400 text-sm md:text-base font-light max-w-2xl mx-auto leading-relaxed">
-            No <strong>LAS Barber Studio</strong>, sob gestão do Master Barber <strong>Lucas Augusto</strong>, a sua privacidade e segurança são tratadas com o mais alto rigor técnico em conformidade com a <strong>Lei Federal nº 13.709/2018 (LGPD)</strong>.
+            No <strong>Noah Barber Studio</strong>, sob gestão do Master Barber <strong>Noah Ferreira</strong>, a sua privacidade e segurança são tratadas com o mais alto rigor técnico em conformidade com a <strong>Lei Federal nº 13.709/2018 (LGPD)</strong>.
           </p>
           <p className="text-gray-500 text-xs mt-3">Última atualização: Novembro de 2026</p>
         </div>
@@ -54,7 +54,7 @@ export default function PoliticaPrivacidadePage() {
               Quem Somos e Compromisso com a Privacidade
             </h2>
             <p className="text-gray-400 font-light leading-relaxed">
-              O <strong>LAS Barber Studio</strong>, estúdio privado e individual de barbearia conduzido por Lucas Augusto, atua como controlador dos dados pessoais fornecidos pelos clientes através deste site e aplicativo móvel (PWA). Garantimos confidencialidade absoluta para cada informação coletada.
+              O <strong>Noah Barber Studio</strong>, estúdio privado e individual de barbearia conduzido por Noah Ferreira, atua como controlador dos dados pessoais fornecidos pelos clientes através deste site e aplicativo móvel (PWA). Garantimos confidencialidade absoluta para cada informação coletada.
             </p>
           </section>
 
@@ -70,7 +70,7 @@ export default function PoliticaPrivacidadePage() {
             <ul className="space-y-2.5 pt-2">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                <span><strong>Nome Completo:</strong> Para identificação na recepção privativa e organização da agenda de Lucas Augusto.</span>
+                <span><strong>Nome Completo:</strong> Para identificação na recepção privativa e organização da agenda de Noah Ferreira.</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
@@ -97,7 +97,7 @@ export default function PoliticaPrivacidadePage() {
               Todos os dados são utilizados unicamente para execução do agendamento dos serviços de barbearia:
             </p>
             <ul className="list-disc pl-5 space-y-1.5 text-gray-400 text-sm">
-              <li>Reserva exclusiva de horário no estúdio privativo com Lucas Augusto;</li>
+              <li>Reserva exclusiva de horário no estúdio privativo com Noah Ferreira;</li>
               <li>Histórico de cortes e preferências para controle do cartão fidelidade VIP;</li>
               <li>Comunicação operacional rápida via WhatsApp caso ocorra alguma remarcação.</li>
             </ul>
@@ -119,7 +119,7 @@ export default function PoliticaPrivacidadePage() {
               </li>
               <li className="flex items-center gap-3 text-sm">
                 <span className="w-2 h-2 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold" />
-                <span><strong>Acesso Restrito:</strong> Somente você e Lucas Augusto têm acesso aos seus agendamentos registrados.</span>
+                <span><strong>Acesso Restrito:</strong> Somente você e Noah Ferreira têm acesso aos seus agendamentos registrados.</span>
               </li>
             </ul>
           </section>
@@ -131,7 +131,7 @@ export default function PoliticaPrivacidadePage() {
               05. Sigilo Absoluto e Não Compartilhamento
             </h2>
             <p className="text-gray-400 font-light leading-relaxed">
-              <strong>NUNCA vendemos, alugamos ou comercializamos seus dados pessoais para terceiros.</strong> Seus dados são de uso restrito do LAS Barber Studio para a excelência do seu atendimento.
+              <strong>NUNCA vendemos, alugamos ou comercializamos seus dados pessoais para terceiros.</strong> Seus dados são de uso restrito do Noah Barber Studio para a excelência do seu atendimento.
             </p>
           </section>
 
@@ -142,30 +142,30 @@ export default function PoliticaPrivacidadePage() {
               Canal de Atendimento do Titular & Contato
             </h2>
             <p className="text-gray-400 font-light leading-relaxed">
-              Para exercer qualquer direito de titular ou tirar dúvidas sobre seus dados, fale diretamente com Lucas Augusto:
+              Para exercer qualquer direito de titular ou tirar dúvidas sobre seus dados, fale diretamente com Noah Ferreira:
             </p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-4 pt-2">
               <a
-                href="https://wa.me/5569993783204?text=Ol%C3%A1%20Lucas!%20Gostaria%20de%20uma%20informa%C3%A7%C3%A3o%20sobre%20meus%20dados%20no%20LAS%20Barber%20Studio."
+                href="https://wa.me/5527992693638?text=Ol%C3%A1%20Noah!%20Gostaria%20de%20uma%20informa%C3%A7%C3%A3o%20sobre%20meus%20dados%20no%20Noah%20Barber%20Studio."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:border-emerald-500/40 text-emerald-400 transition-all text-xs font-semibold"
               >
-                <Phone className="w-4 h-4" /> (69) 99378-3204 (WhatsApp Studio)
+                <Phone className="w-4 h-4" /> (27) 99269-3638 (WhatsApp Studio)
               </a>
               <a
-                href="https://www.instagram.com/lasbarberstudio_?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw=="
+                href="https://www.instagram.com/noahbarberstudio?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw=="
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-500/40 text-amber-400 transition-all text-xs font-semibold"
               >
-                <MapPin className="w-4 h-4" /> Rua dos Ypês, 365E - Centro (@lasbarberstudio_)
+                <MapPin className="w-4 h-4" /> Rua dos Ypês, 365E - Centro (@noahbarberstudio)
               </a>
               <a
-                href="mailto:lucastj609@gmail.com"
+                href="mailto:noahbarberstudio@gmail.com"
                 className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-500/40 text-gray-300 hover:text-white transition-all text-xs font-semibold font-mono"
               >
-                <Mail className="w-4 h-4 text-amber-400" /> lucastj609@gmail.com
+                <Mail className="w-4 h-4 text-amber-400" /> noahbarberstudio@gmail.com
               </a>
             </div>
           </section>

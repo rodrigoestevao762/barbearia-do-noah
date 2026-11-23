@@ -19,7 +19,7 @@ export default function AgendaPage() {
   const { data: session } = useSession();
   const userRole = (session?.user as any)?.role || "ADMIN";
   const userBarberId = (session?.user as any)?.barberId;
-  const userName = session?.user?.name || "Lucas Augusto";
+  const userName = session?.user?.name || "Noah Ferreira";
   const isAdmin = userRole === "ADMIN";
 
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -35,7 +35,7 @@ export default function AgendaPage() {
   });
   const [selectedBarberFilter, setSelectedBarberFilter] = useState<string>("all");
 
-  // Disponibilidade do Dono (Lucas Augusto) - persistida no Supabase PostgreSQL
+  // Disponibilidade do Dono (Noah Ferreira) - persistida no Supabase PostgreSQL
   const [isOwnerAvailable, setIsOwnerAvailable] = useState(true);
   const [lunchBreak, setLunchBreak] = useState<string | null>(null);
   const [defaultLunchBreak, setDefaultLunchBreak] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export default function AgendaPage() {
   const [newClientEmail, setNewClientEmail] = useState("");
   const [newClientPhone, setNewClientPhone] = useState("");
   const [newServiceId, setNewServiceId] = useState(OFFICIAL_SERVICES[0].id);
-  const [newBarberId, setNewBarberId] = useState("barbeiro-lucas");
+  const [newBarberId, setNewBarberId] = useState("barbeiro-noah");
   const [newTime, setNewTime] = useState("10:00");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createErrorMsg, setCreateErrorMsg] = useState("");
@@ -67,7 +67,7 @@ export default function AgendaPage() {
   const [editingApt, setEditingApt] = useState<any | null>(null);
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
-  const [editBarberId, setEditBarberId] = useState("barbeiro-lucas");
+  const [editBarberId, setEditBarberId] = useState("barbeiro-noah");
   const [editServiceId, setEditServiceId] = useState("");
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [editSuccessMsg, setEditSuccessMsg] = useState("");
@@ -81,17 +81,17 @@ export default function AgendaPage() {
   const [cancelSuccessWhatsappUrl, setCancelSuccessWhatsappUrl] = useState<string | null>(null);
 
   const getCancelMessage = (apt: any, preset: "imprevisto" | "ajuste" | "cliente") => {
-    const barberName = BARBERS.find(b => b.id === apt.barberId)?.name.split(" ")[0] || "Lucas";
+    const barberName = BARBERS.find(b => b.id === apt.barberId)?.name.split(" ")[0] || "Noah";
     const aptTime = getDisplayTime(apt.date);
     const aptDate = apt.date ? apt.date.substring(0, 10).split("-").reverse().join("/") : selectedDate.split("-").reverse().join("/");
     const clientName = apt.user?.name || "Cliente";
 
     if (preset === "imprevisto") {
-      return `Olá, ${clientName}! Sou o ${barberName} da LAS Barber Studio. Tive um imprevisto urgente hoje e precisei cancelar o seu horário das ${aptTime} (${aptDate}). Peço sinceras desculpas pelo ocorrido! Poderíamos reagendar para um outro horário ou dia que fique bom para você?`;
+      return `Olá, ${clientName}! Sou o ${barberName} da Noah Barber Studio. Tive um imprevisto urgente hoje e precisei cancelar o seu horário das ${aptTime} (${aptDate}). Peço sinceras desculpas pelo ocorrido! Poderíamos reagendar para um outro horário ou dia que fique bom para você?`;
     } else if (preset === "ajuste") {
-      return `Olá, ${clientName}! Informamos que seu horário das ${aptTime} (${aptDate}) na LAS Barber Studio precisou ser cancelado para ajuste da nossa escala de atendimento. O horário já está liberado caso queira remarcar pelo site ou por aqui!`;
+      return `Olá, ${clientName}! Informamos que seu horário das ${aptTime} (${aptDate}) na Noah Barber Studio precisou ser cancelado para ajuste da nossa escala de atendimento. O horário já está liberado caso queira remarcar pelo site ou por aqui!`;
     } else {
-      return `Olá, ${clientName}! Confirmamos o cancelamento do seu agendamento no LAS Barber Studio para o dia ${aptDate} às ${aptTime}. Estamos à disposição para quando desejar agendar um novo atendimento!`;
+      return `Olá, ${clientName}! Confirmamos o cancelamento do seu agendamento no Noah Barber Studio para o dia ${aptDate} às ${aptTime}. Estamos à disposição para quando desejar agendar um novo atendimento!`;
     }
   };
 
@@ -139,7 +139,7 @@ export default function AgendaPage() {
       .then((res) => res.json())
       .then((data) => {
         const list = Array.isArray(data) ? data : (data?.barbers || []);
-        const owner = list.find((b: any) => b.id === "barbeiro-lucas" || b.id === "barbeiro-dono");
+        const owner = list.find((b: any) => b.id === "barbeiro-noah" || b.id === "barbeiro-dono");
         if (owner) {
           setIsOwnerAvailable(owner.isAvailable !== false);
           setLunchBreak(owner.lunchBreakTime || null);
@@ -161,7 +161,7 @@ export default function AgendaPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          barberId: "barbeiro-lucas", 
+          barberId: "barbeiro-noah", 
           isAvailable: newStatus,
           date: selectedDate 
         })
@@ -190,7 +190,7 @@ export default function AgendaPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          barberId: "barbeiro-lucas", 
+          barberId: "barbeiro-noah", 
           date: selectedDate, 
           lunchBreakTime: time,
           lunchBreakScope: scope,
@@ -264,7 +264,7 @@ export default function AgendaPage() {
     const dayStr = apt.date ? apt.date.substring(0, 10) : selectedDate;
     setEditDate(dayStr);
     setEditTime(getDisplayTime(apt.date));
-    setEditBarberId(apt.barberId || "barbeiro-lucas");
+    setEditBarberId(apt.barberId || "barbeiro-noah");
     setEditServiceId(apt.service?.id || OFFICIAL_SERVICES[0].id);
     setEditSuccessMsg("");
     setEditErrorMsg("");
@@ -326,10 +326,10 @@ export default function AgendaPage() {
       if (res.ok) {
         fetchAgenda();
         if (apt.user?.phone) {
-          const barberName = "Lucas Augusto";
+          const barberName = "Noah Ferreira";
           const newDateFormatted = apt.requestedDate ? apt.requestedDate.substring(0, 10).split("-").reverse().join("/") : "";
           const newTimeFormatted = apt.requestedDate ? getDisplayTime(apt.requestedDate) : "";
-          const msg = `Olá, ${apt.user.name}! Aqui é o ${barberName} do LAS Barber Studio. Sua solicitação de reagendamento para o dia ${newDateFormatted} às ${newTimeFormatted} foi APROVADA com sucesso! Seu horário já está garantido. Te aguardo no estúdio!`;
+          const msg = `Olá, ${apt.user.name}! Aqui é o ${barberName} do Noah Barber Studio. Sua solicitação de reagendamento para o dia ${newDateFormatted} às ${newTimeFormatted} foi APROVADA com sucesso! Seu horário já está garantido. Te aguardo no estúdio!`;
           window.open(`https://wa.me/55${apt.user.phone.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`, '_blank');
         }
       }
@@ -349,10 +349,10 @@ export default function AgendaPage() {
       if (res.ok) {
         fetchAgenda();
         if (apt.user?.phone) {
-          const barberName = "Lucas Augusto";
+          const barberName = "Noah Ferreira";
           const originalDate = apt.date ? apt.date.substring(0, 10).split("-").reverse().join("/") : "";
           const originalTime = getDisplayTime(apt.date);
-          const msg = `Olá, ${apt.user.name}! Aqui é o ${barberName} do LAS Barber Studio. Infelizmente não consegui liberar o novo horário solicitado para reagendamento. Seu horário original para o dia ${originalDate} às ${originalTime} continua ATIVO e confirmado! Se precisar de outro dia, me avise por aqui!`;
+          const msg = `Olá, ${apt.user.name}! Aqui é o ${barberName} do Noah Barber Studio. Infelizmente não consegui liberar o novo horário solicitado para reagendamento. Seu horário original para o dia ${originalDate} às ${originalTime} continua ATIVO e confirmado! Se precisar de outro dia, me avise por aqui!`;
           window.open(`https://wa.me/55${apt.user.phone.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`, '_blank');
         }
       }
@@ -382,11 +382,11 @@ export default function AgendaPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           serviceId: newServiceId,
-          barberId: newBarberId || "barbeiro-lucas",
+          barberId: newBarberId || "barbeiro-noah",
           date: fullDate,
           clientName: newClientName.trim() || "Cliente Balcão",
           clientEmail: newClientEmail.trim().toLowerCase() || null,
-          clientPhone: newClientPhone.trim() || "69993783204",
+          clientPhone: newClientPhone.trim() || "27992693638",
           isWalkIn: true,
         }),
       });
@@ -435,10 +435,10 @@ export default function AgendaPage() {
             </span>
           </div>
           <h2 className="text-3xl font-serif text-white tracking-tight">
-            Agenda do Studio • Lucas Augusto
+            Agenda do Studio • Noah Ferreira
           </h2>
           <p className="text-xs text-gray-400 mt-1">
-            Gestão privativa dos agendamentos, clientes e rituais do LAS Barber Studio.
+            Gestão privativa dos agendamentos, clientes e rituais do Noah Barber Studio.
           </p>
         </div>
 
@@ -463,13 +463,13 @@ export default function AgendaPage() {
         </div>
       </div>
 
-      {/* ━━━ CARD DO MASTER BARBER COM FOTO REAL DE LUCAS AUGUSTO ━━━ */}
+      {/* ━━━ CARD DO MASTER BARBER COM FOTO REAL DE NOAH FERREIRA ━━━ */}
       <div className="bg-gradient-to-r from-[#DFBA73]/15 via-white/[0.02] to-transparent border border-[#DFBA73]/30 rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-xl">
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-lg shadow-[#DFBA73]/25 shrink-0">
             <Image
-              src="/barbers/lucas-augusto.jpg"
-              alt="Lucas Augusto"
+              src="/barbers/noah-ferreira.jpg"
+              alt="Noah Ferreira"
               fill
               className="object-cover object-top"
               priority
@@ -493,7 +493,7 @@ export default function AgendaPage() {
               )}
             </div>
             <h4 className="text-base sm:text-lg font-serif font-bold text-white mt-1">
-              Lucas Augusto — LAS Barber Studio
+              Noah Ferreira — Noah Barber Studio
             </h4>
             <p className="text-xs text-gray-300 font-light mt-0.5">
               {isOwnerAvailable
@@ -555,7 +555,7 @@ export default function AgendaPage() {
             <p className="text-xs text-red-300 mt-0.5">
               {currentDayStatus.isClosed
                 ? currentDayStatus.reason
-                : "O estúdio está marcado como fechado nesta data por Lucas Augusto."}
+                : "O estúdio está marcado como fechado nesta data por Noah Ferreira."}
             </p>
             <p className="text-[11px] text-gray-400 mt-1">
               Clientes que acessarem o site nesta data verão o aviso oficial de fechamento.
@@ -690,7 +690,7 @@ export default function AgendaPage() {
                           {apt.user?.name || "Cliente"}
                         </h4>
                         <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#F5D799] shrink-0 font-mono">
-                          Lucas Augusto
+                          Noah Ferreira
                         </span>
                       </div>
 
@@ -724,7 +724,7 @@ export default function AgendaPage() {
                       {/* Contato direto no WhatsApp do cliente */}
                       {apt.user?.phone && (
                         <a
-                          href={`https://wa.me/55${apt.user.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá, ${apt.user.name}! Sou o Lucas da LAS Barber Studio. Confirmando seu horário para hoje às ${aptTime}!`)}`}
+                          href={`https://wa.me/55${apt.user.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá, ${apt.user.name}! Sou o Noah da Noah Barber Studio. Confirmando seu horário para hoje às ${aptTime}!`)}`}
                           target="_blank"
                           rel="noreferrer"
                           className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-black transition-all shrink-0 cursor-pointer"
@@ -956,14 +956,14 @@ export default function AgendaPage() {
                   <input 
                     required 
                     type="text" 
-                    placeholder="Ex: (69) 99378-3204"
+                    placeholder="Ex: (27) 99269-3638"
                     value={newClientPhone}
                     onChange={(e) => setNewClientPhone(e.target.value)}
                     className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-2.5 px-4 text-white text-sm focus:border-[#DFBA73] focus:outline-none font-mono"
                   />
                 </div>
 
-                {/* Barbeiro Responsável com Foto de Lucas Augusto */}
+                {/* Barbeiro Responsável com Foto de Noah Ferreira */}
                 <div>
                   <label className="block text-gray-400 text-xs uppercase tracking-wider mb-1 font-mono">
                     Barbeiro Atendente
@@ -972,14 +972,14 @@ export default function AgendaPage() {
                     <div className="flex items-center gap-3">
                       <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#DFBA73]/50 shrink-0">
                         <Image
-                          src="/barbers/lucas-augusto.jpg"
-                          alt="Lucas Augusto"
+                          src="/barbers/noah-ferreira.jpg"
+                          alt="Noah Ferreira"
                           fill
                           className="object-cover object-top"
                         />
                       </div>
                       <div>
-                        <h5 className="text-white text-sm font-medium">Lucas Augusto</h5>
+                        <h5 className="text-white text-sm font-medium">Noah Ferreira</h5>
                         <p className="text-[10px] text-[#DFBA73] font-mono">Master Barber & Fundador</p>
                       </div>
                     </div>

@@ -1,11 +1,11 @@
 import { isDateClosed } from "./barber-availability";
 
 /**
- * Calendário de Funcionamento Oficial do LAS Barber Studio.
+ * Calendário de Funcionamento Oficial do Noah Barber Studio.
  * Regras:
  * - Aberto todos os dias do ano (segunda a sábado).
  * - Fechado aos Domingos.
- * - Fechamento manual apenas quando Lucas Augusto ativa "Studio Fechado" para uma data específica.
+ * - Fechamento manual apenas quando Noah Ferreira ativa "Studio Fechado" para uma data específica.
  */
 
 export interface DayStatus {
@@ -44,14 +44,14 @@ export function checkDayStatus(dateStr: string): DayStatus {
     };
   }
 
-  // Verifica se Lucas Augusto fechou esta data específica via Dashboard ("Studio Fechado")
+  // Verifica se Noah Ferreira fechou esta data específica via Dashboard ("Studio Fechado")
   if (isDateClosed(cleanDateStr)) {
     return {
       isClosed: true,
       isSunday: false,
       isHoliday: false,
       isStudioClosed: true,
-      reason: "O estúdio estará fechado nesta data pelo Master Barber Lucas Augusto.",
+      reason: "O estúdio estará fechado nesta data pelo Master Barber Noah Ferreira.",
     };
   }
 

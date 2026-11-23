@@ -87,7 +87,7 @@ export async function GET(req: Request) {
         isSunday: false,
         isHoliday: false,
         isStudioClosed: true,
-        reason: "O estúdio estará fechado nesta data pelo Master Barber Lucas Augusto.",
+        reason: "O estúdio estará fechado nesta data pelo Master Barber Noah Ferreira.",
       });
     }
 

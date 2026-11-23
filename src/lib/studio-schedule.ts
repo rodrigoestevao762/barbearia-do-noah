@@ -95,7 +95,7 @@ export async function getDayScheduleDB(dateStr: string): Promise<ResolvedDaySche
 }
 
 /**
- * Verifica no banco se a data está fechada (Domingo ou "Studio Fechado" por Lucas Augusto).
+ * Verifica no banco se a data está fechada (Domingo ou "Studio Fechado" por Noah Ferreira).
  */
 export async function checkDayStatusDB(dateStr: string): Promise<DayStatus> {
   const baseStatus = checkDayStatus(dateStr);
@@ -110,7 +110,7 @@ export async function checkDayStatusDB(dateStr: string): Promise<DayStatus> {
       isSunday: false,
       isHoliday: false,
       isStudioClosed: true,
-      reason: "O estúdio estará fechado nesta data pelo Master Barber Lucas Augusto.",
+      reason: "O estúdio estará fechado nesta data pelo Master Barber Noah Ferreira.",
     };
   }
 
