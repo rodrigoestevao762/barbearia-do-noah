@@ -1,19 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #08090C;
-  --foreground: #F4F6F8;
-  --noah-obsidian: #08090C;
-  --noah-carbon: #0E1117;
-  --noah-surface: #141720;
-  --noah-bronze: #C5A880;
-  --noah-bronze-light: #E2CCA6;
-  --noah-bronze-dark: #8F6B38;
-  --noah-cognac: #C67D38;
-  --noah-led: #E6EDF5;
-  --gold: #C5A880;
-  --gold-light: #E2CCA6;
-  --gold-dark: #8F6B38;
+  --background: #050608;
+  --foreground: #ffffff;
+  --gold-light: #F5D799;
+  --gold: #DFBA73;
+  --gold-dark: #B88B38;
 }
 
 @theme inline {
@@ -22,8 +14,6 @@
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-gold-dark: var(--gold-dark);
-  --color-bronze: var(--noah-bronze);
-  --color-cognac: var(--noah-cognac);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
 }
@@ -45,7 +35,7 @@ html {
   width: 100% !important;
 }
 
-/* Previne zoom automático invasivo do iOS Safari e Android */
+/* Previne zoom automático invasivo do iOS Safari e Android e remove delay de toque ao focar inputs */
 @media screen and (max-width: 768px) {
   input, select, textarea {
     font-size: 16px !important;
@@ -53,59 +43,31 @@ html {
   }
 }
 
-/* Efeito Glow Bronze Noah */
-.bronze-glow {
-  box-shadow: 0 0 25px rgba(197, 168, 128, 0.22), 0 10px 40px -10px rgba(0, 0, 0, 0.9);
-}
-
-.bronze-glow-subtle {
-  box-shadow: 0 0 15px rgba(197, 168, 128, 0.12);
-}
-
-.bronze-border-glow {
-  border-color: rgba(197, 168, 128, 0.35);
-}
-
-.bronze-text-glow {
-  text-shadow: 0 0 20px rgba(197, 168, 128, 0.4);
-}
-
-/* Fundo sutil de malha hexagonal (inspirado na iluminação física do estúdio) */
-.bg-hex-grid {
-  background-image: radial-gradient(rgba(197, 168, 128, 0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-
-/* Hexágono formatado em CSS */
-.hexagon-shape {
-  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-}
-
-/* Brilho dourado direto legado */
+/* Brilho dourado direto e contínuo até na versão PC (Desktop) */
 .card-glow-direct {
-  border-color: rgba(197, 168, 128, 0.45) !important;
-  box-shadow: 0 12px 40px -5px rgba(0, 0, 0, 0.8), 0 0 25px rgba(197, 168, 128, 0.2) !important;
+  border-color: rgba(223, 186, 115, 0.45) !important;
+  box-shadow: 0 12px 40px -5px rgba(0, 0, 0, 0.8), 0 0 25px rgba(223, 186, 115, 0.18) !important;
 }
 
 .gold-border-direct {
-  border-color: rgba(197, 168, 128, 0.4) !important;
+  border-color: rgba(223, 186, 115, 0.4) !important;
 }
 
 .gold-text-glow {
-  text-shadow: 0 0 18px rgba(197, 168, 128, 0.45);
+  text-shadow: 0 0 18px rgba(223, 186, 115, 0.45);
 }
 
-/* Custom scrollbar styling no tom Champagne Bronze do Noah */
+/* Custom scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #08090C;
+  background: #050608;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C5A880;
+  background: #DFBA73;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #E2CCA6;
+  background: #F5D799;
 }

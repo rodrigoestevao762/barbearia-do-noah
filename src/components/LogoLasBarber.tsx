@@ -13,7 +13,7 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
   className = "",
   variant = "horizontal",
 }) => {
-  // Se for emblem ou monogram: exibe o logo oficial com acabamento bronze e sombra
+  // Se for emblem ou monogram: exibe o logo oficial com acabamento ouro e sombra
   if (variant === "monogram" || variant === "emblem") {
     return (
       <div 
@@ -26,7 +26,7 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
           width={size}
           height={size}
           priority
-          className="object-cover w-full h-full drop-shadow-[0_4px_20px_rgba(197,168,128,0.3)]"
+          className="object-cover w-full h-full drop-shadow-[0_4px_16px_rgba(223,186,115,0.25)]"
         />
       </div>
     );
@@ -36,7 +36,7 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
   return (
     <div className={`inline-flex items-center gap-3 select-none ${className}`}>
       <div 
-        className="relative inline-flex items-center justify-center shrink-0 rounded-xl overflow-hidden shadow-md shadow-black/60 border border-[#C5A880]/40"
+        className="relative inline-flex items-center justify-center shrink-0 rounded-xl overflow-hidden shadow-md shadow-black/50 border border-[#DFBA73]/30"
         style={{ width: size, height: size }}
       >
         <Image
@@ -49,10 +49,10 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
         />
       </div>
       <div className="flex flex-col text-left justify-center">
-        <span className="text-base sm:text-lg md:text-xl font-serif tracking-[0.2em] text-white uppercase font-bold leading-tight group-hover:text-[#E2CCA6] transition-colors">
+        <span className="text-base sm:text-lg md:text-xl font-serif tracking-[0.22em] text-white uppercase font-bold leading-tight group-hover:text-[#F5D799] transition-colors">
           NOAH BARBER STUDIO
         </span>
-        <span className="text-[9px] md:text-[10px] font-mono tracking-[0.34em] text-[#C5A880] uppercase font-bold leading-tight mt-0.5">
+        <span className="text-[9px] md:text-[10px] font-mono tracking-[0.32em] text-[#DFBA73] uppercase font-bold leading-tight mt-0.5">
           ATENDIMENTO EXCLUSIVO
         </span>
       </div>
