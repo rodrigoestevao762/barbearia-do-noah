@@ -13,57 +13,36 @@ const GALLERY_VIDEOS = [
   {
     src: "/studio/video-1.mp4",
     poster: "/studio/hero-1.jpg",
-    label: "Atendimento em Ação",
-    title: "Visagismo & Corte de Precisão",
-    desc: "Noah Ferreira e Adrian Santos esculpindo estilos únicos sob as luminárias hexagonais.",
     col: "col-span-1 md:col-span-2 row-span-1",
   },
   {
     src: "/studio/video-2.mp4",
     poster: "/studio/hero-2.jpg",
-    label: "O Estúdio",
-    title: "Estrutura & Iluminação",
-    desc: "Teto hexagonal de 6000K, bancadas modernas e piso marmorizado Nero Marquina.",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-3.mp4",
     poster: "/studio/hero-3.jpg",
-    label: "Ritual Completo",
-    title: "Barboterapia & Toalha Quente",
-    desc: "Toalha aquecida, vapor de ozônio e massagem facial para relaxamento absoluto.",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-4.mp4",
     poster: "/studio/hero-1.jpg",
-    label: "Alta Fidelidade",
-    title: "Acabamento Cirúrgico",
-    desc: "Alinhamento das linhas da nuca, costeletas e barba com navalha descartável.",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-5.mp4",
     poster: "/studio/hero-2.jpg",
-    label: "Styling Masculino",
-    title: "Finalização & Textura",
-    desc: "Pomadas e óleos de alta performance para fixação com aspecto natural.",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-6.mp4",
     poster: "/studio/hero-3.jpg",
-    label: "Conforto & Recepção",
-    title: "Espaço 100% Climatizado",
-    desc: "Poltronas confortáveis, cantinho do café e pontualidade no atendimento.",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-7.mp4",
     poster: "/studio/hero-1.jpg",
-    label: "Experiência VIP",
-    title: "O Padrão Noah Barber Studio",
-    desc: "Respeito ao seu estilo e ao seu tempo em Morada de Laranjeiras, Serra - ES.",
     col: "col-span-1 row-span-1",
   },
 ];
@@ -76,13 +55,9 @@ const HORARIOS = [
 // Card de Avaliação no Google (Google Reviews - Modelo Mr. Bastos)
 function GoogleReviewCard() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50, scale: 0.96 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      className="relative overflow-hidden rounded-2xl col-span-1 row-span-1 border border-[#DFBA73]/30 bg-gradient-to-br from-white/[0.04] via-[#DFBA73]/[0.06] to-transparent p-6 flex flex-col justify-between shadow-2xl group hover:border-[#DFBA73]/60 transition-all duration-500"
-      style={{ minHeight: 250 }}
+    <div
+      className="relative overflow-hidden rounded-2xl col-span-1 row-span-1 border border-[#DFBA73]/30 bg-gradient-to-br from-white/[0.04] via-[#DFBA73]/[0.06] to-transparent p-6 flex flex-col justify-between shadow-2xl group hover:border-[#DFBA73]/60 transition-all duration-300"
+      style={{ minHeight: 260 }}
     >
       <div className="absolute top-0 right-0 w-32 h-32 bg-[#DFBA73]/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -114,14 +89,13 @@ function GoogleReviewCard() {
         <span>Ver 26 Avaliações no Google</span>
         <ExternalLink className="w-3.5 h-3.5" />
       </a>
-    </motion.div>
+    </div>
   );
 }
 
-// Card de Vídeo com Reprodução Contínua Fluida e Efeito Hover
+// Card de Vídeo com IntersectionObserver para evitar pulos e tela preta no celular
 function GalleryCard({
   item,
-  index,
 }: {
   item: (typeof GALLERY_VIDEOS)[0];
   index: number;
@@ -130,75 +104,73 @@ function GalleryCard({
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {});
-    }
+    const video = videoRef.current;
+    if (!video) return;
+
+    // IntersectionObserver: toca APENAS quando o vídeo estiver visível na tela
+    // Isso evita tela preta, pulos de layout e sobrecarga de decodificador no celular
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50, scale: 0.96 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.8, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+    <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`group relative overflow-hidden rounded-2xl cursor-pointer ${item.col} border border-white/10 hover:border-[#DFBA73]/50 transition-all duration-500 shadow-2xl bg-black`}
+      className={`group relative overflow-hidden rounded-2xl cursor-pointer ${item.col} border border-white/10 hover:border-[#DFBA73]/50 transition-colors duration-300 shadow-2xl bg-[#080A0E]`}
       style={{
-        minHeight: item.col.includes("col-span-2") ? 290 : 250,
+        minHeight: item.col.includes("col-span-2") ? 320 : 260,
       }}
     >
       <video
         ref={videoRef}
         src={item.src}
         poster={item.poster || "/studio/hero-1.jpg"}
-        autoPlay
         loop
         muted
         playsInline
         preload="metadata"
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* Gradiente escuro para legibilidade do texto */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#050608]/95 via-[#050608]/40 to-transparent pointer-events-none" />
+      {/* Gradiente sutil inferior para estética limpa */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#050608]/80 via-transparent to-transparent pointer-events-none" />
 
       {/* Brilho dourado ao passar o mouse */}
-      <motion.div
-        animate={{ opacity: hovered ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
-        className="absolute inset-0 bg-gradient-to-br from-[#DFBA73]/15 via-transparent to-transparent pointer-events-none"
+      <div
+        className={`absolute inset-0 bg-gradient-to-br from-[#DFBA73]/15 via-transparent to-transparent pointer-events-none transition-opacity duration-300 ${
+          hovered ? "opacity-100" : "opacity-0"
+        }`}
       />
 
       {/* Linha dourada inferior */}
-      <motion.div
-        animate={{ scaleX: hovered ? 1 : 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#DFBA73] to-transparent origin-left pointer-events-none"
+      <div
+        className={`absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#DFBA73] to-transparent origin-left transition-opacity duration-300 pointer-events-none ${
+          hovered ? "opacity-100" : "opacity-0"
+        }`}
       />
 
-      {/* Texto descritivo sobre o vídeo */}
-      <div className="absolute bottom-0 left-0 w-full p-5 md:p-6 pointer-events-none">
-        <motion.p
-          animate={{ y: hovered ? 0 : 4, opacity: hovered ? 1 : 0.9 }}
-          transition={{ duration: 0.3 }}
-          className="text-[#DFBA73] text-[10px] uppercase tracking-[0.3em] mb-1 font-semibold font-mono flex items-center gap-1.5"
-        >
+      {/* Selo minimalista no rodapé do vídeo */}
+      <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
+        <span className="text-[10px] font-mono tracking-widest uppercase text-[#DFBA73] bg-black/70 px-3 py-1 rounded-full border border-white/10 backdrop-blur-md flex items-center gap-1.5 shadow-md">
           <span className="w-1.5 h-1.5 rounded-full bg-[#DFBA73] animate-pulse"></span>
-          <span>{item.label}</span>
-        </motion.p>
-        <h3 className="text-white font-serif text-xl leading-tight group-hover:text-[#F5D799] transition-colors">
-          {item.title}
-        </h3>
-        <motion.p
-          animate={{ y: hovered ? 0 : 6, opacity: hovered ? 1 : 0.85 }}
-          transition={{ duration: 0.3, delay: 0.05 }}
-          className="text-gray-300 text-xs sm:text-sm mt-1 font-light leading-relaxed line-clamp-2"
-        >
-          {item.desc}
-        </motion.p>
+          <span>NOAH BARBER STUDIO</span>
+        </span>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
