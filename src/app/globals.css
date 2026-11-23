@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050608;
+  --background: #060709;
   --foreground: #ffffff;
-  --gold-light: #F5D799;
+  --gold-light: #F7DF9E;
   --gold: #DFBA73;
   --gold-dark: #B88B38;
+  --gold-vibrant: #E5B842;
 }
 
 @theme inline {
@@ -14,6 +15,7 @@
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-gold-dark: var(--gold-dark);
+  --color-gold-vibrant: var(--gold-vibrant);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
 }
@@ -46,7 +48,7 @@ html {
 /* Brilho dourado direto e contínuo até na versão PC (Desktop) */
 .card-glow-direct {
   border-color: rgba(223, 186, 115, 0.45) !important;
-  box-shadow: 0 12px 40px -5px rgba(0, 0, 0, 0.8), 0 0 25px rgba(223, 186, 115, 0.18) !important;
+  box-shadow: 0 12px 40px -5px rgba(0, 0, 0, 0.8), 0 0 25px rgba(223, 186, 115, 0.22) !important;
 }
 
 .gold-border-direct {
@@ -62,12 +64,12 @@ html {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #050608;
+  background: #060709;
 }
 ::-webkit-scrollbar-thumb {
   background: #DFBA73;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #F5D799;
+  background: #F7DF9E;
 }

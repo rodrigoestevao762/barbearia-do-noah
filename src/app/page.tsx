@@ -14,8 +14,8 @@ import FloatingSocialButtons from "@/components/FloatingSocialButtons";
 // --- FOTOS AUTÊNTICAS DO NOAH BARBER STUDIO ---
 const HERO_IMAGES = [
   "/studio/hero-1.jpg",
-  "/studio/hero-2.webp",
-  "/studio/hero-3.webp",
+  "/studio/hero-2.jpg",
+  "/studio/hero-3.jpg",
 ];
 
 // --- CARDS DE DESTAQUE (MODELO MR BASTOS COM DADOS DO NOAH) ---
@@ -26,7 +26,7 @@ const SERVICES_HIGHLIGHT = [
     price: "R$ 45", 
     desc: "Corte na tesoura ou máquina com acabamento na navalha, alinhamento milimétrico e estilo autêntico.", 
     badge: "O Clássico",
-    img: "/studio/hero-2.webp" 
+    img: "/studio/hero-2.jpg" 
   },
   { 
     id: "corte-barba",
@@ -42,7 +42,7 @@ const SERVICES_HIGHLIGHT = [
     price: "R$ 140", 
     desc: "Experiência completa VIP: corte, barba na toalha quente, pigmentação, sobrancelha e ozonioterapia relaxante.", 
     badge: "Experiência VIP",
-    img: "/studio/hero-3.webp" 
+    img: "/studio/hero-3.jpg" 
   }
 ];
 
@@ -551,6 +551,7 @@ export default function Home() {
                 }`}
                 style={{
                   backgroundImage: `url(${img})`,
+                  backgroundPosition: "center 35%",
                   transform: "translate3d(0, 0, 0)",
                   backfaceVisibility: "hidden",
                   WebkitBackfaceVisibility: "hidden",
@@ -559,7 +560,8 @@ export default function Home() {
             );
           })}
           {/* Vinheta Cinematográfica de Luxo */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#050608]/40 via-transparent to-[#050608]/90 pointer-events-none z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#060709]/50 via-transparent to-[#060709]/90 pointer-events-none z-10" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(6,7,9,0.7)_100%)] pointer-events-none z-10" />
         </motion.div>
 
         {/* Textos Centrais com Máscara e Brilho Impecável */}

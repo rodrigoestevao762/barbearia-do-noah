@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 
 // Fotos Oficiais dos Atendimentos no Noah Barber Studio
 const EXPERIENCIA_IMAGES = [
-  "/studio/hero-2.webp", // Corte de Alta Precisão no Espelho Iluminado
-  "/studio/hero-1.jpg",  // Estúdio com Iluminação Hexagonal e Bancada
+  "/studio/hero-1.jpg",  // Atendimento em ação sob iluminação hexagonal
+  "/studio/hero-2.jpg",  // Estúdio com iluminação hexagonal e bancadas
 ];
 
 export default function ExperienciaSection() {
