@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
-import { MapPin, Clock, ChevronRight, Star, ExternalLink, Sparkles, Scissors, Calendar } from "lucide-react";
+import { MapPin, Clock, ChevronRight, Star, ExternalLink, Scissors, Calendar } from "lucide-react";
 import { BARBERS } from "@/lib/barbers";
 
 const GOOGLE_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Noah+Barber+Studio+Av+Paulo+Pereira+Gomes+281+Morada+de+Laranjeiras+Serra+ES";
@@ -11,75 +11,68 @@ const GOOGLE_REVIEW_URL = "https://www.google.com/search?q=Barbearia+do+Noah&cli
 const GALLERY_PHOTOS = [
   {
     src: "/studio/hero-1.jpg",
-    label: "O Espaço",
-    desc: "Design contemporâneo com iluminação hexagonal e piso marmorizado.",
-    col: "col-span-2 row-span-1",
+    label: "Iluminação Hexagonal LED",
+    desc: "Matriz geométrica de 6000K que elimina sombras nas têmporas e nuca.",
+    col: "col-span-1 md:col-span-2 row-span-1",
   },
   {
     src: "/studio/hero-2.webp",
-    label: "A Maestria",
-    desc: "Cortes de precisão e visagismo individualizado.",
+    label: "Visagismo no Espelho em Arco",
+    desc: "Halo de iluminação indireta que valoriza a silhueta e o contorno facial.",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/hero-3.webp",
-    label: "Cantinho do Café",
-    desc: "Estrutura climatizada e confortável para você relaxar.",
+    label: "Cantinho do Café & Espera",
+    desc: "Espaço climatizado com poltronas confortáveis e café especial.",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/hero-1.jpg",
-    label: "Nossa Casa",
-    desc: "Cadeiras de alto padrão, espelho com iluminação em arco e assepsia total.",
+    label: "Piso Nero Marquina & Poltrona Cognac",
+    desc: "Mármore preto polido reflexivo e couro caramelo ergonômico.",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/hero-2.webp",
-    label: "O Resultado",
-    desc: "Linhas cirúrgicas, acabamento fino e cliente satisfeito.",
-    col: "col-span-1 row-span-1",
-  },
-  {
-    src: "/studio/hero-3.webp",
-    label: "Nossa Estrutura",
-    desc: "Produtos de primeira linha, recepção acolhedora e pontualidade.",
-    col: "col-span-2 row-span-1",
+    label: "Acabamento Cirúrgico",
+    desc: "Lâminas descartáveis, toalha aquecida e assepsia completa.",
+    col: "col-span-1 md:col-span-2 row-span-1",
   },
 ];
 
 const HORARIOS = [
-  { dia: "Segunda – Sábado", hora: "09:00 – 20:00" },
+  { dia: "Segunda a Sábado", hora: "09:00 – 20:00" },
   { dia: "Domingo", hora: "Fechado" },
 ];
 
-// Card de Avaliação no Google (Google Reviews - Modelo Mr. Bastos)
 function GoogleReviewCard() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 60, scale: 0.96 }}
+      initial={{ opacity: 0, y: 40, scale: 0.98 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      className="relative overflow-hidden rounded-2xl col-span-1 row-span-1 border border-[#DFBA73]/30 bg-gradient-to-br from-white/[0.04] via-[#DFBA73]/[0.05] to-transparent p-6 flex flex-col justify-between shadow-2xl group hover:border-[#DFBA73]/60 transition-all duration-500"
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+      className="relative overflow-hidden rounded-2xl col-span-1 row-span-1 border border-[#C5A880]/35 bg-gradient-to-br from-[#0E1117] via-[#141720] to-[#08090C] p-6 flex flex-col justify-between shadow-2xl group hover:border-[#C5A880]/60 transition-all duration-300"
       style={{ minHeight: 220 }}
     >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-[#DFBA73]/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#C5A880]/10 rounded-full blur-2xl pointer-events-none" />
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1 text-[#DFBA73]">
+          <div className="flex items-center gap-1 text-[#C5A880]">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-4 h-4 fill-[#DFBA73] text-[#DFBA73]" />
+              <Star key={i} className="w-4 h-4 fill-[#C5A880] text-[#C5A880]" />
             ))}
           </div>
-          <span className="text-[11px] font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
-            5.0 ★ (26)
+          <span className="text-[11px] font-mono font-bold text-[#E2CCA6] bg-[#C5A880]/15 px-2.5 py-0.5 rounded-full border border-[#C5A880]/30">
+            5.0 ★ no Google
           </span>
         </div>
 
-        <h3 className="text-white font-serif text-xl leading-tight">Avaliações no Google</h3>
-        <p className="text-gray-300 text-xs mt-1.5 font-light leading-relaxed">
-          &quot;Ótimo cabeleireiro, atencioso e excelente profissional. O Noah manda muito bem no corte e barba.&quot;
+        <h3 className="text-white font-serif text-xl leading-tight">Avaliações Reais</h3>
+        <p className="text-gray-300 text-xs mt-2 font-light leading-relaxed">
+          &quot;Ótimo cabeleireiro, atencioso e excelente profissional. O Noah manda muito bem no corte e barba, ambiente de alto padrão.&quot;
         </p>
       </div>
 
@@ -87,7 +80,7 @@ function GoogleReviewCard() {
         href={GOOGLE_REVIEW_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-4 w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#DFBA73]/20 hover:brightness-110 active:scale-[0.99] transition-all font-mono"
+        className="mt-4 w-full bg-gradient-to-r from-[#E2CCA6] via-[#C5A880] to-[#8F6B38] text-black py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 bronze-glow hover:brightness-110 active:scale-[0.99] transition-all font-mono"
       >
         <Star className="w-3.5 h-3.5 fill-black" />
         <span>Ver 26 Avaliações no Google</span>
@@ -108,50 +101,40 @@ function GalleryCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 60, scale: 0.96 }}
+      initial={{ opacity: 0, y: 40, scale: 0.98 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.9, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.8, delay: index * 0.08 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`relative overflow-hidden rounded-2xl cursor-pointer ${item.col} border border-white/5 hover:border-[#DFBA73]/40 transition-colors`}
+      className={`relative overflow-hidden rounded-2xl cursor-pointer ${item.col} border border-white/[0.06] hover:border-[#C5A880]/50 transition-all shadow-xl`}
       style={{
-        minHeight: item.col.includes("row-span-2") ? 500 : item.col.includes("col-span-2") ? 250 : 220,
+        minHeight: item.col.includes("row-span-2") ? 480 : item.col.includes("col-span-2") ? 260 : 220,
       }}
     >
       <motion.div
-        animate={{ scale: hovered ? 1.07 : 1 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        animate={{ scale: hovered ? 1.05 : 1 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${item.src})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#050608]/90 via-[#050608]/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#08090C]/90 via-[#08090C]/35 to-transparent" />
+      
       <motion.div
         animate={{ opacity: hovered ? 1 : 0 }}
-        transition={{ duration: 0.4 }}
-        className="absolute inset-0 bg-gradient-to-br from-[#DFBA73]/15 via-transparent to-transparent pointer-events-none"
+        transition={{ duration: 0.3 }}
+        className="absolute inset-0 bg-gradient-to-br from-[#C5A880]/15 via-transparent to-transparent pointer-events-none"
       />
-      <motion.div
-        animate={{ scaleX: hovered ? 1 : 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#DFBA73] to-transparent origin-left"
-      />
+      
       <div className="absolute bottom-0 left-0 w-full p-5 md:p-6">
-        <motion.p
-          animate={{ y: hovered ? 0 : 6, opacity: hovered ? 1 : 0 }}
-          transition={{ duration: 0.35 }}
-          className="text-[#DFBA73] text-[10px] uppercase tracking-[0.3em] mb-1 font-semibold font-mono"
-        >
-          {item.label}
-        </motion.p>
+        <p className="text-[#C5A880] text-[10px] uppercase tracking-[0.25em] mb-1 font-semibold font-mono flex items-center gap-1.5">
+          <span>⬡</span>
+          <span>{item.label}</span>
+        </p>
         <h3 className="text-white font-serif text-xl leading-tight">{item.label}</h3>
-        <motion.p
-          animate={{ y: hovered ? 0 : 10, opacity: hovered ? 1 : 0 }}
-          transition={{ duration: 0.35, delay: 0.05 }}
-          className="text-gray-300 text-sm mt-1 font-light"
-        >
+        <p className="text-gray-300 text-xs sm:text-sm mt-1 font-light leading-relaxed">
           {item.desc}
-        </motion.p>
+        </p>
       </div>
     </motion.div>
   );
@@ -168,54 +151,56 @@ export default function NossaAreaSection({
     offset: ["start end", "end start"],
   });
 
-  const titleY = useTransform(scrollYProgress, [0, 0.35], [50, 0]);
+  const titleY = useTransform(scrollYProgress, [0, 0.35], [40, 0]);
   const titleOpacity = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
 
   return (
     <section
       ref={sectionRef}
       id="nossa-area"
-      className="relative bg-[#02050A] py-28 md:py-40 px-5 md:px-12 lg:px-24 overflow-hidden border-t border-white/5"
+      className="relative bg-[#08090C] py-24 md:py-36 px-5 md:px-12 lg:px-24 overflow-hidden border-t border-white/[0.04]"
     >
-      {/* Luzes atmosféricas douradas */}
-      <div className="absolute -top-60 -left-40 w-[600px] h-[600px] bg-[#DFBA73]/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-[#DFBA73]/7 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute left-5 md:left-12 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-white/5 to-transparent" />
+      {/* Luzes atmosféricas champagne bronze */}
+      <div className="absolute -top-60 -left-40 w-[600px] h-[600px] bg-[#C5A880]/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-[#C5A880]/5 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* ── HEADER ── */}
+      {/* HEADER DA SEÇÃO */}
       <div className="max-w-7xl mx-auto mb-16 md:mb-20">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-12">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10">
 
-          {/* Título */}
+          {/* Título & Proposta */}
           <motion.div style={{ y: titleY, opacity: titleOpacity }} className="flex-1">
-            <p className="text-[#DFBA73] uppercase tracking-[0.45em] text-xs font-semibold flex items-center gap-3 mb-8 font-mono">
-              <span className="w-8 h-[1px] bg-[#DFBA73]" />
-              O Estúdio & Localização
+            <p className="text-[#C5A880] uppercase tracking-[0.45em] text-xs font-semibold flex items-center gap-3 mb-4 font-mono">
+              <span className="w-8 h-[1px] bg-[#C5A880]" />
+              <span>⬡ O Estúdio & Localização</span>
             </p>
 
-            <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif text-white tracking-tight leading-[1.05]">
-              Ambiente <br />
-              <span className="italic text-[#DFBA73]">Exclusivo</span> e Confortável
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-serif text-white tracking-tight leading-[1.08]">
+              Arquitetura <br />
+              <span className="italic text-[#C5A880]">Cyber-Luxury</span> e Conforto
             </h2>
+            <p className="text-gray-300 font-light text-base md:text-lg max-w-xl mt-4 leading-relaxed">
+              Cada detalhe do Noah Barber Studio foi construído para criar uma atmosfera moderna, privativa e acolhedora em Morada de Laranjeiras.
+            </p>
           </motion.div>
 
           {/* Horários & Endereço */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col sm:flex-row lg:flex-col gap-6 lg:min-w-[320px]"
+            transition={{ duration: 0.8 }}
+            className="flex flex-col sm:flex-row lg:flex-col gap-5 lg:min-w-[340px]"
           >
             {/* Horários */}
-            <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md flex-1">
-              <div className="flex items-center gap-2.5 text-[#DFBA73] text-xs font-mono uppercase tracking-widest font-semibold mb-4">
+            <div className="p-6 rounded-2xl bg-[#0E1117] border border-white/[0.06] backdrop-blur-md flex-1">
+              <div className="flex items-center gap-2.5 text-[#C5A880] text-xs font-mono uppercase tracking-widest font-semibold mb-3">
                 <Clock className="w-4 h-4" />
                 <span>Horário de Funcionamento</span>
               </div>
               <div className="space-y-2">
                 {HORARIOS.map((h) => (
-                  <div key={h.dia} className="flex justify-between items-center text-sm py-1 border-b border-white/5 last:border-0">
+                  <div key={h.dia} className="flex justify-between items-center text-sm py-1 border-b border-white/[0.04] last:border-0">
                     <span className="text-gray-400 font-light">{h.dia}</span>
                     <span className="text-white font-mono font-semibold">{h.hora}</span>
                   </div>
@@ -224,10 +209,10 @@ export default function NossaAreaSection({
             </div>
 
             {/* Endereço */}
-            <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md flex-1">
-              <div className="flex items-center gap-2.5 text-[#DFBA73] text-xs font-mono uppercase tracking-widest font-semibold mb-2">
+            <div className="p-6 rounded-2xl bg-[#0E1117] border border-white/[0.06] backdrop-blur-md flex-1">
+              <div className="flex items-center gap-2.5 text-[#C5A880] text-xs font-mono uppercase tracking-widest font-semibold mb-2">
                 <MapPin className="w-4 h-4" />
-                <span>Localização</span>
+                <span>Localização Oficial</span>
               </div>
               <p className="text-white text-sm font-medium leading-relaxed">
                 Av. Paulo Pereira Gomes, 281 - Loja 9
@@ -239,9 +224,9 @@ export default function NossaAreaSection({
                 href={GOOGLE_MAPS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-[#DFBA73] hover:text-white mt-3 transition-colors font-mono font-semibold"
+                className="inline-flex items-center gap-1.5 text-xs text-[#C5A880] hover:text-white mt-3 transition-colors font-mono font-semibold"
               >
-                <span>Abrir no Google Maps</span>
+                <span>Traçar rota no Google Maps</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </a>
             </div>
@@ -250,8 +235,8 @@ export default function NossaAreaSection({
         </div>
       </div>
 
-      {/* ── GRID DE FOTOS & AVALIAÇÃO (MODELO MR BASTOS) ── */}
-      <div className="max-w-7xl mx-auto mb-16 md:mb-20">
+      {/* GRID DE FOTOS & GOOGLE REVIEWS */}
+      <div className="max-w-7xl mx-auto mb-20 md:mb-28">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <GalleryCard item={GALLERY_PHOTOS[0]} index={0} />
           <GalleryCard item={GALLERY_PHOTOS[1]} index={1} />
@@ -259,56 +244,23 @@ export default function NossaAreaSection({
           <GalleryCard item={GALLERY_PHOTOS[2]} index={2} />
           <GalleryCard item={GALLERY_PHOTOS[3]} index={3} />
           <GalleryCard item={GALLERY_PHOTOS[4]} index={4} />
-          <GalleryCard item={GALLERY_PHOTOS[5]} index={5} />
         </div>
-
-        {/* Faixa editorial */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-14 flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-t border-b border-white/[0.06] py-7"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-12">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.35em] text-gray-500 mb-1 font-mono">Especialidade</p>
-              <p className="text-white font-serif text-2xl">Corte & Barba</p>
-            </div>
-            <div className="hidden sm:block w-[1px] h-8 bg-white/10" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.35em] text-gray-500 mb-1 font-mono">Atendimento</p>
-              <p className="text-white font-serif text-2xl">Seg – Sáb</p>
-            </div>
-            <div className="hidden sm:block w-[1px] h-8 bg-white/10" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.35em] text-gray-500 mb-1 font-mono">Experiência</p>
-              <p className="text-white font-serif text-2xl">Exclusiva</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 max-w-xs">
-            <div className="w-10 h-[1px] bg-[#DFBA73]/50 shrink-0" />
-            <p className="text-gray-300 text-sm font-light italic leading-snug">
-              &quot;Não fazemos apenas cortes. Valorizamos a sua identidade.&quot;
-            </p>
-          </div>
-        </motion.div>
       </div>
 
-      {/* ── NOSSA EQUIPE (MODELO MR BASTOS COM RETRATOS OFICIAIS) ── */}
-      <div id="equipe" className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+      {/* EQUIPE DE BARBEIROS OFICIAL DO NOAH BARBER STUDIO */}
+      <div id="equipe" className="max-w-7xl mx-auto pt-6 border-t border-white/[0.06]">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
           <div>
-            <p className="text-[#DFBA73] uppercase tracking-[0.45em] text-xs font-semibold flex items-center gap-3 mb-3 font-mono">
-              <span className="w-8 h-[1px] bg-[#DFBA73]" />
-              Equipe Profissional
+            <p className="text-[#C5A880] uppercase tracking-[0.45em] text-xs font-semibold flex items-center gap-3 mb-3 font-mono">
+              <span className="w-8 h-[1px] bg-[#C5A880]" />
+              <span>⬡ Equipe Profissional</span>
             </p>
-            <h3 className="text-3xl md:text-4xl font-serif text-white leading-tight">
-              Conheça Nossa <span className="text-[#DFBA73]">Equipe</span>
+            <h3 className="text-3xl md:text-5xl font-serif text-white leading-tight">
+              Os Barbeiros do <span className="text-[#C5A880]">Estúdio</span>
             </h3>
           </div>
-          <p className="text-gray-400 text-sm font-light max-w-md">
-            Profissionais dedicados a entregar alta precisão na tesoura, degradê impecável, barboterapia e visagismo sob medida em Serra - ES.
+          <p className="text-gray-400 text-sm font-light max-w-md leading-relaxed">
+            Profissionais dedicados a entregar alta precisão na tesoura, degradê navalhado, barboterapia e visagismo sob medida em Serra - ES.
           </p>
         </div>
 
@@ -318,13 +270,13 @@ export default function NossaAreaSection({
             return (
               <motion.article
                 key={barber.id}
-                initial={{ opacity: 0, y: 36 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.75, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative rounded-3xl overflow-hidden border border-white/10 bg-[#050608] hover:border-[#DFBA73]/50 transition-all duration-500 shadow-2xl flex flex-col"
+                viewport={{ once: true }}
+                transition={{ duration: 0.75, delay: idx * 0.15 }}
+                className="group relative rounded-3xl overflow-hidden border border-white/[0.08] bg-[#0E1117] hover:border-[#C5A880]/50 transition-all duration-300 shadow-2xl flex flex-col"
               >
-                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#080A0E]">
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#141720]">
                   <img
                     src={barber.avatar}
                     alt={`${barber.name} - Noah Barber Studio`}
@@ -333,13 +285,14 @@ export default function NossaAreaSection({
                     loading="lazy"
                     className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-[#050608]/20 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E1117] via-[#0E1117]/25 to-transparent pointer-events-none" />
+                  
                   <div className="absolute top-4 left-4 z-10">
                     <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md border font-mono ${
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md border font-mono ${
                         isOwner
-                          ? "bg-gradient-to-r from-[#F5D799] to-[#DFBA73] text-black border-[#DFBA73]/50 shadow-lg shadow-[#DFBA73]/20"
-                          : "bg-[#050608]/80 text-[#DFBA73] border-[#DFBA73]/40"
+                          ? "bg-gradient-to-r from-[#E2CCA6] to-[#C5A880] text-black border-[#C5A880]/50 shadow-lg shadow-[#C5A880]/20"
+                          : "bg-[#08090C]/80 text-[#E2CCA6] border-[#C5A880]/40"
                       }`}
                     >
                       <Scissors className="w-3 h-3" />
@@ -348,15 +301,15 @@ export default function NossaAreaSection({
                   </div>
                 </div>
 
-                <div className="p-6 flex-1 flex flex-col justify-between gap-4 -mt-6 relative z-10">
+                <div className="p-7 flex-1 flex flex-col justify-between gap-5 -mt-6 relative z-10">
                   <div>
-                    <h4 className="text-2xl font-serif text-white group-hover:text-[#F5D799] transition-colors">
+                    <h4 className="text-2xl font-serif text-white group-hover:text-[#E2CCA6] transition-colors">
                       {barber.name}
                     </h4>
-                    <p className="text-xs font-semibold text-[#DFBA73] mt-1 font-mono">
+                    <p className="text-xs font-semibold text-[#C5A880] mt-1 font-mono">
                       {barber.specialty}
                     </p>
-                    <p className="text-xs text-gray-300 font-light leading-relaxed mt-2.5">
+                    <p className="text-xs text-gray-300 font-light leading-relaxed mt-3">
                       {barber.bio}
                     </p>
                   </div>
@@ -365,7 +318,7 @@ export default function NossaAreaSection({
                     <button
                       type="button"
                       onClick={() => onSelectBarber(barber.id)}
-                      className="w-full py-3.5 px-4 rounded-xl bg-white/[0.04] hover:bg-[#DFBA73] text-gray-200 hover:text-black border border-white/10 hover:border-[#DFBA73] text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer font-mono shadow-md"
+                      className="w-full py-3.5 px-4 rounded-xl bg-white/[0.04] hover:bg-[#C5A880] text-gray-200 hover:text-black border border-white/10 hover:border-[#C5A880] text-xs font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer font-mono shadow-md"
                     >
                       <Calendar className="w-3.5 h-3.5" />
                       <span>Agendar com {barber.name.split(" ")[0]}</span>
@@ -373,7 +326,7 @@ export default function NossaAreaSection({
                   ) : (
                     <a
                       href="#servicos"
-                      className="w-full py-3.5 px-4 rounded-xl bg-white/[0.04] hover:bg-[#DFBA73] text-gray-200 hover:text-black border border-white/10 hover:border-[#DFBA73] text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer font-mono shadow-md"
+                      className="w-full py-3.5 px-4 rounded-xl bg-white/[0.04] hover:bg-[#C5A880] text-gray-200 hover:text-black border border-white/10 hover:border-[#C5A880] text-xs font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer font-mono shadow-md"
                     >
                       <Calendar className="w-3.5 h-3.5" />
                       <span>Agendar Horário</span>
