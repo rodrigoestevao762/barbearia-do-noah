@@ -24,7 +24,7 @@ const BLOCKED_URL_PATTERNS = [
   /\.php$/i,                              // Tentativas de execução remota de PHP
 ];
 
-const AUTH_SECRET = process.env.NEXTAUTH_SECRET || "super-secret-las-barber-key-2026";
+const AUTH_SECRET = process.env.NEXTAUTH_SECRET || "super-secret-noah-barber-key-2026";
 
 export async function middleware(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
@@ -66,7 +66,7 @@ export async function middleware(request: NextRequest) {
 
   if (!isDashboardRoute && !isClientRoute && !isLoginRoute) {
     const res = NextResponse.next();
-    res.headers.set("X-Powered-By", "LAS-Studio-Engine");
+    res.headers.set("X-Powered-By", "Noah-Barber-Studio-Engine");
     return res;
   }
 
@@ -136,7 +136,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const response = NextResponse.next();
-  response.headers.set("X-Powered-By", "LAS-Studio-Engine");
+  response.headers.set("X-Powered-By", "Noah-Barber-Studio-Engine");
   return response;
 }
 

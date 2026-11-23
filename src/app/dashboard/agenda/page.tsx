@@ -435,11 +435,43 @@ export default function AgendaPage() {
             </span>
           </div>
           <h2 className="text-3xl font-serif text-white tracking-tight">
-            Agenda do Studio • Noah Ferreira
+            Agenda do Studio • {selectedBarberFilter === "all" ? "Geral" : selectedBarberObj.name}
           </h2>
           <p className="text-xs text-gray-400 mt-1">
-            Gestão privativa dos agendamentos, clientes e rituais do Noah Barber Studio.
+            Gestão dos agendamentos de Noah Ferreira e Adrian Santos no Noah Barber Studio.
           </p>
+
+          {/* Abas de Filtro de Barbeiro */}
+          {isAdmin && (
+            <div className="flex items-center gap-2 mt-4 overflow-x-auto">
+              <button
+                type="button"
+                onClick={() => setSelectedBarberFilter("all")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  selectedBarberFilter === "all"
+                    ? "bg-[#DFBA73] text-black shadow-md shadow-[#DFBA73]/20"
+                    : "bg-white/5 text-gray-400 hover:text-white border border-white/10"
+                }`}
+              >
+                Todos os Barbeiros
+              </button>
+              {BARBERS.map((barber) => (
+                <button
+                  type="button"
+                  key={barber.id}
+                  onClick={() => setSelectedBarberFilter(barber.id)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+                    selectedBarberFilter === barber.id
+                      ? "bg-[#DFBA73] text-black shadow-md shadow-[#DFBA73]/20"
+                      : "bg-white/5 text-gray-400 hover:text-white border border-white/10"
+                  }`}
+                >
+                  <span>{barber.name}</span>
+                  <span className="text-[9px] opacity-75">({barber.role === "ADMIN" ? "Master" : "Barbeiro"})</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -463,13 +495,13 @@ export default function AgendaPage() {
         </div>
       </div>
 
-      {/* ━━━ CARD DO MASTER BARBER COM FOTO REAL DE NOAH FERREIRA ━━━ */}
+      {/* ━━━ CARD DO BARBEIRO SELECIONADO ━━━ */}
       <div className="bg-gradient-to-r from-[#DFBA73]/15 via-white/[0.02] to-transparent border border-[#DFBA73]/30 rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-xl">
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-lg shadow-[#DFBA73]/25 shrink-0">
             <Image
-              src="/barbers/noah-ferreira.jpg"
-              alt="Noah Ferreira"
+              src={selectedBarberObj.avatar}
+              alt={selectedBarberObj.name}
               fill
               className="object-cover object-top"
               priority
@@ -478,7 +510,7 @@ export default function AgendaPage() {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded font-bold bg-[#DFBA73]/20 text-[#F5D799] border border-[#DFBA73]/40">
-                Master Barber & Fundador
+                {selectedBarberObj.role === "ADMIN" ? "Master Barber & Fundador" : "Barbeiro Profissional"}
               </span>
               <span className={`w-2.5 h-2.5 rounded-full ${isOwnerAvailable ? "bg-emerald-400 animate-pulse" : "bg-gray-500"}`} />
               {lunchBreak && (
@@ -486,14 +518,9 @@ export default function AgendaPage() {
                   🍽️ Almoço {isLunchBreakFixed ? "Fixo" : "neste dia"}: {lunchBreak} (travado)
                 </span>
               )}
-              {!lunchBreak && hasLunchDateOverride && defaultLunchBreak && (
-                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full font-mono bg-white/10 text-gray-300 border border-white/20">
-                  Exceção: Sem almoço hoje (Fixo: {defaultLunchBreak})
-                </span>
-              )}
             </div>
             <h4 className="text-base sm:text-lg font-serif font-bold text-white mt-1">
-              Noah Ferreira — Noah Barber Studio
+              {selectedBarberObj.name} — Noah Barber Studio
             </h4>
             <p className="text-xs text-gray-300 font-light mt-0.5">
               {isOwnerAvailable
@@ -690,7 +717,7 @@ export default function AgendaPage() {
                           {apt.user?.name || "Cliente"}
                         </h4>
                         <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#F5D799] shrink-0 font-mono">
-                          Noah Ferreira
+                          {BARBERS.find((b) => b.id === apt.barberId)?.name || "Noah Ferreira"}
                         </span>
                       </div>
 
@@ -963,29 +990,35 @@ export default function AgendaPage() {
                   />
                 </div>
 
-                {/* Barbeiro Responsável com Foto de Noah Ferreira */}
+                {/* Barbeiro Responsável com Seleção Noah ou Adrian */}
                 <div>
-                  <label className="block text-gray-400 text-xs uppercase tracking-wider mb-1 font-mono">
-                    Barbeiro Atendente
+                  <label className="block text-gray-400 text-xs uppercase tracking-wider mb-1.5 font-mono">
+                    Barbeiro Atendente *
                   </label>
-                  <div className="p-3 bg-white/[0.03] border border-[#DFBA73]/30 rounded-xl flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#DFBA73]/50 shrink-0">
-                        <Image
-                          src="/barbers/noah-ferreira.jpg"
-                          alt="Noah Ferreira"
-                          fill
-                          className="object-cover object-top"
-                        />
-                      </div>
-                      <div>
-                        <h5 className="text-white text-sm font-medium">Noah Ferreira</h5>
-                        <p className="text-[10px] text-[#DFBA73] font-mono">Master Barber & Fundador</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] bg-[#DFBA73]/20 text-[#F5D799] border border-[#DFBA73]/30 px-2.5 py-0.5 rounded-full font-bold font-mono">
-                      Exclusivo
-                    </span>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {BARBERS.map((barber) => {
+                      const isSelected = newBarberId === barber.id;
+                      return (
+                        <button
+                          type="button"
+                          key={barber.id}
+                          onClick={() => setNewBarberId(barber.id)}
+                          className={`p-2.5 sm:p-3 rounded-xl border flex items-center gap-2.5 transition-all cursor-pointer text-left ${
+                            isSelected
+                              ? "border-[#DFBA73] bg-[#DFBA73]/20 text-white ring-1 ring-[#DFBA73]"
+                              : "border-white/10 bg-white/[0.02] text-gray-400 hover:text-white"
+                          }`}
+                        >
+                          <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-lg overflow-hidden border border-[#DFBA73]/40 shrink-0">
+                            <Image src={barber.avatar} alt={barber.name} fill className="object-cover object-top" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-white truncate">{barber.name}</p>
+                            <p className="text-[9px] text-[#DFBA73] font-mono">{barber.role === "ADMIN" ? "Master" : "Barbeiro"}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

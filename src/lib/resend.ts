@@ -81,7 +81,7 @@ export async function sendAppointmentConfirmationEmail({
           <div class="container">
             <div class="emblem">
               <div class="diamond">
-                <span class="diamond-text">L</span>
+                <span class="diamond-text">N</span>
               </div>
               <h1 class="logo-text">NOAH BARBER STUDIO</h1>
               <p class="tagline">Noah Ferreira • Estúdio Privativo</p>
@@ -343,7 +343,7 @@ export async function sendPasswordResetEmail({
           <div class="container">
             <div class="emblem">
               <div class="diamond">
-                <span class="diamond-text">L</span>
+                <span class="diamond-text">N</span>
               </div>
               <h1 class="logo-text">NOAH BARBER STUDIO</h1>
               <p class="tagline">Noah Ferreira • Estúdio Privativo</p>

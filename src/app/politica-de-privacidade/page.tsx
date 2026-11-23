@@ -154,7 +154,7 @@ export default function PoliticaPrivacidadePage() {
                 <Phone className="w-4 h-4" /> (27) 99269-3638 (WhatsApp Studio)
               </a>
               <a
-                href="https://www.instagram.com/noahbarberstudio?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw=="
+                href="https://www.instagram.com/studio.nbarber?utm_source=ig_web_button_share_sheet&hvrq=ZDNlZDc0MzIxNw=="
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-500/40 text-amber-400 transition-all text-xs font-semibold"

@@ -111,7 +111,7 @@ export default function PwaInstallPrompt() {
             transition={{ duration: 0.3 }}
             className="fixed bottom-6 left-4 right-4 md:left-auto md:right-8 md:w-[410px] z-[90] bg-[#080A0E]/95 border border-[#DFBA73]/40 rounded-2xl p-3.5 shadow-2xl backdrop-blur-2xl flex items-center justify-between gap-3"
           >
-            {/* Ícone / Emblema LAS perfeitamente isolado e contido */}
+            {/* Ícone / Emblema Noah Barber Studio perfeitamente isolado e contido */}
             <div className="w-11 h-11 rounded-xl bg-[#DFBA73]/15 border border-[#DFBA73]/30 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
               <LogoLasBarber variant="emblem" size={32} />
             </div>

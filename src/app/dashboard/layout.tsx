@@ -200,8 +200,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <LogoLasBarber variant="emblem" size={28} />
           <div className="flex flex-col">
-            <span className="text-xs font-serif font-bold text-white tracking-widest uppercase">LAS STUDIO</span>
-            <span className="text-[9px] font-mono text-[#DFBA73] font-bold tracking-wider">PAINEL DO DONO</span>
+            <span className="text-xs font-serif font-bold text-white tracking-widest uppercase">NOAH STUDIO</span>
+            <span className="text-[9px] font-mono text-[#DFBA73] font-bold tracking-wider">PAINEL DO BARBEIRO</span>
           </div>
         </Link>
 

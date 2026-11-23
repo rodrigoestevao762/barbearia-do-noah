@@ -394,9 +394,9 @@ export default function BookingModal({
         <div className="absolute bottom-0 left-0 w-60 h-60 bg-[radial-gradient(circle,_rgba(184,139,56,0.10)_0%,_transparent_70%)] pointer-events-none rounded-full" />
 
         {/* Header do Modal com Logo e Botão Fechar */}
-        <div className="flex justify-between items-center pb-4 border-b border-white/10 shrink-0 relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#DFBA73]/50 shrink-0 shadow-lg shadow-[#DFBA73]/20">
+        <div className="flex justify-between items-center pb-3 sm:pb-4 border-b border-white/10 shrink-0 relative z-10">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden border border-[#DFBA73]/50 shrink-0 shadow-lg shadow-[#DFBA73]/20">
               <Image
                 src="/brand/logo-square-512.png"
                 alt="Noah Barber Studio"
@@ -406,12 +406,12 @@ export default function BookingModal({
               />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-[0.25em] text-[#DFBA73] font-mono font-bold flex items-center gap-1.5">
-                <Crown className="w-3.5 h-3.5 text-[#DFBA73]" />
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[#DFBA73] font-mono font-bold flex items-center gap-1.5">
+                <Crown className="w-3 h-3 text-[#DFBA73]" />
                 Atendimento Privativo 1 a 1
               </p>
-              <h2 className="text-xl md:text-2xl font-serif text-white tracking-tight">
-                Agendamento Online • LAS Studio
+              <h2 className="text-lg sm:text-2xl font-serif text-white tracking-tight">
+                Agendamento Online
               </h2>
             </div>
           </div>
@@ -637,7 +637,7 @@ export default function BookingModal({
                   </div>
 
                   <p className="text-xs text-gray-300 font-light leading-relaxed">
-                    Atendimento individualizado e privativo conduzido exclusivamente pelo Master Barber do Studio:
+                    Escolha o profissional de sua preferência para seu atendimento exclusivo no estúdio:
                   </p>
 
                   <div className="space-y-3">
@@ -651,15 +651,15 @@ export default function BookingModal({
                             setSelectedBarber(barber);
                             setStep(3);
                           }}
-                          className={`p-5 rounded-2xl border cursor-pointer transition-all duration-300 flex items-center justify-between gap-4 ${
+                          className={`p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-300 flex items-center justify-between gap-4 ${
                             isSelected
                               ? "border-[#DFBA73] bg-gradient-to-r from-[#DFBA73]/20 via-[#080A0E] to-transparent ring-2 ring-[#DFBA73]/50 shadow-xl shadow-[#DFBA73]/20"
                               : "border-white/10 hover:border-[#DFBA73]/40 bg-white/[0.02]"
                           }`}
                         >
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3.5 sm:gap-4">
                             {/* FOTO OFICIAL DO PROFISSIONAL */}
-                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-lg shadow-[#DFBA73]/25 shrink-0">
+                            <div className="relative w-14 h-14 sm:w-18 sm:h-18 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-lg shadow-[#DFBA73]/25 shrink-0">
                               <Image
                                 src={barber.avatar}
                                 alt={barber.name}
@@ -672,9 +672,9 @@ export default function BookingModal({
 
                             <div className="space-y-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="text-lg font-serif font-bold text-white">{barber.name}</h4>
-                                <span className="text-[10px] bg-gradient-to-r from-[#F5D799] to-[#DFBA73] text-black px-2.5 py-0.5 rounded-full font-bold uppercase font-mono tracking-wider">
-                                  Master Barber & Fundador
+                                <h4 className="text-base sm:text-lg font-serif font-bold text-white">{barber.name}</h4>
+                                <span className="text-[9px] sm:text-[10px] bg-gradient-to-r from-[#F5D799] to-[#DFBA73] text-black px-2.5 py-0.5 rounded-full font-bold uppercase font-mono tracking-wider">
+                                  {barber.role === "ADMIN" ? "Master Barber & Fundador" : "Barbeiro Profissional"}
                                 </span>
                               </div>
                               <p className="text-xs text-[#F5D799] font-medium font-mono">
@@ -687,8 +687,10 @@ export default function BookingModal({
                           </div>
 
                           <div className="text-right shrink-0">
-                            <span className="text-[10px] uppercase font-bold tracking-wider px-3.5 py-1.5 rounded-xl font-mono transition-all bg-[#DFBA73] text-black shadow-md shadow-[#DFBA73]/30">
-                              ✓ Selecionado
+                            <span className={`text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 rounded-xl font-mono transition-all ${
+                              isSelected ? "bg-[#DFBA73] text-black shadow-md shadow-[#DFBA73]/30" : "bg-white/5 text-gray-400 border border-white/10"
+                            }`}>
+                              {isSelected ? "✓ Selecionado" : "Escolher"}
                             </span>
                           </div>
                         </div>

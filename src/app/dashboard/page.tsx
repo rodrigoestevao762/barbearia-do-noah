@@ -515,7 +515,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ━━━ PRÓXIMOS AGENDAMENTOS CONFIRMADOS (PADRÃO MR BASTOS / LAS STUDIO) ━━━ */}
+      {/* ━━━ PRÓXIMOS AGENDAMENTOS CONFIRMADOS (PADRÃO NOAH BARBER STUDIO) ━━━ */}
       {nextApt ? (
         <div className="bg-gradient-to-r from-[#DFBA73]/15 via-[#080A0E] to-[#050608] border-2 border-[#DFBA73]/40 rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(ellipse_at_center,_rgba(223,186,115,0.15)_0%,_transparent_70%)] pointer-events-none rounded-full" />

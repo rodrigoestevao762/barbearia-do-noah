@@ -10,7 +10,7 @@ export default function CookieConsentBanner() {
 
   useEffect(() => {
     try {
-      const consent = localStorage.getItem("las_cookie_consent");
+      const consent = localStorage.getItem("noah_cookie_consent");
       if (!consent) {
         const timer = setTimeout(() => setShow(true), 1500);
         return () => clearTimeout(timer);
@@ -22,14 +22,14 @@ export default function CookieConsentBanner() {
 
   const handleAcceptAll = () => {
     try {
-      localStorage.setItem("las_cookie_consent", "accepted");
+      localStorage.setItem("noah_cookie_consent", "accepted");
     } catch (_) {}
     setShow(false);
   };
 
   const handleAcceptNecessary = () => {
     try {
-      localStorage.setItem("las_cookie_consent", "necessary");
+      localStorage.setItem("noah_cookie_consent", "necessary");
     } catch (_) {}
     setShow(false);
   };

@@ -14,7 +14,7 @@ function getAvailabilityFilePath(): string | null {
   try {
     const path = require("path");
     return process.env.VERCEL || process.env.NODE_ENV === "production"
-      ? path.join("/tmp", "las_availability.json")
+      ? path.join("/tmp", "noah_availability.json")
       : path.join(process.cwd(), "src", "data", "availability.json");
   } catch (_) {
     return null;

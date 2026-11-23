@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-const INSTAGRAM_URL = "https://www.instagram.com/noahbarberstudio";
+const INSTAGRAM_URL = "https://www.instagram.com/studio.nbarber?utm_source=ig_web_button_share_sheet&hvrq=ZDNlZDc0MzIxNw==";
 const WHATSAPP_URL = "https://wa.me/5527992693638?text=Ol%C3%A1%20Noah!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Noah%20Barber%20Studio.";
 
 function InstagramIcon({ className = "w-6 h-6" }: { className?: string }) {
@@ -44,7 +44,7 @@ export default function FloatingSocialButtons() {
         {/* Tooltip Desktop */}
         <span className="absolute right-full mr-3 px-3 py-1.5 rounded-xl bg-[#080A0E]/95 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-white/10 shadow-2xl hidden sm:flex items-center gap-1.5 backdrop-blur-md">
           <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
-          @noahbarberstudio
+          @studio.nbarber
         </span>
       </motion.a>
 

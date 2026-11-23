@@ -13,36 +13,57 @@ const GALLERY_VIDEOS = [
   {
     src: "/studio/video-1.mp4",
     poster: "/studio/hero-1.jpg",
+    tag: "Conforto VIP",
+    title: "Cadeiras Reclináveis & Barboterapia",
+    desc: "Poltronas com encosto reclinável e toalha aquecida",
     col: "col-span-1 md:col-span-2 row-span-1",
   },
   {
     src: "/studio/video-2.mp4",
     poster: "/studio/hero-2.jpg",
+    tag: "Estrutura Moderna",
+    title: "Iluminação Hexagonal 6000K",
+    desc: "Luz de alta fidelidade para corte milimétrico e visagismo",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-3.mp4",
     poster: "/studio/hero-3.jpg",
+    tag: "Design Exclusivo",
+    title: "Espelho com Halo de LED",
+    desc: "Iluminação em arco e visagismo individualizado",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-4.mp4",
-    poster: "/studio/hero-1.jpg",
+    poster: "/studio/hero-2.jpg",
+    tag: "Cortesia da Casa",
+    title: "Cantinho do Café & Geladeira de Bebidas",
+    desc: "Café espresso sempre fresco e geladeira com bebidas geladas",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-5.mp4",
-    poster: "/studio/hero-2.jpg",
+    poster: "/studio/hero-3.jpg",
+    tag: "Recepção Exclusiva",
+    title: "Ambiente 100% Climatizado",
+    desc: "Espaço refrigerado, poltronas confortáveis e som ambiente",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-6.mp4",
-    poster: "/studio/hero-3.jpg",
+    poster: "/studio/hero-1.jpg",
+    tag: "Cosméticos Nobres",
+    title: "Bancada de Produtos Profissionais",
+    desc: "Pomadas, óleos essenciais e loções de primeira linha",
     col: "col-span-1 row-span-1",
   },
   {
     src: "/studio/video-7.mp4",
-    poster: "/studio/hero-1.jpg",
+    poster: "/studio/hero-2.jpg",
+    tag: "Nossa Equipe",
+    title: "Noah Ferreira & Adrian Santos",
+    desc: "Atendimento privativo 1 a 1 focado no seu estilo e bem-estar",
     col: "col-span-1 row-span-1",
   },
 ];
@@ -163,12 +184,18 @@ function GalleryCard({
         }`}
       />
 
-      {/* Selo minimalista no rodapé do vídeo */}
-      <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
-        <span className="text-[10px] font-mono tracking-widest uppercase text-[#DFBA73] bg-black/70 px-3 py-1 rounded-full border border-white/10 backdrop-blur-md flex items-center gap-1.5 shadow-md">
+      {/* Selo minimalista e legenda autêntica das comodidades do studio */}
+      <div className="absolute bottom-0 inset-x-0 p-4 sm:p-5 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none z-10 flex flex-col justify-end">
+        <span className="text-[10px] font-mono tracking-widest uppercase text-[#DFBA73] bg-black/70 w-fit px-2.5 py-0.5 rounded-full border border-white/10 backdrop-blur-md flex items-center gap-1.5 shadow-md mb-1.5 font-bold">
           <span className="w-1.5 h-1.5 rounded-full bg-[#DFBA73] animate-pulse"></span>
-          <span>NOAH BARBER STUDIO</span>
+          <span>{item.tag}</span>
         </span>
+        <h4 className="text-white font-serif text-base sm:text-lg font-semibold leading-tight drop-shadow-md">
+          {item.title}
+        </h4>
+        <p className="text-gray-300 text-xs font-light line-clamp-1 mt-0.5 drop-shadow">
+          {item.desc}
+        </p>
       </div>
     </div>
   );

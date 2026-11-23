@@ -98,7 +98,7 @@ export default function ServicesMenuSection({ onSelectService }: ServicesMenuSec
           </div>
         </div>
 
-        {/* ── SPOTLIGHT HERO: O RITUAL SUPREMO DO LAS STUDIO ── */}
+        {/* ── SPOTLIGHT HERO: O RITUAL SUPREMO DO NOAH BARBER STUDIO ── */}
         <div className="mb-14 relative group rounded-3xl overflow-hidden border border-[#DFBA73]/50 bg-gradient-to-br from-[#0e121a] via-[#080A0E] to-[#050608] p-6 sm:p-8 md:p-10 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_30px_rgba(223,186,115,0.18)] hover:border-[#DFBA73]/80 transition-all duration-700">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#DFBA73]/15 via-transparent to-transparent pointer-events-none" />
 
@@ -107,7 +107,7 @@ export default function ServicesMenuSection({ onSelectService }: ServicesMenuSec
             <div className="lg:col-span-5 relative rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] border border-[#DFBA73]/30 shadow-2xl group-hover:scale-[1.01] transition-transform duration-700">
               <Image
                 src={comboDestaque.image}
-                alt="Estúdio Privativo LAS Studio"
+                alt="Estúdio Privativo Noah Barber Studio"
                 fill
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 sizes="(max-width: 1024px) 100vw, 40vw"
@@ -138,7 +138,7 @@ export default function ServicesMenuSection({ onSelectService }: ServicesMenuSec
                   Combo Completo <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] italic font-semibold">(Corte + Barba + Sobrancelha)</span>
                 </h3>
                 <p className="text-gray-300 text-sm sm:text-base font-light leading-relaxed">
-                  O protocolo essencial de alinhamento masculino do LAS Studio. Desfrute de corte capilar de precisão sob medida, barba desenhada na toalha aquecida com navalha clássica e alinhamento de sobrancelha com total discrição.
+                  O protocolo essencial de alinhamento masculino do Noah Barber Studio. Desfrute de corte capilar de precisão sob medida, barba desenhada na toalha aquecida com navalha clássica e alinhamento de sobrancelha com total discrição.
                 </p>
               </div>
 

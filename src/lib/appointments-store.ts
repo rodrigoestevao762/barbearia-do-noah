@@ -40,7 +40,7 @@ export interface StoredExpense {
 // Arquivo de persistência em disco
 const DISK_FILE =
   process.env.VERCEL || process.env.NODE_ENV === "production"
-    ? path.join("/tmp", "las_appointments.json")
+    ? path.join("/tmp", "noah_appointments.json")
     : path.join(process.cwd(), "src", "data", "appointments.json");
 
 // Helper para obter a data local no formato YYYY-MM-DD (fuso Brasil UTC-3)
@@ -56,9 +56,9 @@ const INITIAL_APPOINTMENTS: StoredAppointment[] = [];
 
 // Singleton global para persistência em memória entre chamadas de API
 declare global {
-  var __las_appointments: StoredAppointment[] | undefined;
-  var __las_closings: StoredClosing[] | undefined;
-  var __las_expenses: StoredExpense[] | undefined;
+  var __noah_appointments: StoredAppointment[] | undefined;
+  var __noah_closings: StoredClosing[] | undefined;
+  var __noah_expenses: StoredExpense[] | undefined;
 }
 
 function loadAppointmentsFromDisk(): StoredAppointment[] {
@@ -89,14 +89,14 @@ function saveAppointmentsToDisk(apts: StoredAppointment[]): void {
 }
 
 export function getAllStoredAppointments(): StoredAppointment[] {
-  if (!global.__las_appointments) {
+  if (!global.__noah_appointments) {
     const fromDisk = loadAppointmentsFromDisk();
-    global.__las_appointments = fromDisk.filter(
+    global.__noah_appointments = fromDisk.filter(
       (a) => !a.id?.includes("almir") && 
              !a.user?.name?.toLowerCase().includes("almir")
     );
   }
-  return (global.__las_appointments || []).filter(
+  return (global.__noah_appointments || []).filter(
     (a) => !a.id?.includes("almir") && 
            !a.user?.name?.toLowerCase().includes("almir")
   );
@@ -147,7 +147,7 @@ export function addStoredAppointment(aptData: Partial<StoredAppointment>): Store
   };
 
   all.unshift(newApt);
-  global.__las_appointments = all;
+  global.__noah_appointments = all;
   saveAppointmentsToDisk(all);
   return newApt;
 }
@@ -183,21 +183,21 @@ export function updateStoredAppointmentStatus(
 }
 
 export function getStoredClosingsForDate(dateStr: string): StoredClosing[] {
-  const all = global.__las_closings || [];
+  const all = global.__noah_closings || [];
   return all.filter((c) => c.date.substring(0, 10) === dateStr);
 }
 
 export function addStoredClosing(closingData: StoredClosing): StoredClosing {
-  if (!global.__las_closings) {
-    global.__las_closings = [];
+  if (!global.__noah_closings) {
+    global.__noah_closings = [];
   }
-  global.__las_closings.unshift(closingData);
+  global.__noah_closings.unshift(closingData);
   return closingData;
 }
 
 export function clearAllStoredData(): void {
-  global.__las_appointments = [];
-  global.__las_closings = [];
-  global.__las_expenses = [];
+  global.__noah_appointments = [];
+  global.__noah_closings = [];
+  global.__noah_expenses = [];
   saveAppointmentsToDisk([]);
 }

@@ -100,7 +100,7 @@ export default function StudioVideoSection() {
           <div className="relative aspect-[9/16] md:aspect-[16/9] max-h-[640px] w-full bg-black flex items-center justify-center overflow-hidden">
             <video
               ref={videoRef}
-              src="/studio/las-studio-video.mp4"
+              src="/studio/video-1.mp4"
               poster="/studio/cover-3.jpg"
               preload="metadata"
               className="w-full h-full object-cover md:object-contain cursor-pointer"

@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   // Proteção de segurança: apenas requisições autenticadas podem executar setup do banco
   const authHeader = req.headers.get("authorization");
   const secretParam = new URL(req.url).searchParams.get("key");
-  const expectedSecret = process.env.NEXTAUTH_SECRET || "super-secret-las-barber-key-2026";
+  const expectedSecret = process.env.NEXTAUTH_SECRET || "super-secret-noah-barber-key-2026";
 
   if (authHeader !== `Bearer ${expectedSecret}` && secretParam !== expectedSecret) {
     return NextResponse.json({ error: "Acesso não autorizado." }, { status: 401 });

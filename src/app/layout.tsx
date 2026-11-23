@@ -111,12 +111,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Barbearia do Noah" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/brand/logo-square-512.png?v=las-gold-2026" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=las-gold-2026" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png?v=las-gold-2026" />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico?v=las-gold-2026" />
-        <link rel="shortcut icon" href="/favicon.ico?v=las-gold-2026" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png?v=las-gold-2026" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/brand/logo-square-512.png?v=noah-gold-2026" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=noah-gold-2026" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png?v=noah-gold-2026" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico?v=noah-gold-2026" />
+        <link rel="shortcut icon" href="/favicon.ico?v=noah-gold-2026" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png?v=noah-gold-2026" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -9,7 +9,8 @@ export interface StoredUser {
   phone: string | null;
   passwordHash: string;
   plainPasswordFallback?: string;
-  role: "ADMIN" | "CLIENT";
+  role: "ADMIN" | "BARBER" | "CLIENT";
+  barberId?: string | null;
   createdAt: string;
   aliases?: string[];
 }
@@ -17,27 +18,41 @@ export interface StoredUser {
 // Caminho de persistência em disco para sobreviver a recargas e ambientes serverless
 const DISK_FILE = 
   process.env.VERCEL || process.env.NODE_ENV === "production"
-    ? path.join("/tmp", "las_users.json")
+    ? path.join("/tmp", "noah_users.json")
     : path.join(process.cwd(), "src", "data", "users.json");
 
-// Usuários iniciais oficiais pré-configurados (Apenas Noah Ferreira - Dono/Gestor)
+// Usuários iniciais oficiais pré-configurados (Noah Ferreira & Adrian Santos)
 const INITIAL_USERS: StoredUser[] = [
-  // 1. Noah Ferreira (Proprietário e Barbeiro Gestor Solo)
+  // 1. Noah Ferreira (Proprietário, Master Barber & Admin)
   {
     id: "barbeiro-noah",
     name: "Noah Ferreira",
     email: "noahbarberstudio@gmail.com",
     phone: "5527992693638",
-    passwordHash: "$2b$10$3nbfFPEGUEz5IOBYGT4GXOax0/yVHF25z9UJHNc8qTYD9aDCU5ulO", // LasStudio#2026
+    passwordHash: "$2b$10$3nbfFPEGUEz5IOBYGT4GXOax0/yVHF25z9UJHNc8qTYD9aDCU5ulO",
     plainPasswordFallback: "123",
     role: "ADMIN",
+    barberId: "barbeiro-noah",
     createdAt: "2026-01-01T00:00:00.000Z",
-    aliases: ["27992693638", "993783204", "6999378-3204", "(27) 99269-3638"],
+    aliases: ["27992693638", "(27) 99269-3638", "992693638", "noah", "noah ferreira"],
+  },
+  // 2. Adrian Santos (Barbeiro Profissional)
+  {
+    id: "barbeiro-adrian",
+    name: "Adrian Santos",
+    email: "adriansantos@gmail.com",
+    phone: "5527992693639",
+    passwordHash: "$2b$10$3nbfFPEGUEz5IOBYGT4GXOax0/yVHF25z9UJHNc8qTYD9aDCU5ulO",
+    plainPasswordFallback: "123",
+    role: "BARBER",
+    barberId: "barbeiro-adrian",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    aliases: ["27992693639", "(27) 99269-3639", "992693639", "adrian", "adrian santos"],
   },
 ];
 
 declare global {
-  var __las_users: StoredUser[] | undefined;
+  var __noah_users: StoredUser[] | undefined;
 }
 
 function loadUsersFromDisk(): StoredUser[] {
@@ -46,7 +61,6 @@ function loadUsersFromDisk(): StoredUser[] {
       const raw = fs.readFileSync(DISK_FILE, "utf-8");
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Exclui contas legadas de teste (ex: Almir Bastos, cliente-teste)
         return parsed.filter(
           (u) => !u.name?.toLowerCase().includes("almir") && 
                  !u.id?.includes("almir") &&
@@ -70,17 +84,16 @@ function saveUsersToDisk(users: StoredUser[]): void {
 }
 
 export function getAllStoredUsers(): StoredUser[] {
-  if (!global.__las_users || global.__las_users.length === 0) {
+  if (!global.__noah_users || global.__noah_users.length === 0) {
     const fromDisk = loadUsersFromDisk();
     if (fromDisk.length > 0) {
-      global.__las_users = fromDisk;
+      global.__noah_users = fromDisk;
     } else {
-      global.__las_users = [...INITIAL_USERS];
-      saveUsersToDisk(global.__las_users);
+      global.__noah_users = [...INITIAL_USERS];
+      saveUsersToDisk(global.__noah_users);
     }
   }
-  // Garante exclusão de legados
-  return (global.__las_users || []).filter(
+  return (global.__noah_users || []).filter(
     (u) => !u.name?.toLowerCase().includes("almir") && !u.id?.includes("almir")
   );
 }
@@ -181,7 +194,7 @@ export function upsertStoredUser(data: {
       plainPasswordFallback: pwd,
     };
     users[existingIndex] = updated;
-    global.__las_users = users;
+    global.__noah_users = users;
     saveUsersToDisk(users);
     return updated;
   }
@@ -195,16 +208,16 @@ export function upsertStoredUser(data: {
     plainPasswordFallback: pwd,
     role: data.role || "CLIENT",
     createdAt: new Date().toISOString(),
-    aliases: cleanPhone ? [cleanPhone, `(69) ${cleanPhone.slice(-9)}`] : [],
+    aliases: cleanPhone ? [cleanPhone, `(27) ${cleanPhone.slice(-9)}`] : [],
   };
 
   users.unshift(newUser);
-  global.__las_users = users;
+  global.__noah_users = users;
   saveUsersToDisk(users);
   return newUser;
 }
 
 export function clearAllStoredUsersExceptAdmin(): void {
-  global.__las_users = [...INITIAL_USERS];
-  saveUsersToDisk(global.__las_users);
+  global.__noah_users = [...INITIAL_USERS];
+  saveUsersToDisk(global.__noah_users);
 }

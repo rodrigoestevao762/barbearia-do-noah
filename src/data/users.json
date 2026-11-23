@@ -7,12 +7,32 @@
     "passwordHash": "$2b$10$3nbfFPEGUEz5IOBYGT4GXOax0/yVHF25z9UJHNc8qTYD9aDCU5ulO",
     "plainPasswordFallback": "123",
     "role": "ADMIN",
+    "barberId": "barbeiro-noah",
     "createdAt": "2026-01-01T00:00:00.000Z",
     "aliases": [
       "27992693638",
-      "993783204",
-      "6999378-3204",
-      "(27) 99269-3638"
+      "(27) 99269-3638",
+      "992693638",
+      "noah",
+      "noah ferreira"
+    ]
+  },
+  {
+    "id": "barbeiro-adrian",
+    "name": "Adrian Santos",
+    "email": "adriansantos@gmail.com",
+    "phone": "5527992693639",
+    "passwordHash": "$2b$10$3nbfFPEGUEz5IOBYGT4GXOax0/yVHF25z9UJHNc8qTYD9aDCU5ulO",
+    "plainPasswordFallback": "123",
+    "role": "BARBER",
+    "barberId": "barbeiro-adrian",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "aliases": [
+      "27992693639",
+      "(27) 99269-3639",
+      "992693639",
+      "adrian",
+      "adrian santos"
     ]
   }
 ]

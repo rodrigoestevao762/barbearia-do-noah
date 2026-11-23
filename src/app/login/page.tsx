@@ -238,7 +238,7 @@ export default function LoginPage() {
         
         <div className="absolute bottom-12 left-12 right-12 z-10 max-w-lg">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#DFBA73]/40 bg-black/70 text-[#F5D799] text-xs font-mono uppercase tracking-widest mb-3 shadow-md shadow-[#DFBA73]/10">
-            <Sparkles className="w-3.5 h-3.5 text-[#DFBA73]" /> Noah Ferreira • Master Barber
+            <Sparkles className="w-3.5 h-3.5 text-[#DFBA73]" /> Noah Ferreira & Adrian Santos • Noah Barber Studio
           </div>
           <h2 className="text-3xl font-serif text-white leading-tight mb-3">
             Atendimento 100% Privativo e Individualizado.

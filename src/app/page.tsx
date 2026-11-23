@@ -503,12 +503,12 @@ export default function Home() {
               {/* Redes Sociais no Menu Celular */}
               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 font-mono">
                 <a
-                  href="https://instagram.com/"
+                  href="https://www.instagram.com/studio.nbarber?utm_source=ig_web_button_share_sheet&hvrq=ZDNlZDc0MzIxNw=="
                   target="_blank"
                   rel="noopener noreferrer"
                   className="py-2 px-3 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-300 text-[11px] font-semibold flex items-center justify-center gap-2"
                 >
-                  Instagram
+                  Instagram @studio.nbarber
                 </a>
                 <a
                   href="https://wa.me/5527992693638?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Noah%20Barber%20Studio"
@@ -703,10 +703,11 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ delay: idx * 0.15, duration: 0.8, ease: [0.33, 1, 0.68, 1] }}
-                className={`group relative overflow-hidden bg-gray-900 rounded-2xl border border-white/10 ${
-                  idx === 1 ? "md:-translate-y-6 md:border-[#DFBA73]/50 shadow-[0_20px_50px_rgba(223,186,115,0.18)]" : ""
+                className={`group relative overflow-hidden bg-gray-900 rounded-2xl border border-white/10 h-[380px] sm:h-[430px] ${
+                  idx === 1 
+                    ? "md:h-[520px] md:-translate-y-6 md:border-[#DFBA73]/50 shadow-[0_20px_50px_rgba(223,186,115,0.18)]" 
+                    : "md:h-[460px]"
                 }`}
-                style={{ height: idx === 1 ? '520px' : '460px' }}
               >
                 <img
                   src={service.img}
@@ -717,24 +718,24 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-[#050608]/40 md:via-[#050608]/60 to-transparent opacity-90 md:group-hover:opacity-100 transition-opacity pointer-events-none" />
                 
                 {/* Badge Superior */}
-                <div className="absolute top-6 left-6 z-10 pointer-events-none">
+                <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10 pointer-events-none">
                   <span className="px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-mono font-bold shadow-md">
                     {service.badge}
                   </span>
                 </div>
 
-                <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 translate-y-0 md:translate-y-8 md:group-hover:translate-y-0 transition-transform duration-700 ease-out pointer-events-none z-10">
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-3xl font-serif text-white">{service.title}</h3>
+                <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 md:p-10 translate-y-0 md:translate-y-8 md:group-hover:translate-y-0 transition-transform duration-700 ease-out pointer-events-none z-10">
+                  <div className="flex justify-between items-center mb-1.5 sm:mb-3">
+                    <h3 className="text-2xl sm:text-3xl font-serif text-white">{service.title}</h3>
                   </div>
-                  <p className="text-gray-300 md:text-gray-400 text-sm font-light mb-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 delay-100 max-w-[90%] md:max-w-[85%] leading-relaxed">
+                  <p className="text-gray-300 md:text-gray-400 text-xs sm:text-sm font-light mb-3 sm:mb-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 delay-100 max-w-[95%] md:max-w-[85%] leading-relaxed line-clamp-2 md:line-clamp-none">
                     {service.desc}
                   </p>
-                  <div className="flex justify-between items-center border-t border-white/10 pt-5">
-                    <span className="text-[#DFBA73] font-mono tracking-widest text-2xl font-bold">{service.price}</span>
-                    <div className="px-4 py-2 rounded-full border border-[#DFBA73] md:border-white/20 bg-[#DFBA73] md:bg-transparent text-black md:text-white flex items-center gap-2 text-xs uppercase tracking-wider font-semibold md:group-hover:bg-[#DFBA73] md:group-hover:border-[#DFBA73] md:group-hover:text-black transition-all duration-300 font-mono">
+                  <div className="flex justify-between items-center border-t border-white/10 pt-3 sm:pt-5">
+                    <span className="text-[#DFBA73] font-mono tracking-widest text-xl sm:text-2xl font-bold">{service.price}</span>
+                    <div className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#DFBA73] md:border-white/20 bg-[#DFBA73] md:bg-transparent text-black md:text-white flex items-center gap-1.5 sm:gap-2 text-xs uppercase tracking-wider font-semibold md:group-hover:bg-[#DFBA73] md:group-hover:border-[#DFBA73] md:group-hover:text-black transition-all duration-300 font-mono">
                       <span>Agendar</span>
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                   </div>
                 </div>
@@ -982,12 +983,12 @@ export default function Home() {
                 <Star className="w-3.5 h-3.5 fill-amber-300" /> Avalie no Google (5.0 ★)
               </a>
               <a 
-                href="https://instagram.com/" 
+                href="https://www.instagram.com/studio.nbarber?utm_source=ig_web_button_share_sheet&hvrq=ZDNlZDc0MzIxNw==" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="text-gray-400 hover:text-[#DFBA73] transition-colors text-xs"
               >
-                Instagram
+                Instagram (@studio.nbarber)
               </a>
               <a 
                 href="https://wa.me/5527992693638?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Noah%20Barber%20Studio" 

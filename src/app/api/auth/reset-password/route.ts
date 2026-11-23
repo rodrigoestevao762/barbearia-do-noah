@@ -3,12 +3,12 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 declare global {
-  var __las_reset_tokens: Record<string, { email: string; expiresAt: number }> | undefined;
-  var __las_custom_passwords: Record<string, string> | undefined;
+  var __noah_reset_tokens: Record<string, { email: string; expiresAt: number }> | undefined;
+  var __noah_custom_passwords: Record<string, string> | undefined;
 }
 
-if (!global.__las_custom_passwords) {
-  global.__las_custom_passwords = {};
+if (!global.__noah_custom_passwords) {
+  global.__noah_custom_passwords = {};
 }
 
 export async function POST(req: Request) {
@@ -22,11 +22,11 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!global.__las_reset_tokens) {
-      global.__las_reset_tokens = {};
+    if (!global.__noah_reset_tokens) {
+      global.__noah_reset_tokens = {};
     }
 
-    const tokenData = global.__las_reset_tokens[token];
+    const tokenData = global.__noah_reset_tokens[token];
 
     if (!tokenData) {
       return NextResponse.json(
@@ -36,8 +36,8 @@ export async function POST(req: Request) {
     }
 
     if (Date.now() > tokenData.expiresAt) {
-      if (global.__las_reset_tokens) {
-        delete global.__las_reset_tokens[token];
+      if (global.__noah_reset_tokens) {
+        delete global.__noah_reset_tokens[token];
       }
       return NextResponse.json(
         { error: "Este link expirou. Por favor, solicite um novo link de recuperação." },
@@ -48,8 +48,8 @@ export async function POST(req: Request) {
     const userEmail = tokenData.email;
 
     // 1. Armazena nova senha em memória para login imediato
-    if (global.__las_custom_passwords) {
-      global.__las_custom_passwords[userEmail] = newPassword;
+    if (global.__noah_custom_passwords) {
+      global.__noah_custom_passwords[userEmail] = newPassword;
     }
 
     // 2. Tenta atualizar no banco de dados se disponível
@@ -64,8 +64,8 @@ export async function POST(req: Request) {
     }
 
     // Remove token usado
-    if (global.__las_reset_tokens) {
-      delete global.__las_reset_tokens[token];
+    if (global.__noah_reset_tokens) {
+      delete global.__noah_reset_tokens[token];
     }
 
     return NextResponse.json({

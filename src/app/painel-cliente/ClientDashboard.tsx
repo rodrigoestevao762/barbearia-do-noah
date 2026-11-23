@@ -210,7 +210,7 @@ export default function ClientDashboard() {
         const isDirect = Boolean(data.directCancelled);
         const msg = isDirect
           ? `Olá, ${barberName}! Sou o ${clientName}. Cancelei meu agendamento de ${apt.service?.name || "serviço"} marcado para ${aptDateStr} às ${aptTimeStr} dentro do prazo de 30 min. O horário foi liberado no sistema!`
-          : `Olá, ${barberName}! Sou o ${clientName}. Solicitei o cancelamento do meu agendamento de ${apt.service?.name || "serviço"} do dia ${aptDateStr} às ${aptTimeStr} no sistema do LAS Studio. Poderia aprovar, por favor?`;
+          : `Olá, ${barberName}! Sou o ${clientName}. Solicitei o cancelamento do meu agendamento de ${apt.service?.name || "serviço"} do dia ${aptDateStr} às ${aptTimeStr} no sistema do Noah Barber Studio. Poderia aprovar, por favor?`;
         const whatsappUrl = `https://wa.me/${barberPhone}?text=${encodeURIComponent(msg)}`;
 
         setActionSuccessModal({
@@ -344,8 +344,8 @@ export default function ClientDashboard() {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#DFBA73]/40 shrink-0 shadow-md">
               <Image
-                src="/logo-las-gold.jpg"
-                alt="LAS Studio Logo"
+                src="/brand/noah-logo.jpg"
+                alt="Noah Barber Studio Logo"
                 fill
                 className="object-cover"
               />

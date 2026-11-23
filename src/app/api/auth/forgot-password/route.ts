@@ -4,11 +4,11 @@ import { sendPasswordResetEmail } from "@/lib/resend";
 import crypto from "crypto";
 
 declare global {
-  var __las_reset_tokens: Record<string, { email: string; expiresAt: number }> | undefined;
+  var __noah_reset_tokens: Record<string, { email: string; expiresAt: number }> | undefined;
 }
 
-if (!global.__las_reset_tokens) {
-  global.__las_reset_tokens = {};
+if (!global.__noah_reset_tokens) {
+  global.__noah_reset_tokens = {};
 }
 
 export async function POST(req: Request) {
@@ -39,15 +39,15 @@ export async function POST(req: Request) {
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = Date.now() + 1000 * 60 * 60; // 1 hora
 
-    if (!global.__las_reset_tokens) {
-      global.__las_reset_tokens = {};
+    if (!global.__noah_reset_tokens) {
+      global.__noah_reset_tokens = {};
     }
-    global.__las_reset_tokens[token] = {
+    global.__noah_reset_tokens[token] = {
       email: cleanEmail,
       expiresAt,
     };
 
-    const origin = process.env.NEXTAUTH_URL || "https://las-barber-studio.vercel.app";
+    const origin = process.env.NEXTAUTH_URL || "https://barbearia-do-noah.vercel.app";
     const resetUrl = `${origin}/recuperar-senha?token=${token}`;
 
     const whatsappMsg = `Olá, ${userName}! Segue o link seguro para redefinir sua senha de acesso no Noah Barber Studio:\n\n${resetUrl}\n\n(Válido por 1 hora)`;
