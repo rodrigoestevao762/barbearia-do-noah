@@ -34,11 +34,13 @@ export default function BookingModal({
   isOpen, 
   onClose,
   initialServiceId,
+  initialBarberId,
   initialUserData,
 }: { 
   isOpen: boolean; 
   onClose: () => void;
   initialServiceId?: string;
+  initialBarberId?: string;
   initialUserData?: { name?: string; email?: string; phone?: string };
 }) {
   const { data: session, status } = useSession();
@@ -108,7 +110,13 @@ export default function BookingModal({
   useEffect(() => {
     if (isOpen) {
       setServices(OFFICIAL_SERVICES);
-      setSelectedBarber(BARBERS[0]);
+      
+      const foundBarber = initialBarberId ? BARBERS.find((b) => b.id === initialBarberId) : null;
+      if (foundBarber) {
+        setSelectedBarber(foundBarber);
+      } else {
+        setSelectedBarber(BARBERS[0]);
+      }
       
       if (initialServiceId) {
         const s = OFFICIAL_SERVICES.find(
@@ -116,7 +124,7 @@ export default function BookingModal({
         );
         if (s) {
           setSelectedService(s);
-          setStep(2); // Avança direto para o barbeiro
+          setStep(foundBarber ? 3 : 2); // Se já tiver barbeiro, vai direto pro horário, senão vai pro barbeiro
         } else {
           setStep(1);
           setSelectedService(null);
@@ -133,7 +141,7 @@ export default function BookingModal({
       setIsSuccess(false);
       setErrorMsg("");
     }
-  }, [isOpen, initialServiceId]);
+  }, [isOpen, initialServiceId, initialBarberId]);
 
   // Tecla Escape e bloqueio de scroll blindado para Mobile (evita rolar Landing Page de fundo)
   useEffect(() => {
@@ -179,7 +187,7 @@ export default function BookingModal({
     const todayStr = getTodayStr();
     const nowTimeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
-    const barberId = selectedBarber?.id || "barbeiro-lucas";
+    const barberId = selectedBarber?.id || "barbeiro-noah";
     fetch(`/api/appointments/available?date=${selectedDate}&barberId=${barberId}&t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
@@ -206,9 +214,12 @@ export default function BookingModal({
         const [yStr, mStr, dStr] = selectedDate.split("-");
         const dateObj = new Date(Date.UTC(parseInt(yStr, 10), parseInt(mStr, 10) - 1, parseInt(dStr, 10), 12, 0, 0));
         const isSaturday = dateObj.getUTCDay() === 6;
-        const defaultHours = isSaturday
-          ? ["08:30", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"]
-          : ["08:30", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
+        const defaultHours = [
+          "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+          "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
+          "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
+          "18:00", "18:30", "19:00", "19:30"
+        ];
         if (selectedDate === todayStr) {
           setAvailableTimes(defaultHours.filter((t) => t > nowTimeStr));
         } else {
@@ -272,7 +283,7 @@ export default function BookingModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           serviceId: selectedService.id,
-          barberId: selectedBarber?.id || "barbeiro-lucas",
+          barberId: selectedBarber?.id || "barbeiro-noah",
           date: fullDate,
           clientName: clientName.trim(),
           clientEmail: clientEmail.trim().toLowerCase(),
@@ -348,8 +359,8 @@ export default function BookingModal({
   };
 
   const dateFormatted = selectedDate ? selectedDate.split("-").reverse().join("/") : "";
-  const whatsappMsg = `Olá, Lucas! Acabei de agendar um ${selectedService?.name || "serviço"} (R$ ${selectedService?.price}) no LAS Barber Studio para o dia ${dateFormatted} às ${selectedTime}.\n\nMeus dados:\nNome: ${clientName}\nE-mail: ${clientEmail}\nWhatsApp: ${clientPhone}\nForma de Pagamento: ${paymentMethod}\n\nPoderia me confirmar?`;
-  const whatsappUrl = `https://wa.me/${selectedBarber?.phone || "5569993783204"}?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappMsg = `Olá! Acabei de agendar um ${selectedService?.name || "serviço"} (R$ ${selectedService?.price}) no Noah Barber Studio para o dia ${dateFormatted} às ${selectedTime}.\n\nMeus dados:\nNome: ${clientName}\nE-mail: ${clientEmail}\nWhatsApp: ${clientPhone}\nForma de Pagamento: ${paymentMethod}\n\nPoderia me confirmar?`;
+  const whatsappUrl = `https://wa.me/${selectedBarber?.phone || "5527992693638"}?text=${encodeURIComponent(whatsappMsg)}`;
 
   // CRÍTICO: Se o modal NÃO estiver aberto ou não estiver montado no browser, NÃO RENDERIZA NADA!
   if (!isOpen) return null;

@@ -15,45 +15,42 @@ function jsonNoStore(body: unknown, status = 200) {
   });
 }
 
-// Horários Oficiais do LAS Barber Studio:
-// - Segunda a Sexta: 08:30 às 20:00
-// - Sábado: 08:30 às 18:00
+// Horários Oficiais do Noah Barber Studio:
+// - Segunda a Sábado: 09:00 às 20:00
 // - Domingo: Fechado
-const WEEKDAY_HOURS = [
-  "08:30",
+const OPERATING_HOURS = [
   "09:00",
+  "09:30",
   "10:00",
+  "10:30",
   "11:00",
+  "11:30",
   "12:00",
+  "12:30",
   "13:00",
+  "13:30",
   "14:00",
+  "14:30",
   "15:00",
+  "15:30",
   "16:00",
+  "16:30",
   "17:00",
+  "17:30",
   "18:00",
+  "18:30",
   "19:00",
-  "20:00",
+  "19:30",
 ];
 
-const SATURDAY_HOURS = [
-  "08:30",
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-];
+const WEEKDAY_HOURS = OPERATING_HOURS;
+const SATURDAY_HOURS = OPERATING_HOURS;
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const dateParam = searchParams.get("date");
-    const barberId = searchParams.get("barberId") || "barbeiro-lucas";
+    const barberId = searchParams.get("barberId") || "barbeiro-noah";
 
     if (!dateParam) {
       return NextResponse.json({ error: "Data não informada" }, { status: 400 });

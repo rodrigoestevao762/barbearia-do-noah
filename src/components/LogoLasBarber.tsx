@@ -1,14 +1,14 @@
 import React from "react";
 import Image from "next/image";
 
-interface LogoLasBarberProps {
+interface LogoNoahBarberProps {
   size?: number;
   className?: string;
   color?: string;
   variant?: "horizontal" | "emblem" | "monogram";
 }
 
-export const LogoLasBarber: React.FC<LogoLasBarberProps> = ({
+export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
   size = 48,
   className = "",
   variant = "horizontal",
@@ -21,8 +21,8 @@ export const LogoLasBarber: React.FC<LogoLasBarberProps> = ({
         style={{ width: size, height: size }}
       >
         <Image
-          src="/brand/logo-square-512.png"
-          alt="LAS Barber Studio"
+          src="/brand/noah-logo.jpg"
+          alt="Noah Barber Studio"
           width={size}
           height={size}
           priority
@@ -40,8 +40,8 @@ export const LogoLasBarber: React.FC<LogoLasBarberProps> = ({
         style={{ width: size, height: size }}
       >
         <Image
-          src="/brand/logo-square-512.png"
-          alt="LAS Barber Studio"
+          src="/brand/noah-logo.jpg"
+          alt="Noah Barber Studio"
           width={size}
           height={size}
           priority
@@ -50,14 +50,16 @@ export const LogoLasBarber: React.FC<LogoLasBarberProps> = ({
       </div>
       <div className="flex flex-col text-left justify-center">
         <span className="text-base sm:text-lg md:text-xl font-serif tracking-[0.22em] text-white uppercase font-bold leading-tight group-hover:text-[#F5D799] transition-colors">
-          LAS BARBER STUDIO
+          NOAH BARBER STUDIO
         </span>
         <span className="text-[9px] md:text-[10px] font-mono tracking-[0.32em] text-[#DFBA73] uppercase font-bold leading-tight mt-0.5">
-          BY LUCAS AUGUSTO
+          ATENDIMENTO EXCLUSIVO
         </span>
       </div>
     </div>
   );
 };
 
-export default LogoLasBarber;
+// Aliases para compatibilidade total
+export const LogoLasBarber = LogoNoahBarber;
+export default LogoNoahBarber;

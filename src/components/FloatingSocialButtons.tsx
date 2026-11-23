@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 
-const INSTAGRAM_URL = "https://www.instagram.com/lasbarberstudio_?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw==";
-const WHATSAPP_URL = "https://wa.me/5569993783204?text=Ol%C3%A1%20Lucas!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20LAS%20Barber%20Studio.";
+const INSTAGRAM_URL = "https://www.instagram.com/noahbarberstudio";
+const WHATSAPP_URL = "https://wa.me/5527992693638?text=Ol%C3%A1%20Noah!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Noah%20Barber%20Studio.";
 
 function InstagramIcon({ className = "w-6 h-6" }: { className?: string }) {
   return (
@@ -31,7 +31,7 @@ export default function FloatingSocialButtons() {
         href={INSTAGRAM_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Instagram LAS Barber Studio"
+        aria-label="Instagram Noah Barber Studio"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 1, duration: 0.5, type: "spring" }}
@@ -44,7 +44,7 @@ export default function FloatingSocialButtons() {
         {/* Tooltip Desktop */}
         <span className="absolute right-full mr-3 px-3 py-1.5 rounded-xl bg-[#080A0E]/95 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-white/10 shadow-2xl hidden sm:flex items-center gap-1.5 backdrop-blur-md">
           <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
-          @lasbarberstudio_
+          @noahbarberstudio
         </span>
       </motion.a>
 
@@ -53,20 +53,20 @@ export default function FloatingSocialButtons() {
         href={WHATSAPP_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="WhatsApp Lucas Augusto"
+        aria-label="WhatsApp Noah Barber Studio"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 1.2, duration: 0.5, type: "spring" }}
         whileHover={{ scale: 1.12 }}
         whileTap={{ scale: 0.92 }}
-        className="group relative w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-[#128C7E] to-[#25D366] text-white flex items-center justify-center shadow-[0_8px_30px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_40px_rgba(37,211,102,0.6)] transition-all duration-300"
+        className="group relative w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-[#25D366] to-[#128C7E] text-white flex items-center justify-center shadow-[0_8px_30px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_40px_rgba(37,211,102,0.7)] transition-all duration-300"
       >
         <WhatsAppIcon className="w-6 h-6 md:w-7 md:h-7" />
-        
+
         {/* Tooltip Desktop */}
         <span className="absolute right-full mr-3 px-3 py-1.5 rounded-xl bg-[#080A0E]/95 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-white/10 shadow-2xl hidden sm:flex items-center gap-1.5 backdrop-blur-md">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse" />
-          (69) 99378-3204
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          (27) 99269-3638
         </span>
       </motion.a>
     </div>

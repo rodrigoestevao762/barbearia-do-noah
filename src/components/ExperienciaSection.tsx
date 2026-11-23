@@ -1,157 +1,147 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, UserCheck, Flame, Coffee, Shield } from "lucide-react";
+import { Award, ShieldCheck, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+
+// Fotos Oficiais dos Atendimentos no Noah Barber Studio
+const EXPERIENCIA_IMAGES = [
+  "/studio/hero-2.webp", // Corte de Alta Precisão no Espelho Iluminado
+  "/studio/hero-1.jpg",  // Estúdio com Iluminação Hexagonal e Bancada
+];
 
 export default function ExperienciaSection() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Pré-carregamento e transição cinematográfica fluida
+  useEffect(() => {
+    EXPERIENCIA_IMAGES.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % EXPERIENCIA_IMAGES.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section 
       id="experiencia" 
-      className="relative bg-[#050608] py-24 md:py-32 px-6 md:px-12 overflow-hidden border-t border-white/5"
+      className="relative min-h-screen flex items-center justify-center bg-[#050608] overflow-hidden py-24 md:py-36 px-4 md:px-8 border-t border-white/5"
     >
-      {/* Luz ambiente de fundo em ouro vibrante (GPU otimizado via radial-gradient) */}
-      <div className="absolute top-1/3 left-1/4 w-[700px] h-[350px] bg-[radial-gradient(ellipse_at_center,_rgba(223,186,115,0.12)_0%,_transparent_70%)] pointer-events-none rounded-full" />
-      <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[300px] bg-[radial-gradient(ellipse_at_center,_rgba(184,139,56,0.10)_0%,_transparent_70%)] pointer-events-none rounded-full" />
+      {/* FUNDO COM SLIDESHOW DAS FOTOS OFICIAIS DO NOAH BARBER STUDIO (Zero Lag, GPU Acoplada) */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+        {EXPERIENCIA_IMAGES.map((src, idx) => {
+          const isActive = idx === currentSlide;
+          return (
+            <div
+              key={src}
+              aria-hidden={!isActive}
+              className={`absolute inset-0 bg-cover transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
+                isActive ? "opacity-100 z-10" : "opacity-0 z-0"
+              }`}
+              style={{
+                backgroundImage: `url(${src})`,
+                backgroundPosition: "center 32%",
+                transform: "translate3d(0, 0, 0)",
+                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
+              }}
+            />
+          );
+        })}
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        
-        {/* Cabeçalho da Seção */}
-        <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16 md:mb-20 space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#DFBA73]/15 border border-[#DFBA73]/40 text-[#F5D799] text-xs uppercase tracking-[0.25em] shadow-lg shadow-[#DFBA73]/10 font-mono font-bold">
-            <Sparkles className="w-3.5 h-3.5 text-[#DFBA73]" />
-            <span>O Padrão LAS Studio</span>
+        {/* OVERLAYS SUAVES - Mantém as fotos de cortes nítidas, vivas e com atmosfera premium */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050608]/85 via-[#050608]/40 to-[#050608]/90 pointer-events-none z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(5,6,8,0.6)_100%)] pointer-events-none z-10" />
+      </div>
+
+      {/* CAIXA DE TEXTO CINEMÁTICA (GLASSMORPHISM COM ALTA VISIBILIDADE DAS FOTOS AO FUNDO - MODELO MR BASTOS) */}
+      <motion.div
+        initial={{ opacity: 0, y: 35 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-30 w-full max-w-5xl mx-auto p-7 sm:p-12 md:p-16 lg:p-20 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.85)] border border-[#DFBA73]/30 bg-[#050608]/75 md:bg-[#050608]/85 backdrop-blur-md"
+      >
+        {/* Iluminação de borda dourada nobre */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-[#DFBA73]/70 to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2/4 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+
+        <div className="relative z-20 flex flex-col items-center text-center">
+          
+          {/* Subtítulo Badge */}
+          <div className="inline-flex items-center gap-3 mb-6">
+            <span className="w-6 md:w-12 h-[1px] bg-gradient-to-r from-transparent to-[#DFBA73]" />
+            <p className="text-[#DFBA73] uppercase tracking-[0.45em] text-xs md:text-sm font-semibold flex items-center gap-2 font-mono">
+              <Sparkles className="w-3.5 h-3.5 text-[#DFBA73]" />
+              A Experiência
+            </p>
+            <span className="w-6 md:w-12 h-[1px] bg-gradient-to-l from-transparent to-[#DFBA73]" />
           </div>
 
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-serif text-white tracking-tight leading-[1.12]">
-            Técnica Precisa, Produtos Nobres & <br className="hidden sm:block" />
-            <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] font-medium">
-              O Estúdio Só Para Você.
-            </span>
+          {/* Título Principal de Impacto */}
+          <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.2rem] font-serif font-black leading-[1.08] tracking-tight mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white via-neutral-100 to-[#DFBA73] drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] uppercase">
+            A Arte de Forjar <br className="hidden md:block" /> Grandes Homens.
           </h2>
 
-          <p className="text-gray-300 text-sm md:text-base font-light leading-relaxed">
-            Aqui você não disputa atenção em salão barulhento nem espera sentado em fila. O estúdio fecha as portas no seu horário para que você receba um atendimento calmo, exclusivo e de alto padrão.
+          {/* Divisor de Luxo */}
+          <div className="w-20 h-[2px] bg-gradient-to-r from-transparent via-[#DFBA73]/80 to-transparent mb-8" />
+
+          {/* Texto de Filosofia da Barbearia */}
+          <p className="max-w-3xl text-gray-100 font-light text-base sm:text-lg md:text-2xl leading-relaxed mb-12 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+            Não vendemos apenas cortes de cabelo. Entregamos um ritual cinematográfico de resgate da confiança e do bem-estar, onde o respeito ao estilo individual encontra a excelência do homem contemporâneo.
           </p>
-        </div>
 
-        {/* Bloco Principal em Duas Colunas */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          
-          {/* Coluna Esquerda: Foto de Lucas Augusto no Estúdio */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="lg:col-span-6 relative"
-          >
-            <div className="relative rounded-3xl overflow-hidden border border-[#DFBA73]/40 shadow-[0_25px_80px_rgba(223,186,115,0.12)] bg-[#080A0E] group">
-              <div className="aspect-[4/5] w-full relative overflow-hidden">
-                <img
-                  src="/barbers/lucas-augusto.jpg"
-                  alt="Lucas Augusto Master Barber no LAS Barber Studio"
-                  className="w-full h-full object-cover object-[center_20%] group-hover:scale-105 transition-transform duration-700 ease-out"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-transparent to-black/20" />
-                <div className="absolute inset-0 border border-white/10 rounded-3xl pointer-events-none" />
+          {/* BADGES CINEMÁTICOS DE ALTA PERFORMANCE (MODELO MR BASTOS) */}
+          <div className="flex flex-col sm:flex-row gap-5 md:gap-8 w-full max-w-2xl justify-center mb-8">
+            
+            {/* Badge 1 - Maestria */}
+            <div className="flex-1 bg-black/60 backdrop-blur-sm border border-[#DFBA73]/30 hover:border-[#DFBA73] p-5 sm:p-6 rounded-2xl flex items-center gap-5 transition-all duration-300 hover:bg-[#DFBA73]/10 group shadow-lg">
+              <div className="p-3.5 bg-[#080A0E] rounded-full border border-[#DFBA73]/40 shadow-inner group-hover:scale-105 transition-transform duration-300">
+                <ShieldCheck className="w-7 h-7 text-[#DFBA73]" />
               </div>
-
-              {/* Tag Flutuante na Foto */}
-              <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[#080A0E]/90 backdrop-blur-md border border-[#DFBA73]/40 flex items-center justify-between gap-3 shadow-xl">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5D799] to-[#DFBA73] flex items-center justify-center text-black shrink-0 shadow-md shadow-[#DFBA73]/20 font-bold">
-                    <UserCheck className="w-5 h-5 text-black" />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-serif text-sm font-bold">Lucas Augusto</h4>
-                    <p className="text-[11px] text-[#DFBA73] uppercase tracking-wider font-mono font-semibold">Master Barber & Fundador</p>
-                  </div>
-                </div>
-                <span className="text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799] font-mono">
-                  Atendimento 1 a 1
-                </span>
+              <div className="text-left">
+                <h4 className="text-white font-serif text-xl sm:text-2xl font-bold mb-0.5">Maestria</h4>
+                <p className="text-[11px] text-gray-300 uppercase tracking-widest font-mono font-medium">Técnica Impecável</p>
               </div>
             </div>
 
-            <div className="absolute -top-4 -left-4 w-24 h-24 border border-[#DFBA73]/30 rounded-full pointer-events-none -z-10" />
-          </motion.div>
-
-          {/* Coluna Direita: Os 3 Diferenciais Práticos */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
-            className="lg:col-span-6 space-y-6"
-          >
-            <div>
-              <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#DFBA73] font-bold">
-                Como Funciona o Atendimento
-              </span>
-              <h3 className="text-2xl sm:text-4xl font-serif text-white mt-1 leading-snug">
-                Um horário reservado para o seu cuidado e descanso.
-              </h3>
-              <p className="text-gray-300 text-sm md:text-base font-light mt-3 leading-relaxed">
-                Cada sessão é planejada para que você saia com o corte e a barba alinhados, sem correria e com a atenção total do profissional.
-              </p>
+            {/* Badge 2 - Premium */}
+            <div className="flex-1 bg-black/60 backdrop-blur-sm border border-[#DFBA73]/30 hover:border-[#DFBA73] p-5 sm:p-6 rounded-2xl flex items-center gap-5 transition-all duration-300 hover:bg-[#DFBA73]/10 group shadow-lg">
+              <div className="p-3.5 bg-[#080A0E] rounded-full border border-[#DFBA73]/40 shadow-inner group-hover:scale-105 transition-transform duration-300">
+                <Award className="w-7 h-7 text-[#DFBA73]" />
+              </div>
+              <div className="text-left">
+                <h4 className="text-white font-serif text-xl sm:text-2xl font-bold mb-0.5">Exclusivo</h4>
+                <p className="text-[11px] text-gray-300 uppercase tracking-widest font-mono font-medium">Atmosfera de Luxo</p>
+              </div>
             </div>
 
-            {/* 3 Cartões de Diferenciais Práticos */}
-            <div className="space-y-4 pt-2">
-              
-              {/* Diferencial 1 */}
-              <div className="p-5 rounded-2xl bg-[#080A0E] border border-white/10 hover:border-[#DFBA73]/50 transition-all duration-300 flex items-start gap-4 group hover:shadow-xl hover:shadow-[#DFBA73]/10">
-                <div className="w-12 h-12 rounded-xl bg-[#DFBA73]/15 border border-[#DFBA73]/40 flex items-center justify-center text-[#DFBA73] shrink-0 mt-0.5 group-hover:scale-105 transition-transform shadow-md shadow-[#DFBA73]/10">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="text-white font-serif text-lg font-bold group-hover:text-[#F5D799] transition-colors">
-                    Estúdio 100% Privativo (1 a 1)
-                  </h4>
-                  <p className="text-xs md:text-sm text-gray-300 font-light leading-relaxed">
-                    Você tem o estúdio inteiro reservado para o seu horário. Sem conversas paralelas, sem barulho e com privacidade garantida.
-                  </p>
-                </div>
-              </div>
+          </div>
 
-              {/* Diferencial 2 */}
-              <div className="p-5 rounded-2xl bg-[#080A0E] border border-white/10 hover:border-[#DFBA73]/50 transition-all duration-300 flex items-start gap-4 group hover:shadow-xl hover:shadow-[#DFBA73]/10">
-                <div className="w-12 h-12 rounded-xl bg-[#DFBA73]/15 border border-[#DFBA73]/40 flex items-center justify-center text-[#DFBA73] shrink-0 mt-0.5 group-hover:scale-105 transition-transform shadow-md shadow-[#DFBA73]/10">
-                  <Sparkles className="w-6 h-6" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="text-white font-serif text-lg font-bold group-hover:text-[#F5D799] transition-colors">
-                    Corte Sob Medida & Alta Precisão
-                  </h4>
-                  <p className="text-xs md:text-sm text-gray-300 font-light leading-relaxed">
-                    Técnica milimétrica alinhada ao caimento natural do seu cabelo e estilo pessoal, garantindo um visual marcante e de fácil manutenção no dia a dia.
-                  </p>
-                </div>
-              </div>
-
-              {/* Diferencial 3 */}
-              <div className="p-5 rounded-2xl bg-[#080A0E] border border-white/10 hover:border-[#DFBA73]/50 transition-all duration-300 flex items-start gap-4 group hover:shadow-xl hover:shadow-[#DFBA73]/10">
-                <div className="w-12 h-12 rounded-xl bg-[#DFBA73]/15 border border-[#DFBA73]/40 flex items-center justify-center text-[#DFBA73] shrink-0 mt-0.5 group-hover:scale-105 transition-transform shadow-md shadow-[#DFBA73]/10">
-                  <Flame className="w-6 h-6" />
-                </div>
-                <div className="space-y-1">
-                  <h4 className="text-white font-serif text-lg font-bold group-hover:text-[#F5D799] transition-colors">
-                    Barboterapia com Toalha Quente & Vapor
-                  </h4>
-                  <p className="text-xs md:text-sm text-gray-300 font-light leading-relaxed">
-                    Preparação da pele com toalhas aquecidas, vapor suave de ozônio e óleos hidratantes para um barbear rente, macio e sem irritações.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-
-          </motion.div>
+          {/* Indicador de Transição de Fotos */}
+          <div className="flex items-center gap-2 pt-2">
+            {EXPERIENCIA_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setCurrentSlide(i)}
+                aria-label={`Ver foto ${i + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
+                  i === currentSlide 
+                    ? "w-8 bg-[#DFBA73]" 
+                    : "w-2 bg-white/20 hover:bg-white/40"
+                }`}
+              />
+            ))}
+          </div>
 
         </div>
-
-      </div>
+      </motion.div>
     </section>
   );
 }

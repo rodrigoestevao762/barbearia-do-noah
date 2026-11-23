@@ -6,21 +6,21 @@ import { findStoredUserByEmailOrPhone, StoredUser } from "@/lib/users-store";
 
 export const AUTH_SECRET = process.env.NEXTAUTH_SECRET || "super-secret-las-barber-key-2026";
 
-// Única conta oficial de gestão (Proprietário / Lucas Augusto)
+// Única conta oficial de gestão (Proprietário / Noah Ferreira)
 const OWNER_ACCOUNT = {
-  id: "barbeiro-lucas",
-  email: "lucastj609@gmail.com",
-  phone: "5569993783204",
+  id: "barbeiro-noah",
+  email: "noahbarberstudio@gmail.com",
+  phone: "5527992693638",
   phoneAliases: [
-    "69993783204",
-    "5569993783204",
-    "993783204",
-    "6999378-3204",
-    "(69) 99378-3204",
+    "27992693638",
+    "5527992693638",
+    "992693638",
+    "2799269-3638",
+    "(27) 99269-3638",
   ],
-  name: "Lucas Augusto",
+  name: "Noah Ferreira",
   role: "ADMIN" as const,
-  barberId: "barbeiro-lucas",
+  barberId: "barbeiro-noah",
   passwordHash: "$2b$10$3nbfFPEGUEz5IOBYGT4GXOax0/yVHF25z9UJHNc8qTYD9aDCU5ulO",
 };
 

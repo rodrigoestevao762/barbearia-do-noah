@@ -2,7 +2,7 @@ export interface BarberData {
   id: string;
   name: string;
   email: string;
-  phone: string; // WhatsApp com DDI e DDD (ex: 5569993783204)
+  phone: string; // WhatsApp com DDI e DDD (ex: 5527992693638)
   phoneDisplay: string;
   role: "ADMIN" | "BARBER";
   specialty: string;
@@ -13,16 +13,28 @@ export interface BarberData {
 
 export const BARBERS: BarberData[] = [
   {
-    id: "barbeiro-lucas",
-    name: "Lucas Augusto",
-    email: "lucastj609@gmail.com",
-    phone: "5569993783204",
-    phoneDisplay: "(69) 99378-3204",
+    id: "barbeiro-noah",
+    name: "Noah Ferreira",
+    email: "noahbarberstudio@gmail.com",
+    phone: "5527992693638",
+    phoneDisplay: "(27) 99269-3638",
     role: "ADMIN",
-    specialty: "Corte de Alta Precisão, Barboterapia & Barbearia Clássica",
-    avatar: "/barbers/lucas-augusto.jpg",
-    bio: "Fundador e Master Barber do LAS Barber Studio. Atendimento privativo individual de alto padrão em Comodoro - MT.",
+    specialty: "Corte de Alta Precisão, Visagismo & Estilo Exclusivo",
+    avatar: "/barbers/noah-ferreira.jpg",
+    bio: "Fundador e Master Barber do Noah Barber Studio. Conceito de atendimento exclusivo e personalizado em Serra - ES.",
     commissionRate: 1.0,
+  },
+  {
+    id: "barbeiro-adrian",
+    name: "Adrian Santos",
+    email: "adriansantos@gmail.com",
+    phone: "5527992693639",
+    phoneDisplay: "(27) 99269-3638",
+    role: "BARBER",
+    specialty: "Cortes Modernos, Degradê & Barboterapia",
+    avatar: "/barbers/adrian-santos.jpg",
+    bio: "Barbeiro profissional especialista em cortes contemporâneos, acabamentos finos e barboterapia.",
+    commissionRate: 0.7,
   },
 ];
 
