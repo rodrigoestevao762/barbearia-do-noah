@@ -28,6 +28,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const dateParam = searchParams.get("date") || getLocalDateString();
+    const barberFilterParam = searchParams.get("barberId") || "all";
 
     // 1. FLUXO DO CLIENTE
     if (userRole === "CLIENT") {
@@ -175,54 +176,98 @@ export async function GET(req: Request) {
       .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(0, 20);
 
-    // Como Noah Ferreira trabalha sozinho, 100% da receita é dele / do Studio
-    const soloBarber = BARBERS[0];
-    const bApts = allDayAppointments;
-    const completedList = bApts.filter((apt) => apt.status === "COMPLETED");
-    const totalGrossRevenue = completedList.reduce((acc, apt) => acc + (apt.service?.price || 0), 0);
-    const ticketMedio = completedList.length > 0 ? totalGrossRevenue / completedList.length : 0;
+    // Modelo de Comissionamento Noah Barber Studio: 45% Barbeiro / 55% Casa (Administração)
+    const COMMISSION_RATE = 0.45;
+    const HOUSE_RATE = 0.55;
 
-    const breakdown = [
-      {
-        id: soloBarber.id,
-        name: soloBarber.name,
-        role: soloBarber.role,
-        avatar: soloBarber.avatar,
-        phone: soloBarber.phone,
-        phoneDisplay: soloBarber.phoneDisplay,
-        commissionRate: 1.0, // 100% Dono / Barbeiro Solo
-        totalApts: bApts.length,
-        completedApts: completedList.length,
-        revenue: totalGrossRevenue,
-        commission: totalGrossRevenue, // 100% receita retida
-        houseShare: 0,
+    // Detalhamento individual por barbeiro (Noah Ferreira & Adrian Santos)
+    const breakdown = BARBERS.map((barber) => {
+      const barberApts = allDayAppointments.filter((apt) => {
+        if (barber.isOwner) {
+          return apt.barberId === barber.id || apt.barberId === "barbeiro-dono" || !apt.barberId;
+        }
+        return apt.barberId === barber.id;
+      });
+
+      const completed = barberApts.filter((apt) => apt.status === "COMPLETED");
+      const revenue = completed.reduce((acc, apt) => acc + (apt.service?.price || 0), 0);
+      const commission = Math.round(revenue * COMMISSION_RATE * 100) / 100;
+      const houseShare = Math.round(revenue * HOUSE_RATE * 100) / 100;
+
+      return {
+        id: barber.id,
+        name: barber.name,
+        role: barber.role,
+        avatar: barber.avatar,
+        phone: barber.phone,
+        phoneDisplay: barber.phoneDisplay,
+        commissionRate: COMMISSION_RATE,
+        isOwner: Boolean(barber.isOwner),
+        totalApts: barberApts.length,
+        completedApts: completed.length,
+        revenue,
+        commission,
+        houseShare,
+      };
+    });
+
+    // Faturamento e Repasses Totais do Estúdio
+    const allCompleted = allDayAppointments.filter((apt) => apt.status === "COMPLETED");
+    const totalGrossShop = allCompleted.reduce((acc, apt) => acc + (apt.service?.price || 0), 0);
+    const totalCommissionsToPay = Math.round(totalGrossShop * COMMISSION_RATE * 100) / 100;
+    const houseNetProfit = Math.round(totalGrossShop * HOUSE_RATE * 100) / 100;
+    const ticketMedio = allCompleted.length > 0 ? totalGrossShop / allCompleted.length : 0;
+
+    // Filtro ativo (Todos, Noah Ferreira, ou Adrian Santos)
+    let displayAppointments = allDayAppointments;
+    let displayUpcoming = upcomingAppointments;
+
+    if (barberFilterParam !== "all") {
+      const targetBarber = BARBERS.find((b) => b.id === barberFilterParam);
+      if (targetBarber) {
+        displayAppointments = allDayAppointments.filter((apt) => {
+          if (targetBarber.isOwner) {
+            return apt.barberId === targetBarber.id || apt.barberId === "barbeiro-dono" || !apt.barberId;
+          }
+          return apt.barberId === targetBarber.id;
+        });
+
+        displayUpcoming = upcomingAppointments.filter((apt) => {
+          if (targetBarber.isOwner) {
+            return apt.barberId === targetBarber.id || apt.barberId === "barbeiro-dono" || !apt.barberId;
+          }
+          return apt.barberId === targetBarber.id;
+        });
       }
-    ];
+    }
+
+    const currentBarber = BARBERS.find((b) => b.id === barberFilterParam) || BARBERS[0];
 
     return NextResponse.json({
       isClient: false,
       userRole,
-      currentBarber: soloBarber,
-      activeFilter: "all",
+      currentBarber,
+      activeFilter: barberFilterParam,
       selectedDate: dateParam,
       
-      // Faturamento Oficial do Studio (100% retido pelo Dono)
-      revenue: totalGrossRevenue,
-      totalGrossShop: totalGrossRevenue,
-      houseNetProfit: totalGrossRevenue,
-      totalEmployeeCommissions: 0, // Sem funcionários / trabalha sozinho
-      myCommission: totalGrossRevenue,
-      houseShare: 0,
+      // Totais da Casa
+      revenue: totalGrossShop,
+      totalGrossShop,
+      houseNetProfit,
+      totalCommissionsToPay,
+      totalEmployeeCommissions: totalCommissionsToPay,
+      myCommission: currentBarber.isOwner ? totalCommissionsToPay : (breakdown.find(b => b.id === currentBarber.id)?.commission || 0),
+      houseShare: houseNetProfit,
       ticketMedio,
       
-      // Contadores
-      todayCount: bApts.length,
-      completedCount: completedList.length,
-      clientsCount: bApts.length,
-      appointments: bApts,
-      upcomingAppointments,
+      // Contadores e Listas
+      todayCount: displayAppointments.length,
+      completedCount: displayAppointments.filter((a) => a.status === "COMPLETED").length,
+      clientsCount: displayAppointments.length,
+      appointments: displayAppointments,
+      upcomingAppointments: displayUpcoming,
       barberBreakdown: breakdown,
-      barbersList: [soloBarber],
+      barbersList: BARBERS,
     });
   } catch (error) {
     return NextResponse.json({ error: "Erro ao buscar dados do dashboard" }, { status: 500 });

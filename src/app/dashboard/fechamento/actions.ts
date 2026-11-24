@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma";
-import { BARBERS } from "@/lib/barbers";
+import { BARBERS, BARBER_COMMISSION_RATE, HOUSE_COMMISSION_RATE } from "@/lib/barbers";
 import { 
   getAppointmentsForDate, 
   getStoredClosingsForDate, 
@@ -51,29 +51,42 @@ export async function getFechamentoData(dateStr?: string) {
     }
 
     let totalRevenue = 0;
-    const masterBarber = BARBERS[0] || { id: "barbeiro-noah", name: "Noah Ferreira" };
-    
-    // Noah Barber Studio possui modelo 100% exclusivo com o proprietário Noah Ferreira
-    const barberRevenue = {
-      id: masterBarber.id,
-      name: masterBarber.name,
-      total: 0,
-      commission: 0,
-      rate: 1.0,
-      isOwner: true,
-    };
 
-    appointments.forEach(app => {
-      const price = app.service?.price || 0;
-      totalRevenue += price;
-      barberRevenue.total += price;
-      barberRevenue.commission += price;
+    // Detalhamento individual por profissional da equipe (Noah Ferreira & Adrian Santos)
+    const barberRevenues = BARBERS.map((barber) => {
+      const bApts = appointments.filter((app) => {
+        if (barber.isOwner) {
+          return app.barberId === barber.id || app.barberId === "barbeiro-dono" || !app.barberId;
+        }
+        return app.barberId === barber.id;
+      });
+
+      const total = bApts.reduce((acc, app) => acc + (app.service?.price || 0), 0);
+      const commission = Math.round(total * BARBER_COMMISSION_RATE * 100) / 100;
+      const houseShare = Math.round(total * HOUSE_COMMISSION_RATE * 100) / 100;
+      totalRevenue += total;
+
+      return {
+        id: barber.id,
+        name: barber.name,
+        role: barber.role,
+        avatar: barber.avatar,
+        total,
+        commission,
+        houseShare,
+        rate: BARBER_COMMISSION_RATE,
+        isOwner: Boolean(barber.isOwner),
+        aptsCount: bApts.length,
+      };
     });
+
+    const totalCommissions = Math.round(totalRevenue * BARBER_COMMISSION_RATE * 100) / 100;
+    const houseShare = Math.round(totalRevenue * HOUSE_COMMISSION_RATE * 100) / 100;
 
     const sanitizedClosings = closings.map((c: any) => ({
       ...c,
       closedBy: (!c.closedBy || c.closedBy.includes("Bastos") || c.closedBy.includes("Mr."))
-        ? "Noah Ferreira (Master Barber)"
+        ? "Noah Ferreira (Dono)"
         : c.closedBy,
     }));
 
@@ -81,7 +94,11 @@ export async function getFechamentoData(dateStr?: string) {
       success: true as const,
       data: {
         totalRevenue,
-        barberRevenues: [barberRevenue],
+        totalCommissions,
+        houseShare,
+        commissionRate: BARBER_COMMISSION_RATE,
+        houseRate: HOUSE_COMMISSION_RATE,
+        barberRevenues,
         closings: sanitizedClosings
       }
     };
@@ -93,27 +110,40 @@ export async function getFechamentoData(dateStr?: string) {
     const rawClosings = getStoredClosingsForDate(targetDateStr);
 
     let totalRevenue = 0;
-    const masterBarber = BARBERS[0] || { id: "barbeiro-noah", name: "Noah Ferreira" };
-    const barberRevenue = {
-      id: masterBarber.id,
-      name: masterBarber.name,
-      total: 0,
-      commission: 0,
-      rate: 1.0,
-      isOwner: true,
-    };
+    const barberRevenues = BARBERS.map((barber) => {
+      const bApts = completedApts.filter((app) => {
+        if (barber.isOwner) {
+          return app.barberId === barber.id || app.barberId === "barbeiro-dono" || !app.barberId;
+        }
+        return app.barberId === barber.id;
+      });
 
-    completedApts.forEach(app => {
-      const price = app.service?.price || 0;
-      totalRevenue += price;
-      barberRevenue.total += price;
-      barberRevenue.commission += price;
+      const total = bApts.reduce((acc, app) => acc + (app.service?.price || 0), 0);
+      const commission = Math.round(total * BARBER_COMMISSION_RATE * 100) / 100;
+      const houseShare = Math.round(total * HOUSE_COMMISSION_RATE * 100) / 100;
+      totalRevenue += total;
+
+      return {
+        id: barber.id,
+        name: barber.name,
+        role: barber.role,
+        avatar: barber.avatar,
+        total,
+        commission,
+        houseShare,
+        rate: BARBER_COMMISSION_RATE,
+        isOwner: Boolean(barber.isOwner),
+        aptsCount: bApts.length,
+      };
     });
+
+    const totalCommissions = Math.round(totalRevenue * BARBER_COMMISSION_RATE * 100) / 100;
+    const houseShare = Math.round(totalRevenue * HOUSE_COMMISSION_RATE * 100) / 100;
 
     const sanitizedClosings = rawClosings.map((c: any) => ({
       ...c,
       closedBy: (!c.closedBy || c.closedBy.includes("Bastos") || c.closedBy.includes("Mr."))
-        ? "Noah Ferreira (Master Barber)"
+        ? "Noah Ferreira (Dono)"
         : c.closedBy,
     }));
 
@@ -121,7 +151,11 @@ export async function getFechamentoData(dateStr?: string) {
       success: true as const,
       data: {
         totalRevenue,
-        barberRevenues: [barberRevenue],
+        totalCommissions,
+        houseShare,
+        commissionRate: BARBER_COMMISSION_RATE,
+        houseRate: HOUSE_COMMISSION_RATE,
+        barberRevenues,
         closings: sanitizedClosings
       }
     };
@@ -130,9 +164,6 @@ export async function getFechamentoData(dateStr?: string) {
 
 export async function closeCashRegister(data: { totalRevenue: number, barberRevenues: string, closedBy: string, dateStr: string }) {
   try {
-    const parsedRevenues = JSON.parse(data.barberRevenues);
-    const totalCommissions = parsedRevenues.reduce((acc: number, b: any) => acc + b.commission, 0);
-
     const closingDate = new Date(`${data.dateStr}T23:59:59-03:00`);
 
     try {
@@ -149,21 +180,16 @@ export async function closeCashRegister(data: { totalRevenue: number, barberReve
     } catch (dbErr) {
       const storedClosing = addStoredClosing({
         id: `closing-${Date.now()}`,
-        date: data.dateStr,
+        date: closingDate.toISOString(),
         totalRevenue: data.totalRevenue,
         totalExpenses: 0,
         barberRevenues: data.barberRevenues,
         closedBy: data.closedBy,
         createdAt: new Date().toISOString(),
       });
-
-      return {
-        success: true,
-        data: storedClosing
-      };
+      return { success: true, data: storedClosing };
     }
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return { success: false, error: msg };
+  } catch (error: any) {
+    return { success: false, error: error.message };
   }
 }

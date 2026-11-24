@@ -269,8 +269,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="hidden md:flex pl-36 pr-12 pt-10 justify-between items-end relative z-40">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 shadow-md shadow-[#DFBA73]/20 font-mono">
-              <Shield className="w-3.5 h-3.5" /> Gestor do Estúdio • Dono
+            <span className="text-[10px] bg-blue-500/15 border border-blue-500/30 text-blue-400 font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
+              <Shield className="w-3.5 h-3.5 text-blue-400" /> {isAdmin ? "PROPRIETÁRIO (DONO)" : "BARBEIRO DA EQUIPE"}
             </span>
           </div>
           <motion.h1 
@@ -278,7 +278,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl md:text-5xl font-serif text-white tracking-tight"
           >
-            {greeting}, <span className="text-[#F5D799] italic">{userName}</span>
+            {greeting}, <span className="text-white italic">{userName} {isAdmin ? "(DONO)" : ""}</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }}
@@ -286,7 +286,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             transition={{ delay: 0.1 }}
             className="text-gray-300 text-xs md:text-sm mt-1.5 font-light"
           >
-            Painel do Studio • Noah Barber Studio • Gestão solo, agenda e faturamento de Noah Ferreira.
+            Painel Administrativo Noah Barber Studio · Controle total da barbearia, equipe e faturamento.
           </motion.p>
         </div>
 
@@ -294,10 +294,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex items-center gap-3 relative">
           <Link
             href="/"
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-[#DFBA73] hover:text-black border border-white/10 text-xs font-bold text-gray-300 transition-all shadow-sm font-mono tracking-wider uppercase"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-gray-300 transition-all shadow-sm font-mono tracking-wider uppercase"
             title="Voltar ao Site"
           >
-            <Home className="w-4 h-4 text-[#DFBA73]" />
+            <Home className="w-4 h-4 text-blue-400" />
             <span>Voltar ao Site</span>
           </Link>
 
@@ -320,9 +320,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Bell className="w-5 h-5" />
             {notifications.length > 0 && (
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#DFBA73] animate-pulse" />
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />
             )}
           </button>
+
+          {/* User Pill Badge */}
+          <div className="flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-2xl px-3 py-1.5">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-300 flex items-center justify-center font-bold text-xs">
+              {userInitial}
+            </div>
+            <span className="text-xs font-mono font-semibold text-gray-200">
+              {session?.user?.name || "Noah Ferreira"} {isAdmin ? "(Dono)" : ""}
+            </span>
+          </div>
         </div>
       </header>
 

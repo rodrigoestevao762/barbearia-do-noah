@@ -8,8 +8,12 @@ export interface BarberData {
   specialty: string;
   avatar: string;
   bio: string;
-  commissionRate: number;
+  commissionRate: number; // 0.45 = 45%
+  isOwner?: boolean;
 }
+
+export const HOUSE_COMMISSION_RATE = 0.55; // 55% para Casa / Administração
+export const BARBER_COMMISSION_RATE = 0.45; // 45% Repasse para Barbeiro
 
 export const BARBERS: BarberData[] = [
   {
@@ -21,8 +25,9 @@ export const BARBERS: BarberData[] = [
     role: "ADMIN",
     specialty: "Corte de Alta Precisão, Visagismo & Estilo Exclusivo",
     avatar: "/barbers/noah-ferreira.jpg",
-    bio: "Fundador e Master Barber do Noah Barber Studio. Conceito de atendimento exclusivo e personalizado em Serra - ES.",
-    commissionRate: 1.0,
+    bio: "Fundador e Proprietário do Noah Barber Studio. Alta precisão, visagismo e atendimento de alto padrão.",
+    commissionRate: 0.45,
+    isOwner: true,
   },
   {
     id: "barbeiro-adrian",
@@ -34,7 +39,8 @@ export const BARBERS: BarberData[] = [
     specialty: "Cortes Modernos, Degradê & Barboterapia",
     avatar: "/barbers/adrian-santos.jpg",
     bio: "Barbeiro profissional especialista em cortes contemporâneos, acabamentos finos e barboterapia.",
-    commissionRate: 0.7,
+    commissionRate: 0.45,
+    isOwner: false,
   },
 ];
 

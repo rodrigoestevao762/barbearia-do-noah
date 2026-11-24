@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://barbeariadonoah.vercel.app";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://barbearia-do-noah.vercel.app";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -28,18 +28,20 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Barbearia do Noah | Estilo, Precisão & Atendimento Exclusivo",
-  description: "Atendimento exclusivo na Barbearia do Noah. Cortes modernos e clássicos de alta precisão, barba alinhada na navalha e ambiente reservado.",
+  title: "Noah Barber Studio | Atendimento Exclusivo & Alta Precisão",
+  description: "Noah Barber Studio em Morada de Laranjeiras, Serra - ES. Cortes de alta precisão, visagismo, barba na toalha aquecida e atendimento exclusivo por Noah Ferreira e Adrian Santos.",
   keywords: [
+    "Noah Barber Studio",
     "Barbearia do Noah",
-    "Noah Barber",
-    "Barbearia",
+    "Noah Ferreira",
+    "Adrian Santos",
+    "Barbearia Serra ES",
+    "Morada de Laranjeiras",
     "Corte Masculino de Alta Precisão",
-    "Corte Masculino Premium",
-    "Barba e Cabelo",
-    "Agendamento Barbearia",
+    "Barboterapia",
+    "Agendamento Online",
   ],
-  authors: [{ name: "Barbearia do Noah" }],
+  authors: [{ name: "Noah Barber Studio" }],
   icons: {
     icon: [
       { url: "/brand/logo-square-512.png", sizes: "512x512", type: "image/png" },
@@ -55,16 +57,16 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   openGraph: {
-    title: "Barbearia do Noah | Estilo, Precisão & Atendimento Exclusivo",
-    description: "Atendimento exclusivo na Barbearia do Noah. Conforto, cortes de alta precisão e cuidado completo para você.",
+    title: "Noah Barber Studio | Atendimento Exclusivo & Alta Precisão",
+    description: "Noah Barber Studio em Serra - ES. Cortes milimétricos, visagismo e barboterapia em ambiente reservado de alto padrão.",
     url: SITE_URL,
-    siteName: "Barbearia do Noah",
+    siteName: "Noah Barber Studio",
     images: [
       {
         url: `${SITE_URL}/opengraph-image.png`,
-        width: 1200,
-        height: 630,
-        alt: "Barbearia do Noah",
+        width: 1024,
+        height: 574,
+        alt: "Noah Barber Studio Oficial",
       },
     ],
     locale: "pt_BR",
@@ -72,8 +74,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Barbearia do Noah",
-    description: "Estúdio de barbearia e cortes de alta precisão na Barbearia do Noah.",
+    title: "Noah Barber Studio",
+    description: "Estúdio de barbearia privativo e cortes de alta precisão no Noah Barber Studio.",
     images: [`${SITE_URL}/twitter-image.png`],
   },
   alternates: {

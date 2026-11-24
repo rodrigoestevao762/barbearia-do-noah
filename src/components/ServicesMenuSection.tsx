@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -83,6 +83,22 @@ export default function ServicesMenuSection({ onSelectService }: ServicesMenuSec
   const [searchTerm, setSearchTerm] = useState("");
   const [productSearchTerm, setProductSearchTerm] = useState("");
 
+  // Detecta hash #produtos ou #servicos na URL para trocar de aba automaticamente
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const checkHash = () => {
+        if (window.location.hash === "#produtos") {
+          setMainTab("produtos");
+        } else if (window.location.hash === "#servicos") {
+          setMainTab("servicos");
+        }
+      };
+      checkHash();
+      window.addEventListener("hashchange", checkHash);
+      return () => window.removeEventListener("hashchange", checkHash);
+    }
+  }, []);
+
   // Filtra serviços
   const filteredServices = useMemo(() => {
     return OFFICIAL_SERVICES.filter((service) => {
@@ -158,7 +174,7 @@ export default function ServicesMenuSection({ onSelectService }: ServicesMenuSec
         </div>
 
         {/* ── SELETOR PRINCIPAL: [ SERVIÇOS & RITUAIS ] vs [ PRODUTOS & COSMÉTICOS ] ── */}
-        <div className="flex flex-wrap items-center justify-start gap-3 mb-10 p-1.5 rounded-2xl bg-white/[0.03] border border-white/10 w-fit backdrop-blur-md">
+        <div id="produtos" className="flex flex-wrap items-center justify-start gap-3 mb-10 p-1.5 rounded-2xl bg-white/[0.03] border border-white/10 w-fit backdrop-blur-md scroll-mt-28">
           <button
             onClick={() => setMainTab("servicos")}
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-mono text-xs uppercase tracking-widest transition-all cursor-pointer ${
