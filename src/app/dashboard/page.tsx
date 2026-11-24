@@ -29,6 +29,7 @@ import { useSession } from "next-auth/react";
 import { BARBERS, BarberData, BARBER_COMMISSION_RATE, HOUSE_COMMISSION_RATE } from "@/lib/barbers";
 import { OFFICIAL_SERVICES, ServiceItem } from "@/lib/services";
 import { getDisplayTime } from "@/lib/timezone";
+import { LunchBreakControl } from "@/components/LunchBreakControl";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -100,6 +101,10 @@ export default function DashboardPage() {
   const [isOwnerAvailable, setIsOwnerAvailable] = useState(true);
   const [earlyClosing, setEarlyClosing] = useState<string | null>(null);
   const [lunchBreak, setLunchBreak] = useState<string | null>(null);
+  const [defaultLunchBreak, setDefaultLunchBreak] = useState<string | null>(null);
+  const [isLunchBreakFixed, setIsLunchBreakFixed] = useState(false);
+  const [hasLunchDateOverride, setHasLunchDateOverride] = useState(false);
+  const [isSavingLunch, setIsSavingLunch] = useState(false);
   const [lunchBreakScope, setLunchBreakScope] = useState<"default" | "date">("default");
   const [isTogglingOwner, setIsTogglingOwner] = useState(false);
 
@@ -115,22 +120,25 @@ export default function DashboardPage() {
       .then((res) => res.json())
       .then((data) => {
         const list = Array.isArray(data) ? data : data?.barbers || [];
-        const targetBarberId = isAdrian ? "barbeiro-adrian" : "barbeiro-noah";
-        const target = list.find((b: any) => b.id === targetBarberId || (!isAdrian && b.id === "barbeiro-dono"));
+        const targetBarberId = isAdrian ? "barbeiro-adrian" : controlledBarberId;
+        const target = list.find((b: any) => b.id === targetBarberId || (!isAdrian && targetBarberId === "barbeiro-noah" && b.id === "barbeiro-dono"));
         if (target) {
           setIsOwnerAvailable(target.isAvailable !== false);
           setEarlyClosing(target.earlyClosingTime || null);
           setLunchBreak(target.lunchBreakTime || null);
+          setDefaultLunchBreak(target.defaultLunchBreakTime || null);
+          setIsLunchBreakFixed(Boolean(target.isLunchBreakFixed));
+          setHasLunchDateOverride(Boolean(target.hasLunchDateOverride));
         }
       })
       .catch(() => {});
-  }, [selectedDate, isAdrian]);
+  }, [selectedDate, isAdrian, controlledBarberId]);
 
   const toggleOwnerAvailability = async () => {
     setIsTogglingOwner(true);
     const newStatus = !isOwnerAvailable;
     const formattedDate = selectedDate.split("-").reverse().join("/");
-    const targetBarberId = isAdrian ? "barbeiro-adrian" : "barbeiro-noah";
+    const targetBarberId = isAdrian ? "barbeiro-adrian" : controlledBarberId;
     try {
       const res = await fetch("/api/barbers", {
         method: "PATCH",
@@ -149,11 +157,17 @@ export default function DashboardPage() {
               ? `Adrian Santos agora está DISPONÍVEL NO SITE em ${formattedDate}.`
               : `Adrian Santos agora está EM FOLGA (NÃO ATENDERÁ) em ${formattedDate}. O estúdio permanecerá aberto com Noah.`
           );
+        } else if (targetBarberId === "barbeiro-adrian") {
+          setToastMessage(
+            newStatus
+              ? `Adrian Santos definido como DISPONÍVEL em ${formattedDate}.`
+              : `Adrian Santos definido como EM FOLGA em ${formattedDate}.`
+          );
         } else {
           setToastMessage(
             newStatus
-              ? `Noah Ferreira (Dono) DISPONÍVEL NO SITE em ${formattedDate}.`
-              : `Noah Ferreira (Dono) EM FOLGA (OCULTO NO SITE) em ${formattedDate}.`
+              ? `Studio ABERTO para agendamentos no dia ${formattedDate}.`
+              : `Studio FECHADO apenas para o dia ${formattedDate}. Os demais dias permanecem normais.`
           );
         }
       }
@@ -164,25 +178,59 @@ export default function DashboardPage() {
     }
   };
 
-  const handleSetLunchBreak = async (time: string | null) => {
+  const handleSetLunchBreak = async (time: string | null, scope: "default" | "date" = lunchBreakScope) => {
+    setIsSavingLunch(true);
+    const targetBarberId = isAdrian ? "barbeiro-adrian" : controlledBarberId;
     try {
       const res = await fetch("/api/barbers", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          barberId: controlledBarberId,
+          barberId: targetBarberId,
           date: selectedDate,
           lunchBreakTime: time,
-          lunchBreakScope,
+          lunchBreakScope: scope,
         }),
       });
       if (res.ok) {
-        setLunchBreak(time);
-        const barberName = BARBERS.find((b) => b.id === controlledBarberId)?.name || "Noah";
+        const data = await res.json();
+        setLunchBreak(data.lunchBreakTime || time);
+        setDefaultLunchBreak(data.defaultLunchBreakTime || null);
+        setIsLunchBreakFixed(Boolean(data.isLunchBreakFixed));
+        setHasLunchDateOverride(Boolean(data.hasLunchDateOverride));
+        setLunchBreakScope(scope);
+        const barberName = BARBERS.find((b) => b.id === targetBarberId)?.name || (isAdrian ? "Adrian Santos" : "Noah");
         setToastMessage(
           time
             ? `Pausa para almoço (${time}) configurada para ${barberName}.`
             : `Pausa para almoço removida para ${barberName}.`
+        );
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSavingLunch(false);
+    }
+  };
+
+  const handleSetEarlyClosing = async (time: string | null) => {
+    const formattedDate = selectedDate.split("-").reverse().join("/");
+    try {
+      const res = await fetch("/api/barbers", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          barberId: "barbeiro-noah",
+          date: selectedDate,
+          earlyClosingTime: time,
+        }),
+      });
+      if (res.ok) {
+        setEarlyClosing(time);
+        setToastMessage(
+          time
+            ? `Expediente de ${formattedDate} encerrará mais cedo às ${time}. Horários posteriores bloqueados.`
+            : `Horário normal restabelecido para o dia ${formattedDate}.`
         );
       }
     } catch (e) {
@@ -534,47 +582,180 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* DISPONIBILIDADE NO SITE (DONO OU INDIVIDUAL DO ADRIAN) */}
-      <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-xl">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 shrink-0">
-            <Power className="w-6 h-6" />
+      {/* ━━━ CARD DE DISPONIBILIDADE DO STUDIO & CONTROLE DA AGENDA (PADRÃO LAS BARBER STUDIO COM FOTOS DE NOAH E ADRIAN) ━━━ */}
+      <div className="bg-[#080A0E] border-2 border-white/10 rounded-3xl p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-2xl relative">
+        <div className="flex items-center gap-5">
+          {/* FOTO DO BARBEIRO SELECIONADO (NOAH OU ADRIAN) */}
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shrink-0 shadow-lg shadow-black/50">
+            <Image
+              src={
+                controlledBarberId === "barbeiro-adrian" || isAdrian
+                  ? "/barbers/adrian-santos.jpg"
+                  : "/barbers/noah-ferreira.jpg"
+              }
+              alt={
+                controlledBarberId === "barbeiro-adrian" || isAdrian
+                  ? "Adrian Santos"
+                  : "Noah Ferreira"
+              }
+              fill
+              className="object-cover object-top"
+              priority
+            />
           </div>
+
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-[#DFBA73]">
-                {isAdmin ? "ESCALA 4X4 / FLEXÍVEL DO DONO" : "CONTROLE DE FOLGA INDIVIDUAL"}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Seletor Noah / Adrian para o Dono */}
+              {isAdmin && (
+                <div className="flex items-center bg-[#050608] border border-white/10 rounded-xl p-0.5 mr-1">
+                  <button
+                    type="button"
+                    onClick={() => setControlledBarberId("barbeiro-noah")}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      controlledBarberId === "barbeiro-noah"
+                        ? "bg-[#DFBA73] text-black shadow"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${controlledBarberId === "barbeiro-noah" ? "bg-black" : "bg-[#DFBA73]"}`} />
+                    <span>Noah (Dono)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setControlledBarberId("barbeiro-adrian")}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      controlledBarberId === "barbeiro-adrian"
+                        ? "bg-[#DFBA73] text-black shadow"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${controlledBarberId === "barbeiro-adrian" ? "bg-black" : "bg-emerald-400"}`} />
+                    <span>Adrian (Equipe)</span>
+                  </button>
+                </div>
+              )}
+
+              <span className="text-[10px] uppercase font-bold tracking-widest text-[#F5D799] bg-[#DFBA73]/20 border border-[#DFBA73]/30 px-2.5 py-0.5 rounded-full font-mono">
+                {controlledBarberId === "barbeiro-adrian" || isAdrian
+                  ? "Barbeiro da Equipe • 45%"
+                  : "Proprietário & Dono • 55%"}
               </span>
+
+              <span
+                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full font-mono ${
+                  isOwnerAvailable
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                    : "bg-red-500/20 text-red-300 border border-red-500/30"
+                }`}
+              >
+                {controlledBarberId === "barbeiro-adrian" || isAdrian
+                  ? isOwnerAvailable
+                    ? `Disponível em ${selectedDate.split("-").reverse().join("/")}`
+                    : `Em Folga em ${selectedDate.split("-").reverse().join("/")}`
+                  : isOwnerAvailable
+                  ? `Studio Aberto em ${selectedDate.split("-").reverse().join("/")}`
+                  : `Studio Fechado em ${selectedDate.split("-").reverse().join("/")}`}
+              </span>
+
+              {earlyClosing && controlledBarberId !== "barbeiro-adrian" && !isAdrian && (
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full font-mono bg-[#DFBA73]/20 text-[#F5D799] border border-[#DFBA73]/40">
+                  Saída antecipada às {earlyClosing}
+                </span>
+              )}
+
+              {lunchBreak && (
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  🍽️ Almoço {isLunchBreakFixed ? "Fixo" : "neste dia"}: {lunchBreak} (travado)
+                </span>
+              )}
+
+              {!lunchBreak && hasLunchDateOverride && defaultLunchBreak && (
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full font-mono bg-white/10 text-gray-300 border border-white/20">
+                  Exceção: Sem almoço hoje (Fixo: {defaultLunchBreak})
+                </span>
+              )}
             </div>
-            <h4 className="text-lg font-serif font-bold text-white mt-0.5">
-              {isAdmin 
-                ? "Disponibilidade de Noah Ferreira (Dono) para Agendamentos" 
-                : "Minha Folga / Disponibilidade no Site (Adrian Santos)"}
-            </h4>
-            <p className="text-xs text-gray-400 font-light mt-0.5">
-              {isAdmin 
-                ? (isOwnerAvailable
-                    ? "Disponível no Site: O nome de Noah Ferreira está visível para agendamentos online."
-                    : "Em folga / Oculto: Seu nome está oculto no site. Apenas os outros barbeiros recebem agendamentos.")
-                : (isOwnerAvailable
-                    ? "Você está DISPONÍVEL no site para receber agendamentos de clientes na data selecionada acima."
-                    : "Você marcou FOLGA para a data selecionada acima. O estúdio continuará funcionando normalmente com Noah.")}
+
+            <h3 className="text-xl font-serif text-white mt-1">
+              {controlledBarberId === "barbeiro-adrian" || isAdrian
+                ? "Adrian Santos — Noah Barber Studio"
+                : "Noah Ferreira — Noah Barber Studio"}
+            </h3>
+
+            <p className="text-xs text-gray-300 mt-0.5 max-w-xl leading-relaxed font-light">
+              {controlledBarberId === "barbeiro-adrian" || isAdrian
+                ? isOwnerAvailable
+                  ? `Disponível para agendamentos online em ${selectedDate.split("-").reverse().join("/")}.`
+                  : `Folga confirmada para ${selectedDate.split("-").reverse().join("/")}. O estúdio permanecerá aberto com Noah.`
+                : isOwnerAvailable
+                ? `Disponível para agendamentos online em ${selectedDate.split("-").reverse().join("/")}. Os demais dias do ano continuam abertos.`
+                : `Studio fechado nesta data específica (${selectedDate.split("-").reverse().join("/")}). Os outros dias continuam normais.`}
             </p>
           </div>
         </div>
 
-        <button
-          onClick={toggleOwnerAvailability}
-          disabled={isTogglingOwner}
-          className={`px-5 py-3 rounded-2xl font-mono font-bold text-xs uppercase tracking-wider transition-all shrink-0 cursor-pointer border flex items-center gap-2 ${
-            isOwnerAvailable
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-              : "bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10"
-          }`}
-        >
-          <Power className="w-4 h-4" />
-          <span>{isOwnerAvailable ? "🟢 DISPONÍVEL NO SITE" : "⏻ EM FOLGA NESTA DATA"}</span>
-        </button>
+        {/* CONTROLES: ALMOÇO, SAIR ANTES E STUDIO ABERTO/FECHADO */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+          {/* Controle Pausa para Almoço (Fixo Diário ou Só na Data) */}
+          <LunchBreakControl
+            selectedDate={selectedDate}
+            lunchBreak={lunchBreak}
+            defaultLunchBreak={defaultLunchBreak}
+            hasDateOverride={hasLunchDateOverride}
+            scope={lunchBreakScope}
+            saving={isSavingLunch}
+            onScopeChange={setLunchBreakScope}
+            onSelectTime={handleSetLunchBreak}
+          />
+
+          {/* Controle Sair Mais Cedo nesta data (Apenas para o Dono Noah) */}
+          {(!isAdrian && controlledBarberId === "barbeiro-noah") && (
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-3 py-2">
+              <Clock className="w-3.5 h-3.5 text-[#DFBA73]" />
+              <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider whitespace-nowrap">
+                Sair antes:
+              </span>
+              <select
+                value={earlyClosing || ""}
+                onChange={(e) => handleSetEarlyClosing(e.target.value || null)}
+                className="bg-transparent text-white text-xs font-mono outline-none cursor-pointer"
+              >
+                <option value="" className="bg-[#080A0E] text-white">Horário normal (20h)</option>
+                <option value="19:00" className="bg-[#080A0E] text-white">Encerrar às 19:00</option>
+                <option value="18:00" className="bg-[#080A0E] text-white">Encerrar às 18:00</option>
+                <option value="17:00" className="bg-[#080A0E] text-white">Encerrar às 17:00</option>
+                <option value="16:00" className="bg-[#080A0E] text-white">Encerrar às 16:00</option>
+                <option value="15:00" className="bg-[#080A0E] text-white">Encerrar às 15:00</option>
+                <option value="14:00" className="bg-[#080A0E] text-white">Encerrar às 14:00</option>
+              </select>
+            </div>
+          )}
+
+          {/* Botão Studio Aberto / Fechado (Dono) ou Folga (Adrian) */}
+          <button
+            onClick={toggleOwnerAvailability}
+            disabled={isTogglingOwner}
+            className={`px-5 py-3 rounded-2xl font-bold uppercase tracking-wider text-xs font-mono transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md shrink-0 ${
+              isOwnerAvailable
+                ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500 hover:text-black"
+                : "bg-red-500/20 text-red-300 border border-red-500/40 hover:bg-red-500 hover:text-white"
+            }`}
+          >
+            <Power className="w-4 h-4" />
+            <span>
+              {isTogglingOwner
+                ? "Atualizando..."
+                : controlledBarberId === "barbeiro-adrian" || isAdrian
+                ? isOwnerAvailable
+                  ? "🟢 Trabalhar Hoje"
+                  : "🔴 Folga na Data"
+                : isOwnerAvailable
+                ? "Studio Aberto"
+                : "Studio Fechado"}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* PRÓXIMOS ATENDIMENTOS CONFIRMADOS */}

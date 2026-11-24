@@ -480,28 +480,33 @@ export default function AgendaPage() {
         </div>
       </div>
 
-      {/* CARD 1: DISPONIBILIDADE NO SITE (DONO OU INDIVIDUAL DO ADRIAN) */}
+      {/* CARD 1: STATUS DO STUDIO / DISPONIBILIDADE NO SITE COM FOTO DO BARBEIRO */}
       <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-xl">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 shrink-0">
-            <Power className="w-6 h-6" />
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shrink-0 shadow-md">
+            <Image
+              src={isAdmin ? "/barbers/noah-ferreira.jpg" : "/barbers/adrian-santos.jpg"}
+              alt={isAdmin ? "Noah Ferreira" : "Adrian Santos"}
+              fill
+              className="object-cover object-top"
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-[#DFBA73]">
-                {isAdmin ? "ESCALA 4X4 / FLEXÍVEL DO DONO" : "CONTROLE DE FOLGA INDIVIDUAL"}
+                {isAdmin ? "STATUS DO STUDIO (ABERTO OU FECHADO)" : "CONTROLE DE FOLGA INDIVIDUAL"}
               </span>
             </div>
             <h4 className="text-lg font-serif font-bold text-white mt-0.5">
               {isAdmin 
-                ? "Disponibilidade de Noah Ferreira (Dono) para Agendamentos" 
+                ? "Studio Aberto ou Fechado (Noah Ferreira)" 
                 : "Minha Folga / Disponibilidade no Site (Adrian Santos)"}
             </h4>
             <p className="text-xs text-gray-400 font-light mt-0.5">
               {isAdmin 
                 ? (isOwnerAvailable
-                    ? "Disponível no Site: O nome de Noah Ferreira está visível para agendamentos online."
-                    : "Em folga / Oculto: Seu nome está oculto no site. Apenas os outros barbeiros recebem agendamentos.")
+                    ? "Studio Aberto: O estúdio está aberto e recebendo agendamentos online normalmente."
+                    : "Studio Fechado: O estúdio está fechado para a data selecionada acima.")
                 : (isOwnerAvailable
                     ? "Você está DISPONÍVEL no site para receber agendamentos na data selecionada acima."
                     : "Você marcou FOLGA para a data selecionada acima. Seu horário estará bloqueado no site, sem afetar o Noah.")}
@@ -515,11 +520,15 @@ export default function AgendaPage() {
           className={`px-5 py-3 rounded-2xl font-mono font-bold text-xs uppercase tracking-wider transition-all shrink-0 cursor-pointer border flex items-center gap-2 ${
             isOwnerAvailable
               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-              : "bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10"
+              : "bg-red-500/20 border-red-500/30 text-red-300 hover:bg-red-500/30"
           }`}
         >
           <Power className="w-4 h-4" />
-          <span>{isOwnerAvailable ? "🟢 DISPONÍVEL NO SITE" : "⏻ EM FOLGA NESTA DATA"}</span>
+          <span>
+            {isAdmin 
+              ? (isOwnerAvailable ? "Studio Aberto" : "Studio Fechado")
+              : (isOwnerAvailable ? "🟢 DISPONÍVEL NO SITE" : "⏻ EM FOLGA NESTA DATA")}
+          </span>
         </button>
       </div>
 
@@ -598,8 +607,13 @@ export default function AgendaPage() {
         <div className="bg-[#050608] border border-white/5 rounded-2xl p-5 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#DFBA73]/10 border border-[#DFBA73]/20 flex items-center justify-center text-[#DFBA73] shrink-0">
-                <Coffee className="w-5 h-5" />
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#DFBA73] shrink-0 shadow-md">
+                <Image
+                  src={currentControlledBarber.id === "barbeiro-adrian" ? "/barbers/adrian-santos.jpg" : "/barbers/noah-ferreira.jpg"}
+                  alt={currentControlledBarber.name}
+                  fill
+                  className="object-cover object-top"
+                />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
