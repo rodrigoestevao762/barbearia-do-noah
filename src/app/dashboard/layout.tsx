@@ -97,6 +97,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     setIsNotifOpen(false);
+    if (typeof window !== "undefined") {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   useEffect(() => {
@@ -236,13 +239,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Mobile Bottom Bar (Barra Inferior Mobile com todas as abas incluindo Clientes VIP) */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-[#050608]/98 border-t border-white/10 z-[100] flex justify-around items-center px-1 pb-safe backdrop-blur-2xl">
+      <nav className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-[#050608]/98 border-t border-white/10 z-[100] flex justify-around items-center px-1 pb-safe backdrop-blur-2xl touch-manipulation">
         {navItems.map((item) => {
           const isActive = pathname === item.id;
           return (
             <Link 
               key={item.id} 
               href={item.id} 
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
               className={`p-1.5 flex flex-col items-center justify-center transition-all ${
                 isActive ? "text-[#DFBA73] scale-105" : "text-gray-400 hover:text-white"
               }`}
@@ -337,7 +345,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* Main Content Area */}
-      <main className="md:pl-36 md:pr-12 px-4 pt-6 pb-24 md:pb-16 relative z-10">
+      <main className="md:pl-36 md:pr-12 px-4 pt-6 pb-32 md:pb-16 relative z-10 w-full min-h-[calc(100vh-5rem)]">
         {children}
       </main>
 

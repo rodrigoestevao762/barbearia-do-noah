@@ -285,7 +285,7 @@ export default function FinanceiroPage() {
       </div>
 
       {/* TABS DE PROFISSIONAIS (VISÃO GERAL ESTÚDIO / NOAH DONO 55% / ADRIAN 45%) */}
-      <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto scrollbar-hide overscroll-x-contain touch-pan-y">
         <button
           onClick={() => setActiveTab("all")}
           className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap ${
