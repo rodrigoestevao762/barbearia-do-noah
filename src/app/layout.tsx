@@ -119,12 +119,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Barbearia do Noah" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/brand/logo-square-512.png?v=noah-gold-2026" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=noah-gold-2026" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png?v=noah-gold-2026" />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico?v=noah-gold-2026" />
-        <link rel="shortcut icon" href="/favicon.ico?v=noah-gold-2026" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png?v=noah-gold-2026" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/brand/logo-square-512.png?v=noah-2026-v3" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=noah-2026-v3" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png?v=noah-2026-v3" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico?v=noah-2026-v3" />
+        <link rel="shortcut icon" href="/favicon.ico?v=noah-2026-v3" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png?v=noah-2026-v3" />
+        <meta property="og:image" content="https://barbearia-do-noah.vercel.app/brand/noah-og-banner.png?v=noah-2026-v3" />
+        <meta property="og:image:secure_url" content="https://barbearia-do-noah.vercel.app/brand/noah-og-banner.png?v=noah-2026-v3" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:image" content="https://barbearia-do-noah.vercel.app/brand/noah-og-banner.png?v=noah-2026-v3" />
+        <link rel="image_src" href="https://barbearia-do-noah.vercel.app/brand/noah-og-banner.png?v=noah-2026-v3" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

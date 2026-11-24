@@ -14,12 +14,27 @@ export default function PwaInstallPrompt() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    // 1. Registra o Service Worker para PWA
-    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then((reg) => console.log("PWA Service Worker ativo:", reg.scope))
-        .catch((err) => console.warn("Erro no SW:", err));
+    // 1. Limpa caches antigos do navegador e registra o Service Worker atualizado
+    if (typeof window !== "undefined") {
+      if ("caches" in window) {
+        caches.keys().then((keys) => {
+          keys.forEach((key) => {
+            if (key.includes("las-studio") || (key.includes("v1") && !key.includes("v3"))) {
+              caches.delete(key);
+            }
+          });
+        });
+      }
+
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then((reg) => {
+            reg.update();
+            console.log("PWA Service Worker ativo:", reg.scope);
+          })
+          .catch((err) => console.warn("Erro no SW:", err));
+      }
     }
 
     // 2. Verifica se já está instalado (standalone)

@@ -1,20 +1,21 @@
-// Service Worker para LAS Barber Studio PWA
-const CACHE_NAME = 'las-studio-cache-v1';
+// Service Worker para Noah Barber Studio PWA
+const CACHE_NAME = 'noah-barber-studio-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
   '/favicon.ico',
-  '/icon.png',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/apple-icon.png'
+  '/icon.png?v=noah-2026-v3',
+  '/icon-192.png?v=noah-2026-v3',
+  '/icon-512.png?v=noah-2026-v3',
+  '/apple-icon.png?v=noah-2026-v3'
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -24,6 +25,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((name) => {
           if (name !== CACHE_NAME) {
+            console.log('Limpando cache legado:', name);
             return caches.delete(name);
           }
         })
