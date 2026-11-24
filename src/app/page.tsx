@@ -250,12 +250,16 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* NAVBAR (MODELO MR BASTOS - TRANSPARENTE E TOTALMENTE INTEGRADA À FOTO) */}
+      {/* NAVBAR COM SAFE AREA PARA CÂMERA MOBILE */}
       <motion.nav 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? -20 : 0 }}
         transition={{ duration: 0.8, delay: 1 }}
-        className="fixed top-0 left-0 w-full px-6 py-6 md:px-12 md:py-8 flex justify-between items-center z-50 bg-transparent pointer-events-auto"
+        className="fixed top-0 left-0 w-full px-5 md:px-12 flex justify-between items-center z-50 bg-gradient-to-b from-black/85 via-black/40 to-transparent pointer-events-auto transition-all"
+        style={{
+          paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 1.25rem), 3.5rem)",
+          paddingBottom: "1.25rem",
+        }}
       >
         <Link 
           href="/" 
@@ -335,7 +339,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -25 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed inset-0 z-[100] bg-[#02050A] flex flex-col justify-between p-6 overflow-y-auto md:hidden"
+            className="fixed inset-0 z-[100] bg-[#02050A] flex flex-col justify-between px-6 pb-6 overflow-y-auto md:hidden"
+            style={{
+              paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 1.25rem), 3.5rem)",
+            }}
           >
             {/* Topo do Menu Mobile */}
             <div className="flex items-center justify-between pb-5 border-b border-white/10 shrink-0">

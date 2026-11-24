@@ -201,7 +201,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Mobile Top Bar com Safe Area para desviar da câmera do celular */}
       <div 
         className="md:hidden sticky top-0 z-40 bg-[#050608]/95 backdrop-blur-xl border-b border-white/10 px-4 pb-3.5 flex items-center justify-between"
-        style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 0.85rem), 2.75rem)" }}
+        style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 1.25rem), 3.5rem)" }}
       >
         <Link 
           href="/dashboard" 
@@ -381,7 +381,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: -8 }}
               transition={{ duration: 0.16, ease: "easeOut" }}
-              className="fixed left-3 right-3 sm:left-auto sm:right-6 md:right-12 top-[calc(env(safe-area-inset-top,0px)+4.75rem)] md:top-24 sm:w-96 max-h-[calc(100dvh-7rem)] flex flex-col bg-[#080A0E]/95 border border-[#DFBA73]/40 rounded-2xl p-4 shadow-2xl shadow-black/95 z-[120] backdrop-blur-2xl ring-1 ring-white/10 font-sans"
+              className="fixed left-3 right-3 sm:left-auto sm:right-6 md:right-12 md:top-24 sm:w-96 max-h-[calc(100dvh-7rem)] flex flex-col bg-[#080A0E]/95 border border-[#DFBA73]/40 rounded-2xl p-4 shadow-2xl shadow-black/95 z-[120] backdrop-blur-2xl ring-1 ring-white/10 font-sans"
+              style={{ top: "max(calc(env(safe-area-inset-top, 0px) + 5.25rem), 6rem)" }}
             >
               <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-white/10 shrink-0">
                 <h4 className="text-sm font-serif text-white">Últimos Atendimentos</h4>

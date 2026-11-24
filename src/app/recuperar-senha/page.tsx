@@ -169,7 +169,7 @@ export default function RecuperarSenhaPage() {
   return (
     <div 
       className="min-h-screen bg-[#050608] flex items-center justify-center p-6 text-white selection:bg-[#DFBA73] selection:text-black relative overflow-hidden font-sans"
-      style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 2rem), 3rem)" }}
+      style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 2rem), 3.5rem)" }}
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#DFBA73]/10 blur-[150px] pointer-events-none rounded-full" />
       <Suspense fallback={<div className="text-[#DFBA73] animate-pulse font-mono text-xs">Carregando...</div>}>

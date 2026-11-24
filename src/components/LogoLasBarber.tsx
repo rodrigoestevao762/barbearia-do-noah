@@ -34,7 +34,7 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
 
   // Se for horizontal (navbar, header, footer):
   return (
-    <div className={`inline-flex items-center gap-3 select-none ${className}`}>
+    <div className={`inline-flex items-center gap-2.5 sm:gap-3 select-none ${className}`}>
       <div 
         className="relative inline-flex items-center justify-center shrink-0 rounded-xl overflow-hidden shadow-md shadow-black/50 border border-[#DFBA73]/30"
         style={{ width: size, height: size }}
@@ -49,10 +49,10 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
         />
       </div>
       <div className="flex flex-col text-left justify-center">
-        <span className="text-base sm:text-lg md:text-xl font-serif tracking-[0.22em] text-white uppercase font-bold leading-tight group-hover:text-[#F5D799] transition-colors">
+        <span className="text-sm sm:text-base md:text-xl font-serif tracking-[0.18em] sm:tracking-[0.22em] text-white uppercase font-bold leading-tight group-hover:text-[#F5D799] transition-colors">
           NOAH BARBER STUDIO
         </span>
-        <span className="text-[9px] md:text-[10px] font-mono tracking-[0.32em] text-[#DFBA73] uppercase font-bold leading-tight mt-0.5">
+        <span className="text-[8px] sm:text-[9px] md:text-[10px] font-mono tracking-[0.26em] sm:tracking-[0.32em] text-[#DFBA73] uppercase font-bold leading-tight mt-0.5">
           ATENDIMENTO EXCLUSIVO
         </span>
       </div>

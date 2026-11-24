@@ -12,8 +12,11 @@ export default function PoliticaPrivacidadePage() {
   return (
     <div className="min-h-screen bg-[#050B14] text-white selection:bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold selection:text-[#050B14] font-sans">
       {/* Topo / Barra Superior */}
-      <header className="border-b border-amber-500/20 bg-[#070D18]/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
+      <header 
+        className="border-b border-amber-500/20 bg-[#070D18]/80 backdrop-blur-md sticky top-0 z-50"
+        style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 0.85rem), 2.5rem)" }}
+      >
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-400 hover:text-amber-400 transition-colors font-semibold"

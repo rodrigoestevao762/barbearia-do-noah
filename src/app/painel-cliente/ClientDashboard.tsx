@@ -338,7 +338,7 @@ export default function ClientDashboard() {
       {/* ── HEADER DO CLIENTE COM SAFE AREA PARA CÂMERA MOBILE ── */}
       <header 
         className="border-b border-white/10 bg-[#080A0E]/90 sticky top-0 z-40 backdrop-blur-2xl pb-4 px-6"
-        style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 0.85rem), 2.75rem)" }}
+        style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 1.25rem), 3.5rem)" }}
       >
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3 group">

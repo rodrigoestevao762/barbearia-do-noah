@@ -132,14 +132,14 @@ export default function LoginPage() {
         <Link 
           href="/" 
           className="absolute left-6 sm:left-8 flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-400 hover:text-[#DFBA73] transition-colors z-20"
-          style={{ top: "max(calc(env(safe-area-inset-top, 0px) + 0.85rem), 1.75rem)" }}
+          style={{ top: "max(calc(env(safe-area-inset-top, 0px) + 1.25rem), 3rem)" }}
         >
           <ChevronLeft className="w-4 h-4" /> Voltar ao Site
         </Link>
 
         <div 
           className="w-full max-w-md relative z-10 lg:pt-0"
-          style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 4.25rem), 4.75rem)" }}
+          style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 5rem), 5.5rem)" }}
         >
           <div className="mb-8 text-center lg:text-left">
             <div className="flex items-center gap-4 justify-center lg:justify-start mb-5">
