@@ -12,8 +12,10 @@ export interface BarberData {
   isOwner?: boolean;
 }
 
-export const HOUSE_COMMISSION_RATE = 0.55; // 55% para Casa / Administração
-export const BARBER_COMMISSION_RATE = 0.45; // 45% Repasse para Barbeiro
+export const OWNER_COMMISSION_RATE = 0.55; // 55% para Noah Ferreira (Dono)
+export const ADRIAN_COMMISSION_RATE = 0.45; // 45% para Adrian Santos (Funcionário)
+export const HOUSE_COMMISSION_RATE = 0.55; // Compatibilidade de sistema
+export const BARBER_COMMISSION_RATE = 0.45;
 
 export const BARBERS: BarberData[] = [
   {
@@ -26,7 +28,7 @@ export const BARBERS: BarberData[] = [
     specialty: "Corte de Alta Precisão, Visagismo & Estilo Exclusivo",
     avatar: "/barbers/noah-ferreira.jpg",
     bio: "Fundador e Proprietário do Noah Barber Studio. Alta precisão, visagismo e atendimento de alto padrão.",
-    commissionRate: 0.45,
+    commissionRate: 0.55,
     isOwner: true,
   },
   {

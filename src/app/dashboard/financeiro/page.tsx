@@ -234,20 +234,20 @@ export default function FinanceiroPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 right-6 z-[100] bg-[#080A0E] border border-blue-500/50 text-blue-300 px-5 py-3 rounded-2xl shadow-2xl shadow-black/80 flex items-center gap-3 text-xs font-mono font-semibold"
+            className="fixed top-6 right-6 z-[100] bg-[#080A0E] border border-[#DFBA73]/50 text-[#F5D799] px-5 py-3 rounded-2xl shadow-2xl shadow-black/80 flex items-center gap-3 text-xs font-mono font-semibold"
           >
-            <CheckCircle2 className="w-4 h-4 text-blue-400" />
+            <CheckCircle2 className="w-4 h-4 text-[#DFBA73]" />
             <span>{toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* HEADER MR. BASTOS STYLE */}
+      {/* HEADER NOAH BARBER STUDIO STYLE */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-6">
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="text-[10px] bg-blue-500/15 border border-blue-500/30 text-blue-400 font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3 h-3 text-blue-400" /> GESTÃO GERAL DO DONO • 45% Barbeiros (Inclusive Dono) • 55% Casa / Gestão
+            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
+              <Shield className="w-3 h-3 text-[#DFBA73]" /> GESTÃO GERAL DO DONO • 55% Noah (Dono) • 45% Adrian (Funcionário)
             </span>
           </div>
 
@@ -255,7 +255,7 @@ export default function FinanceiroPage() {
             Gestão Financeira
           </h2>
           <p className="text-gray-400 mt-1 text-sm font-light">
-            Controle financeiro geral da casa, lucro retido e fechamento diário por barbeiro.
+            Controle financeiro geral do estúdio, comissões de Adrian e faturamento do Dono Noah Ferreira.
           </p>
         </div>
 
@@ -276,53 +276,53 @@ export default function FinanceiroPage() {
           <button
             type="button"
             onClick={() => setIsFixedExpenseModalOpen(true)}
-            className="px-4 py-2.5 rounded-2xl bg-[#080A0E] hover:bg-white/5 border border-blue-500/30 text-blue-400 hover:text-blue-300 font-mono text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-500/5 font-semibold"
+            className="px-4 py-2.5 rounded-2xl bg-[#080A0E] hover:bg-white/5 border border-[#DFBA73]/30 text-[#DFBA73] hover:text-[#F5D799] font-mono text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#DFBA73]/10 font-semibold"
           >
-            <TrendingDown className="w-3.5 h-3.5 text-blue-400" />
+            <TrendingDown className="w-3.5 h-3.5 text-[#DFBA73]" />
             <span>DESPESA FIXA DA BARBEARIA</span>
           </button>
         </div>
       </div>
 
-      {/* TABS DE PROFISSIONAIS (VISÃO GERAL CASA / NOAH DONO / ADRIAN 45%) */}
+      {/* TABS DE PROFISSIONAIS (VISÃO GERAL ESTÚDIO / NOAH DONO 55% / ADRIAN 45%) */}
       <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto">
         <button
           onClick={() => setActiveTab("all")}
           className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeTab === "all"
-              ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 border border-blue-500"
+              ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
               : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
           }`}
         >
-          VISÃO GERAL (CASA)
+          VISÃO GERAL DO ESTÚDIO
         </button>
 
         <button
           onClick={() => setActiveTab("barbeiro-noah")}
           className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
             activeTab === "barbeiro-noah"
-              ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 border border-blue-500"
+              ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
               : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
           }`}
         >
           <span>✂️</span>
-          <span>NOAH (DONO)</span>
+          <span>NOAH (DONO · 55%)</span>
         </button>
 
         <button
           onClick={() => setActiveTab("barbeiro-adrian")}
           className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
             activeTab === "barbeiro-adrian"
-              ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 border border-blue-500"
+              ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
               : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
           }`}
         >
           <span>✂️</span>
-          <span>ADRIAN (45%)</span>
+          <span>ADRIAN (FUNCIONÁRIO · 45%)</span>
         </button>
       </div>
 
-      {/* 4 CARDS ESTRUTURA MR. BASTOS */}
+      {/* 4 CARDS ESTRUTURA NOAH BARBER STUDIO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Card 1: ENTRADAS BRUTAS */}
         <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all">
@@ -339,48 +339,48 @@ export default function FinanceiroPage() {
           </p>
         </div>
 
-        {/* Card 2: COMISSÕES A PAGAR (45%) - Tema Azul */}
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-blue-500/50 transition-all">
+        {/* Card 2: COMISSÃO ADRIAN (45%) - Tema Dourado/Âmbar */}
+        <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-3xl p-6 relative overflow-hidden group hover:border-[#DFBA73]/50 transition-all">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-blue-300 font-bold flex items-center gap-1.5">
-              <Scissors className="w-3.5 h-3.5 text-blue-400" /> COMISSÕES A PAGAR (45%)
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#F5D799] font-bold flex items-center gap-1.5">
+              <Scissors className="w-3.5 h-3.5 text-[#DFBA73]" /> COMISSÃO ADRIAN (45%)
             </span>
           </div>
-          <h3 className="text-3xl font-serif text-blue-400 tracking-tight mb-1">
+          <h3 className="text-3xl font-serif text-[#DFBA73] tracking-tight mb-1">
             R$ {displayComissoes.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
-          <p className="text-xs text-blue-300/70 font-light">
-            {activeTab === "all" ? "Total devido aos barbeiros (inclusive Dono)." : "Comissão líquida do barbeiro."}
+          <p className="text-xs text-[#DFBA73]/70 font-light">
+            {activeTab === "all" ? "Comissão a pagar ao funcionário Adrian Santos (45%)." : "Comissão líquida do barbeiro (45%)."}
           </p>
         </div>
 
-        {/* Card 3: CONTA ADMINISTRAÇÃO (55%) */}
-        <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-1.5">
-              <Building className="w-3.5 h-3.5 text-gray-400" /> CONTA ADMINISTRAÇÃO (55%)
-            </span>
-          </div>
-          <h3 className="text-3xl font-serif text-white tracking-tight mb-1">
-            R$ {displayAdmin.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-          </h3>
-          <p className="text-xs text-gray-400 font-light">
-            Destinado para cobrir custos mensais da barbearia.
-          </p>
-        </div>
-
-        {/* Card 4: SALDO LÍQUIDO DA CASA - Tema Verde Esmeralda */}
+        {/* Card 3: FATURAMENTO NOAH (DONO · 55%) */}
         <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold flex items-center gap-1.5">
-              <Wallet className="w-3.5 h-3.5 text-emerald-400" /> SALDO LÍQUIDO DA CASA
+              <Building className="w-3.5 h-3.5 text-emerald-400" /> NOAH FERREIRA (DONO · 55%)
             </span>
           </div>
           <h3 className="text-3xl font-serif text-emerald-400 tracking-tight mb-1">
-            R$ {displaySaldoLiquido.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            R$ {displayAdmin.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
           <p className="text-xs text-emerald-300/70 font-light">
-            55% retido menos saídas e despesas.
+            Faturamento do Dono Noah: produção própria + 55% de Adrian.
+          </p>
+        </div>
+
+        {/* Card 4: SALDO LÍQUIDO DO ESTÚDIO - Tema Verde Esmeralda */}
+        <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-300 font-bold flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5 text-emerald-400" /> SALDO LÍQUIDO DO ESTÚDIO
+            </span>
+          </div>
+          <h3 className="text-3xl font-serif text-white tracking-tight mb-1">
+            R$ {displaySaldoLiquido.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+          </h3>
+          <p className="text-xs text-gray-400 font-light">
+            Receita do Dono retida menos saídas e vales diários.
           </p>
         </div>
       </div>
@@ -470,7 +470,7 @@ export default function FinanceiroPage() {
                         sizes="56px"
                       />
                     ) : (
-                      <Shield className="w-6 h-6 text-blue-400" />
+                      <Shield className="w-6 h-6 text-[#DFBA73]" />
                     )}
                   </div>
 
@@ -479,8 +479,12 @@ export default function FinanceiroPage() {
                       <h4 className="text-white font-serif font-bold text-lg">
                         {barber.name} {barber.isOwner ? "(Dono)" : ""}
                       </h4>
-                      <span className="text-[10px] uppercase font-bold font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/40 text-blue-300">
-                        {barber.isOwner ? "DONO • 45%" : "COMISSÃO 45%"}
+                      <span className={`text-[10px] uppercase font-bold font-mono tracking-wider px-2.5 py-0.5 rounded-full ${
+                        barber.isOwner
+                          ? "bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799]"
+                          : "bg-amber-500/20 border border-amber-500/40 text-amber-300"
+                      }`}>
+                        {barber.isOwner ? "DONO · 55%" : "FUNCIONÁRIO · 45%"}
                       </span>
                     </div>
                     <p className="text-xs text-gray-400 mt-0.5 font-light">
@@ -494,12 +498,20 @@ export default function FinanceiroPage() {
                     <p className="text-[10px] text-gray-400 uppercase font-mono tracking-wider">
                       PRODUÇÃO BRUTA: R$ {barber.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </p>
-                    <h5 className="text-xl font-serif text-blue-400 font-bold mt-0.5">
-                      Comissão (45%): R$ {barber.commission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                    </h5>
-                    <p className="text-[11px] text-emerald-400 font-mono mt-0.5">
-                      Repasse Casa / Administração (55%): + R$ {barber.houseShare.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                    </p>
+                    {barber.isOwner ? (
+                      <h5 className="text-xl font-serif text-emerald-400 font-bold mt-0.5">
+                        Produção do Dono: R$ {barber.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      </h5>
+                    ) : (
+                      <h5 className="text-xl font-serif text-[#DFBA73] font-bold mt-0.5">
+                        Comissão (45%): R$ {barber.commission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      </h5>
+                    )}
+                    {!barber.isOwner && (
+                      <p className="text-[11px] text-emerald-400 font-mono mt-0.5">
+                        Repasse Dono Noah (55%): + R$ {barber.houseShare.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -543,7 +555,7 @@ export default function FinanceiroPage() {
                         onClick={() => setExpenseCategory(cat)}
                         className={`py-2 text-xs font-mono font-semibold uppercase rounded-xl border transition-all ${
                           expenseCategory === cat
-                            ? "bg-blue-600 border-blue-500 text-white"
+                            ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold border-[#DFBA73]"
                             : "bg-white/5 border-white/10 text-gray-400 hover:text-white"
                         }`}
                       >
@@ -579,7 +591,7 @@ export default function FinanceiroPage() {
                     placeholder="Ex: Vale semanal, Gelo para bebidas, Lâminas..."
                     value={expenseDesc}
                     onChange={(e) => setExpenseDesc(e.target.value)}
-                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-blue-500"
+                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-[#DFBA73]"
                   />
                 </div>
 
@@ -594,14 +606,14 @@ export default function FinanceiroPage() {
                     placeholder="0.00"
                     value={expenseAmount}
                     onChange={(e) => setExpenseAmount(e.target.value)}
-                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-blue-500"
+                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-[#DFBA73]"
                   />
                 </div>
 
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase font-mono tracking-wider text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/30 cursor-pointer"
+                    className="w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase font-mono tracking-wider text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 cursor-pointer"
                   >
                     Confirmar Saída
                   </button>
@@ -630,11 +642,11 @@ export default function FinanceiroPage() {
               </button>
 
               <div className="flex items-center gap-3 mb-2">
-                <Building className="w-5 h-5 text-blue-400" />
+                <Building className="w-5 h-5 text-[#DFBA73]" />
                 <h3 className="text-xl font-serif text-white">Despesas Fixas da Barbearia</h3>
               </div>
               <p className="text-xs text-gray-400 font-light mb-6">
-                Custos mensais estruturais mantidos pela retenção da Conta Administração (55%).
+                Custos mensais estruturais mantidos pelo faturamento da barbearia.
               </p>
 
               {/* Lista de Despesas Fixas */}
@@ -664,14 +676,14 @@ export default function FinanceiroPage() {
               </div>
 
               {/* Totalizador Mensal */}
-              <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-2xl flex items-center justify-between mb-6">
+              <div className="p-4 bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-2xl flex items-center justify-between mb-6">
                 <div>
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-blue-300">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-[#F5D799]">
                     Total Fixo Mensal Estimado
                   </p>
-                  <p className="text-xs text-gray-400">Coberto pelos 55% da casa</p>
+                  <p className="text-xs text-gray-400">Custos fixos da barbearia</p>
                 </div>
-                <h4 className="text-2xl font-serif text-blue-400 font-bold">
+                <h4 className="text-2xl font-serif text-[#DFBA73] font-bold">
                   R$ {totalFixedMonthly.toFixed(2)}
                 </h4>
               </div>
@@ -688,7 +700,7 @@ export default function FinanceiroPage() {
                     placeholder="Título (ex: Contador)"
                     value={newFixedTitle}
                     onChange={(e) => setNewFixedTitle(e.target.value)}
-                    className="bg-[#050608] border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500"
+                    className="bg-[#050608] border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-[#DFBA73]"
                   />
                   <input
                     type="number"
@@ -697,12 +709,12 @@ export default function FinanceiroPage() {
                     placeholder="Valor (R$)"
                     value={newFixedAmount}
                     onChange={(e) => setNewFixedAmount(e.target.value)}
-                    className="bg-[#050608] border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500"
+                    className="bg-[#050608] border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-[#DFBA73]"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase font-mono tracking-wider text-xs py-2.5 rounded-xl transition-all shadow-md cursor-pointer"
+                  className="w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase font-mono tracking-wider text-xs py-2.5 rounded-xl transition-all shadow-md hover:brightness-110 cursor-pointer"
                 >
                   Salvar Despesa Fixa
                 </button>

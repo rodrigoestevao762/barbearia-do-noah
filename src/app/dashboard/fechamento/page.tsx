@@ -122,19 +122,19 @@ export default function FechamentoPage() {
 
   return (
     <div className="max-w-5xl mx-auto pb-16 space-y-8">
-      {/* HEADER OFICIAL PADRÃO MR. BASTOS */}
+      {/* HEADER OFICIAL PADRÃO NOAH BARBER STUDIO */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-6">
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="text-[10px] bg-blue-500/15 border border-blue-500/30 text-blue-400 font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3 h-3 text-blue-400" /> GESTÃO & ADMINISTRAÇÃO
+            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
+              <Shield className="w-3 h-3 text-[#DFBA73]" /> GESTÃO & ADMINISTRAÇÃO
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
             Fechamento de Caixa
           </h2>
           <p className="text-xs text-gray-400 mt-1 font-light">
-            Conferência final do dia com repasse de 45% aos barbeiros e 55% para a Administração cobrir os custos mensais.
+            Conferência final do dia com repasse de 55% para Noah Ferreira (Dono) e 45% para Adrian Santos (Funcionário).
           </p>
         </div>
 
@@ -170,7 +170,7 @@ export default function FechamentoPage() {
         </motion.div>
       )}
 
-      {/* 3 CARDS DE FATURAMENTO: BRUTO, REPASSE BARBEIROS (45%) E CAIXA CASA (55%) */}
+      {/* 3 CARDS DE FATURAMENTO: BRUTO, ADRIAN (45%) E NOAH DONO (55%) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1: Faturamento Bruto */}
         <motion.div
@@ -196,32 +196,32 @@ export default function FechamentoPage() {
           </p>
         </motion.div>
 
-        {/* Card 2: Repasse Barbeiros (45%) - Tema Azul */}
+        {/* Card 2: Repasse Adrian Santos (45%) - Tema Âmbar / Ouro */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="bg-blue-500/10 border border-blue-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-blue-500/50 transition-all shadow-xl shadow-black/40"
+          className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-3xl p-6 relative overflow-hidden group hover:border-[#DFBA73]/50 transition-all shadow-xl shadow-black/40"
         >
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-11 h-11 bg-blue-500/20 border border-blue-500/30 rounded-2xl flex items-center justify-center text-blue-400">
+            <div className="w-11 h-11 bg-[#DFBA73]/20 border border-[#DFBA73]/30 rounded-2xl flex items-center justify-center text-[#DFBA73]">
               <Scissors className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-blue-300 text-[10px] uppercase font-mono tracking-widest font-bold">
-                REPASSE BARBEIROS (45%)
+              <p className="text-[#F5D799] text-[10px] uppercase font-mono tracking-widest font-bold">
+                ADRIAN SANTOS (45%)
               </p>
-              <h3 className="text-2xl md:text-3xl font-serif text-blue-400 tracking-tight mt-0.5">
+              <h3 className="text-2xl md:text-3xl font-serif text-[#DFBA73] tracking-tight mt-0.5">
                 R$ {data.totalCommissions.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
               </h3>
             </div>
           </div>
-          <p className="text-[11px] text-blue-300/70 font-light">
-            Total a pagar a todos os barbeiros (inclusive Dono a 45%).
+          <p className="text-[11px] text-[#DFBA73]/70 font-light">
+            Comissão do funcionário Adrian Santos (45% de seus atendimentos).
           </p>
         </motion.div>
 
-        {/* Card 3: Caixa Casa / Administração (55%) - Tema Verde Esmeralda */}
+        {/* Card 3: Noah Ferreira (Dono · 55%) - Tema Verde Esmeralda */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -234,7 +234,7 @@ export default function FechamentoPage() {
             </div>
             <div>
               <p className="text-emerald-300 text-[10px] uppercase font-mono tracking-widest font-bold">
-                CAIXA CASA / ADMINISTRAÇÃO (55%)
+                NOAH FERREIRA (DONO · 55%)
               </p>
               <h3 className="text-2xl md:text-3xl font-serif text-emerald-400 tracking-tight mt-0.5">
                 R$ {data.houseShare.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
@@ -242,7 +242,7 @@ export default function FechamentoPage() {
             </div>
           </div>
           <p className="text-[11px] text-emerald-300/70 font-light">
-            55% destinado para cobrir os custos mensais.
+            Faturamento retido por Noah (Dono): sua produção + 55% de Adrian.
           </p>
         </motion.div>
       </div>
@@ -260,7 +260,7 @@ export default function FechamentoPage() {
             </p>
           ) : (
             data.barberRevenues.map((barber: BarberRevenue, idx: number) => {
-              const barberHouseShare = barber.houseShare ?? Math.round(barber.total * 0.55 * 100) / 100;
+              const isOwner = barber.isOwner;
               return (
                 <motion.div
                   key={barber.id || idx}
@@ -281,27 +281,27 @@ export default function FechamentoPage() {
                           sizes="56px"
                         />
                       ) : (
-                        <Shield className="w-6 h-6 text-blue-400" />
+                        <Shield className="w-6 h-6 text-[#DFBA73]" />
                       )}
                     </div>
 
                     <div>
                       <div className="flex items-center gap-2.5 flex-wrap">
                         <h4 className="text-white font-serif font-bold text-lg">
-                          {barber.name} {barber.isOwner ? "(Dono)" : ""}
+                          {barber.name} {isOwner ? "(Dono)" : ""}
                         </h4>
-                        {barber.isOwner ? (
-                          <span className="text-[10px] uppercase font-bold font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/40 text-blue-300">
-                            DONO • 45%
+                        {isOwner ? (
+                          <span className="text-[10px] uppercase font-bold font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799]">
+                            DONO · 55%
                           </span>
                         ) : (
-                          <span className="text-[10px] uppercase font-bold font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/40 text-blue-300">
-                            COMISSÃO 45%
+                          <span className="text-[10px] uppercase font-bold font-mono tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300">
+                            FUNCIONÁRIO · 45%
                           </span>
                         )}
                       </div>
                       <p className="text-xs text-gray-400 mt-0.5 font-light">
-                        {barber.isOwner ? "Proprietário da Barbearia" : "Barbeiro da Equipe"}
+                        {isOwner ? "Proprietário da Barbearia" : "Barbeiro da Equipe"}
                       </p>
                     </div>
                   </div>
@@ -311,12 +311,20 @@ export default function FechamentoPage() {
                       <p className="text-[10px] text-gray-400 uppercase font-mono tracking-wider">
                         PRODUÇÃO BRUTA: R$ {barber.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </p>
-                      <h5 className="text-xl font-serif text-blue-400 font-bold mt-0.5">
-                        Comissão (45%): R$ {barber.commission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </h5>
-                      <p className="text-[11px] text-emerald-400 font-mono mt-0.5">
-                        Repasse Casa / Administração: + R$ {barberHouseShare.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </p>
+                      {isOwner ? (
+                        <h5 className="text-xl font-serif text-emerald-400 font-bold mt-0.5">
+                          Produção do Dono: R$ {barber.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        </h5>
+                      ) : (
+                        <h5 className="text-xl font-serif text-[#DFBA73] font-bold mt-0.5">
+                          Comissão (45%): R$ {barber.commission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        </h5>
+                      )}
+                      {!isOwner && (
+                        <p className="text-[11px] text-emerald-400 font-mono mt-0.5">
+                          Repasse Dono Noah (55%): + R$ {(barber.houseShare || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </motion.div>
@@ -326,11 +334,11 @@ export default function FechamentoPage() {
         </div>
       </div>
 
-      {/* BOTÃO DE REGISTRO DO FECHAMENTO PADRÃO MR. BASTOS */}
+      {/* BOTÃO DE REGISTRO DO FECHAMENTO PADRÃO NOAH BARBER STUDIO */}
       {!isClosed ? (
         <button
           onClick={handleClose}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase font-mono tracking-widest text-xs py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-2xl shadow-blue-600/30 cursor-pointer"
+          className="w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase font-mono tracking-widest text-xs py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-2xl shadow-[#DFBA73]/25 hover:brightness-110 cursor-pointer"
         >
           <Archive className="w-4 h-4" />
           <span>Registrar Fechamento do Caixa</span>

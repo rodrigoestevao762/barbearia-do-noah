@@ -176,9 +176,9 @@ export async function GET(req: Request) {
       .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(0, 20);
 
-    // Modelo de Comissionamento Noah Barber Studio: 45% Barbeiro / 55% Casa (Administração)
-    const COMMISSION_RATE = 0.45;
-    const HOUSE_RATE = 0.55;
+    // Modelo de Comissionamento Noah Barber Studio: 55% Noah (Dono) / 45% Adrian (Funcionário)
+    const ADRIAN_RATE = 0.45;
+    const OWNER_RATE = 0.55;
 
     // Detalhamento individual por barbeiro (Noah Ferreira & Adrian Santos)
     const breakdown = BARBERS.map((barber) => {
@@ -191,17 +191,18 @@ export async function GET(req: Request) {
 
       const completed = barberApts.filter((apt) => apt.status === "COMPLETED");
       const revenue = completed.reduce((acc, apt) => acc + (apt.service?.price || 0), 0);
-      const commission = Math.round(revenue * COMMISSION_RATE * 100) / 100;
-      const houseShare = Math.round(revenue * HOUSE_RATE * 100) / 100;
+      const rate = barber.isOwner ? OWNER_RATE : ADRIAN_RATE;
+      const commission = Math.round(revenue * rate * 100) / 100;
+      const houseShare = barber.isOwner ? revenue : Math.round(revenue * OWNER_RATE * 100) / 100;
 
       return {
         id: barber.id,
         name: barber.name,
-        role: barber.role,
+        role: barber.isOwner ? "Proprietário da Barbearia" : "Barbeiro da Equipe",
         avatar: barber.avatar,
         phone: barber.phone,
         phoneDisplay: barber.phoneDisplay,
-        commissionRate: COMMISSION_RATE,
+        commissionRate: rate,
         isOwner: Boolean(barber.isOwner),
         totalApts: barberApts.length,
         completedApts: completed.length,
@@ -214,8 +215,10 @@ export async function GET(req: Request) {
     // Faturamento e Repasses Totais do Estúdio
     const allCompleted = allDayAppointments.filter((apt) => apt.status === "COMPLETED");
     const totalGrossShop = allCompleted.reduce((acc, apt) => acc + (apt.service?.price || 0), 0);
-    const totalCommissionsToPay = Math.round(totalGrossShop * COMMISSION_RATE * 100) / 100;
-    const houseNetProfit = Math.round(totalGrossShop * HOUSE_RATE * 100) / 100;
+    const adrianBreakdownItem = breakdown.find((b) => !b.isOwner);
+    const noahBreakdownItem = breakdown.find((b) => b.isOwner);
+    const totalCommissionsToPay = adrianBreakdownItem ? adrianBreakdownItem.commission : Math.round(totalGrossShop * ADRIAN_RATE * 100) / 100;
+    const houseNetProfit = (noahBreakdownItem ? noahBreakdownItem.revenue : 0) + (adrianBreakdownItem ? (adrianBreakdownItem.revenue * OWNER_RATE) : 0);
     const ticketMedio = allCompleted.length > 0 ? totalGrossShop / allCompleted.length : 0;
 
     // Filtro ativo (Todos, Noah Ferreira, ou Adrian Santos)

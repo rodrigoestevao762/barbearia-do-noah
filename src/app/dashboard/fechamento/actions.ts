@@ -52,7 +52,7 @@ export async function getFechamentoData(dateStr?: string) {
 
     let totalRevenue = 0;
 
-    // Detalhamento individual por profissional da equipe (Noah Ferreira & Adrian Santos)
+    // Detalhamento individual por profissional (55% Noah Dono / 45% Adrian Funcionário)
     const barberRevenues = BARBERS.map((barber) => {
       const bApts = appointments.filter((app) => {
         if (barber.isOwner) {
@@ -62,26 +62,36 @@ export async function getFechamentoData(dateStr?: string) {
       });
 
       const total = bApts.reduce((acc, app) => acc + (app.service?.price || 0), 0);
-      const commission = Math.round(total * BARBER_COMMISSION_RATE * 100) / 100;
-      const houseShare = Math.round(total * HOUSE_COMMISSION_RATE * 100) / 100;
       totalRevenue += total;
+
+      const rate = barber.isOwner ? 0.55 : 0.45;
+      const commission = Math.round(total * rate * 100) / 100;
+      const ownerShare = barber.isOwner 
+        ? total 
+        : Math.round(total * 0.55 * 100) / 100;
 
       return {
         id: barber.id,
         name: barber.name,
-        role: barber.role,
+        role: barber.isOwner ? "Proprietário da Barbearia" : "Barbeiro da Equipe",
         avatar: barber.avatar,
         total,
         commission,
-        houseShare,
-        rate: BARBER_COMMISSION_RATE,
+        houseShare: ownerShare,
+        rate,
         isOwner: Boolean(barber.isOwner),
         aptsCount: bApts.length,
       };
     });
 
-    const totalCommissions = Math.round(totalRevenue * BARBER_COMMISSION_RATE * 100) / 100;
-    const houseShare = Math.round(totalRevenue * HOUSE_COMMISSION_RATE * 100) / 100;
+    const adrianBarber = barberRevenues.find(b => !b.isOwner);
+    const noahBarber = barberRevenues.find(b => b.isOwner);
+
+    // Adrian recebe 45% de seus atendimentos
+    const totalCommissions = adrianBarber ? adrianBarber.commission : Math.round(totalRevenue * 0.45 * 100) / 100;
+    // Noah (Dono) fica com sua produção + 55% dos atendimentos de Adrian
+    const noahTotalReceita = (noahBarber ? noahBarber.total : 0) + (adrianBarber ? (adrianBarber.total * 0.55) : 0);
+    const houseShare = Math.round(noahTotalReceita * 100) / 100;
 
     const sanitizedClosings = closings.map((c: any) => ({
       ...c,

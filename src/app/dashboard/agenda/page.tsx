@@ -372,18 +372,18 @@ export default function AgendaPage() {
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-16">
       {/* Toast Feedback */}
       {toastMessage && (
-        <div className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 bg-[#0B0E14]/95 border border-blue-500/50 text-blue-300 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-xl text-xs font-mono flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom-4">
+        <div className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6 bg-[#0B0E14]/95 border border-[#DFBA73]/50 text-[#F5D799] px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-xl text-xs font-mono flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom-4">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* HEADER MR. BASTOS STYLE */}
+      {/* HEADER NOAH BARBER STUDIO STYLE */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] bg-blue-500/15 border border-blue-500/30 text-blue-400 font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3 h-3 text-blue-400" /> AGENDA ADMINISTRATIVA
+            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
+              <Shield className="w-3 h-3 text-[#DFBA73]" /> AGENDA ADMINISTRATIVA
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
@@ -402,7 +402,7 @@ export default function AgendaPage() {
               onClick={() => setSelectedBarberFilter("all")}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                 selectedBarberFilter === "all"
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                  ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-md shadow-[#DFBA73]/25"
                   : "text-gray-400 hover:text-white"
               }`}
             >
@@ -412,7 +412,7 @@ export default function AgendaPage() {
               onClick={() => setSelectedBarberFilter("barbeiro-noah")}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                 selectedBarberFilter === "barbeiro-noah"
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                  ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-md shadow-[#DFBA73]/25"
                   : "text-gray-400 hover:text-white"
               }`}
             >
@@ -422,7 +422,7 @@ export default function AgendaPage() {
               onClick={() => setSelectedBarberFilter("barbeiro-adrian")}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                 selectedBarberFilter === "barbeiro-adrian"
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                  ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-md shadow-[#DFBA73]/25"
                   : "text-gray-400 hover:text-white"
               }`}
             >
@@ -435,7 +435,7 @@ export default function AgendaPage() {
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="bg-[#080A0E] border border-white/10 rounded-2xl px-4 py-2 text-white text-xs font-mono focus:outline-none focus:border-blue-500 transition-colors [&::-webkit-calendar-picker-indicator]:invert cursor-pointer"
+            className="bg-[#080A0E] border border-white/10 rounded-2xl px-4 py-2 text-white text-xs font-mono focus:outline-none focus:border-[#DFBA73] transition-colors [&::-webkit-calendar-picker-indicator]:invert cursor-pointer"
           />
 
           {/* Novo Agendamento Button */}
@@ -444,7 +444,7 @@ export default function AgendaPage() {
               setCreateErrorMsg("");
               setIsModalOpen(true);
             }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-xs uppercase font-mono tracking-wider transition-all flex items-center gap-1.5 shadow-lg shadow-blue-600/30 cursor-pointer"
+            className="px-4 py-2 bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold rounded-2xl text-xs uppercase font-mono tracking-wider transition-all flex items-center gap-1.5 shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 cursor-pointer"
           >
             <Plus className="w-4 h-4" /> NOVO AGENDAMENTO
           </button>
@@ -459,7 +459,7 @@ export default function AgendaPage() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-blue-400">
+              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-[#DFBA73]">
                 ESCALA 4X4 / FLEXÍVEL
               </span>
             </div>
@@ -493,7 +493,7 @@ export default function AgendaPage() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/5 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-blue-400 flex items-center gap-1.5">
+              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-[#DFBA73] flex items-center gap-1.5">
                 <Coffee className="w-3.5 h-3.5" /> CONTROLE INDIVIDUAL DE ALMOÇO & EXPEDIENTE
               </span>
             </div>
@@ -509,22 +509,22 @@ export default function AgendaPage() {
                 onClick={() => setControlledBarberId("barbeiro-noah")}
                 className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   controlledBarberId === "barbeiro-noah"
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                    ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-md shadow-[#DFBA73]/25"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
-                <span className={`w-2 h-2 rounded-full ${controlledBarberId === "barbeiro-noah" ? "bg-white" : "bg-blue-400"}`} />
+                <span className={`w-2 h-2 rounded-full ${controlledBarberId === "barbeiro-noah" ? "bg-black" : "bg-[#DFBA73]"}`} />
                 <span>Noah</span>
               </button>
               <button
                 onClick={() => setControlledBarberId("barbeiro-adrian")}
                 className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   controlledBarberId === "barbeiro-adrian"
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                    ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-md shadow-[#DFBA73]/25"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
-                <span className={`w-2 h-2 rounded-full ${controlledBarberId === "barbeiro-adrian" ? "bg-white" : "bg-emerald-400"}`} />
+                <span className={`w-2 h-2 rounded-full ${controlledBarberId === "barbeiro-adrian" ? "bg-black" : "bg-emerald-400"}`} />
                 <span>Adrian</span>
               </button>
             </div>
@@ -559,14 +559,14 @@ export default function AgendaPage() {
         <div className="bg-[#050608] border border-white/5 rounded-2xl p-5 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#DFBA73]/10 border border-[#DFBA73]/20 flex items-center justify-center text-[#DFBA73] shrink-0">
                 <Coffee className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h5 className="text-sm font-serif font-bold text-white">Pausa para Almoço</h5>
-                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                    {currentControlledBarber.name.toUpperCase()} {currentControlledBarber.isOwner ? "(DONO)" : ""}
+                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#DFBA73]/20 text-[#F5D799] border border-[#DFBA73]/30">
+                    {currentControlledBarber.name.toUpperCase()} {currentControlledBarber.isOwner ? "(DONO · 55%)" : "(FUNCIONÁRIO · 45%)"}
                   </span>
                   <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded ${lunchBreak ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-white/5 text-gray-400"}`}>
                     {lunchBreak ? `PAUSA: ${lunchBreak}` : "SEM PAUSA CONFIGURADA"}
@@ -587,7 +587,7 @@ export default function AgendaPage() {
                 onClick={() => setLunchBreakScope("default")}
                 className={`px-3 py-1 rounded-lg text-[10px] font-mono uppercase font-bold transition-all cursor-pointer ${
                   lunchBreakScope === "default"
-                    ? "bg-blue-600 text-white shadow"
+                    ? "bg-[#DFBA73] text-black font-bold shadow"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
@@ -598,7 +598,7 @@ export default function AgendaPage() {
                 onClick={() => setLunchBreakScope("date")}
                 className={`px-3 py-1 rounded-lg text-[10px] font-mono uppercase font-bold transition-all cursor-pointer ${
                   lunchBreakScope === "date"
-                    ? "bg-blue-600 text-white shadow"
+                    ? "bg-[#DFBA73] text-black font-bold shadow"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
@@ -617,7 +617,7 @@ export default function AgendaPage() {
                   onClick={() => handleSetLunchBreak(lunchBreak === time ? null : time, lunchBreakScope)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer ${
                     lunchBreak === time
-                      ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/30 border border-blue-500"
+                      ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold shadow-md shadow-[#DFBA73]/25 border border-[#DFBA73]"
                       : "bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5"
                   }`}
                 >
@@ -636,7 +636,7 @@ export default function AgendaPage() {
                     onClick={() => handleSetLunchBreak(lunchBreak === mappedTime ? null : mappedTime, lunchBreakScope)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer ${
                       lunchBreak === mappedTime
-                        ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-600/30 border border-blue-500"
+                        ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold shadow-md shadow-[#DFBA73]/25 border border-[#DFBA73]"
                         : "bg-white/5 hover:bg-white/10 text-gray-300 border border-white/5"
                     }`}
                   >
@@ -670,7 +670,7 @@ export default function AgendaPage() {
         </div>
 
         {loading ? (
-          <div className="py-16 text-center text-blue-400 animate-pulse font-mono text-sm">
+          <div className="py-16 text-center text-[#DFBA73] animate-pulse font-mono text-sm">
             Carregando agenda do estúdio...
           </div>
         ) : appointments.length === 0 ? (
@@ -682,7 +682,8 @@ export default function AgendaPage() {
             {appointments.map((apt) => {
               const aptTime = getDisplayTime(apt.date);
               const cutPrice = Number(apt.service?.price || 0);
-              const commissionValue = Math.round(cutPrice * BARBER_COMMISSION_RATE * 100) / 100;
+              const isAdrian = apt.barberId === "barbeiro-adrian";
+              const commissionValue = isAdrian ? Math.round(cutPrice * 0.45 * 100) / 100 : cutPrice;
               const barberAttendant = BARBERS.find((b) => b.id === apt.barberId) || BARBERS[0];
 
               return (
@@ -691,7 +692,7 @@ export default function AgendaPage() {
                   className={`flex flex-col md:flex-row md:items-center justify-between p-4 sm:p-5 bg-white/[0.02] border rounded-2xl transition-all gap-4 overflow-hidden ${
                     apt.status === "CANCELLED"
                       ? "border-red-500/20 opacity-50"
-                      : "border-white/5 hover:border-blue-500/40"
+                      : "border-white/5 hover:border-[#DFBA73]/40"
                   }`}
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
@@ -706,7 +707,7 @@ export default function AgendaPage() {
                         <h4 className="text-white font-medium text-base sm:text-lg truncate">
                           {apt.user?.name || "Cliente"}
                         </h4>
-                        <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium bg-blue-500/15 border border-blue-500/30 text-blue-300 shrink-0 font-mono">
+                        <span className="text-[10px] px-2.5 py-0.5 rounded-full font-medium bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] shrink-0 font-mono">
                           ✂️ {barberAttendant.name.split(" ")[0]}
                         </span>
                       </div>
@@ -716,8 +717,10 @@ export default function AgendaPage() {
                         <span>•</span>
                         <span className="text-white font-mono font-bold">R$ {cutPrice.toFixed(2)}</span>
                         <span>•</span>
-                        <span className="text-blue-400 font-mono font-semibold">
-                          Comissão: R$ {commissionValue.toFixed(2)} (45%)
+                        <span className="text-[#DFBA73] font-mono font-semibold">
+                          {isAdrian
+                            ? `Comissão Adrian: R$ ${commissionValue.toFixed(2)} (45%)`
+                            : `Atendimento Dono: R$ ${cutPrice.toFixed(2)}`}
                         </span>
                       </div>
 
@@ -735,7 +738,7 @@ export default function AgendaPage() {
                           ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10"
                           : apt.status === "CANCELLED"
                           ? "border-red-500/30 text-red-400 bg-red-500/10"
-                          : "border-blue-500/30 text-blue-300 bg-blue-500/10"
+                          : "border-[#DFBA73]/30 text-[#F5D799] bg-[#DFBA73]/10"
                       }`}
                     >
                       {apt.status === "COMPLETED" ? "CONCLUÍDO" : apt.status === "CANCELLED" ? "CANCELADO" : "CONFIRMADO"}
@@ -828,7 +831,7 @@ export default function AgendaPage() {
                     placeholder="Ex: Carlos Silva"
                     value={newClientName}
                     onChange={(e) => setNewClientName(e.target.value)}
-                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-blue-500"
+                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-[#DFBA73]"
                   />
                 </div>
 
@@ -840,7 +843,7 @@ export default function AgendaPage() {
                       placeholder="27999999999"
                       value={newClientPhone}
                       onChange={(e) => setNewClientPhone(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-blue-500"
+                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-[#DFBA73]"
                     />
                   </div>
                   <div>
@@ -850,7 +853,7 @@ export default function AgendaPage() {
                       required
                       value={newTime}
                       onChange={(e) => setNewTime(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-blue-500"
+                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-[#DFBA73]"
                     />
                   </div>
                 </div>
@@ -889,7 +892,7 @@ export default function AgendaPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase font-mono tracking-wider text-xs py-3 rounded-xl transition-all shadow-lg shadow-blue-600/30"
+                    className="w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase font-mono tracking-wider text-xs py-3 rounded-xl transition-all shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 cursor-pointer"
                   >
                     {isSubmitting ? "Agendando..." : "Confirmar Agendamento"}
                   </button>
@@ -943,7 +946,7 @@ export default function AgendaPage() {
                       required
                       value={editDate}
                       onChange={(e) => setEditDate(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500 [&::-webkit-calendar-picker-indicator]:invert"
+                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-[#DFBA73] [&::-webkit-calendar-picker-indicator]:invert"
                     />
                   </div>
                   <div>
@@ -953,7 +956,7 @@ export default function AgendaPage() {
                       required
                       value={editTime}
                       onChange={(e) => setEditTime(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500"
+                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-[#DFBA73]"
                     />
                   </div>
                 </div>
@@ -967,7 +970,7 @@ export default function AgendaPage() {
                   >
                     {BARBERS.map((b) => (
                       <option key={b.id} value={b.id}>
-                        {b.name} {b.isOwner ? "(Dono)" : ""}
+                        {b.name} {b.isOwner ? "(Dono · 55%)" : "(Funcionário · 45%)"}
                       </option>
                     ))}
                   </select>
@@ -992,7 +995,7 @@ export default function AgendaPage() {
                   <button
                     type="submit"
                     disabled={isSavingEdit}
-                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase font-mono tracking-wider text-xs py-3 rounded-xl transition-all shadow-lg shadow-blue-600/30"
+                    className="w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase font-mono tracking-wider text-xs py-3 rounded-xl transition-all shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 cursor-pointer"
                   >
                     {isSavingEdit ? "Salvando..." : "Salvar Alterações"}
                   </button>

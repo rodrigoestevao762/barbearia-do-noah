@@ -269,8 +269,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="hidden md:flex pl-36 pr-12 pt-10 justify-between items-end relative z-40">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] bg-blue-500/15 border border-blue-500/30 text-blue-400 font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3.5 h-3.5 text-blue-400" /> {isAdmin ? "PROPRIETÁRIO (DONO)" : "BARBEIRO DA EQUIPE"}
+            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
+              <Shield className="w-3.5 h-3.5 text-[#DFBA73]" /> {isAdmin ? "PROPRIETÁRIO (DONO)" : "BARBEIRO DA EQUIPE"}
             </span>
           </div>
           <motion.h1 
@@ -297,7 +297,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-gray-300 transition-all shadow-sm font-mono tracking-wider uppercase"
             title="Voltar ao Site"
           >
-            <Home className="w-4 h-4 text-blue-400" />
+            <Home className="w-4 h-4 text-[#DFBA73]" />
             <span>Voltar ao Site</span>
           </Link>
 
@@ -320,13 +320,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Bell className="w-5 h-5" />
             {notifications.length > 0 && (
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#DFBA73] animate-pulse" />
             )}
           </button>
 
           {/* User Pill Badge */}
           <div className="flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-2xl px-3 py-1.5">
-            <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-300 flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-xl bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799] flex items-center justify-center font-bold text-xs">
               {userInitial}
             </div>
             <span className="text-xs font-mono font-semibold text-gray-200">
