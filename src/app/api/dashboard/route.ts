@@ -215,13 +215,73 @@ export async function GET(req: Request) {
     // Faturamento e Repasses Totais do Estúdio
     const allCompleted = allDayAppointments.filter((apt) => apt.status === "COMPLETED");
     const totalGrossShop = allCompleted.reduce((acc, apt) => acc + (apt.service?.price || 0), 0);
-    const adrianBreakdownItem = breakdown.find((b) => !b.isOwner);
-    const noahBreakdownItem = breakdown.find((b) => b.isOwner);
-    const totalCommissionsToPay = adrianBreakdownItem ? adrianBreakdownItem.commission : Math.round(totalGrossShop * ADRIAN_RATE * 100) / 100;
+    const adrianBreakdownItem = breakdown.find((b) => !b.isOwner) || { revenue: 0, commission: 0, completedApts: 0, totalApts: 0 };
+    const noahBreakdownItem = breakdown.find((b) => b.isOwner) || { revenue: 0, commission: 0, completedApts: 0, totalApts: 0 };
+    const totalCommissionsToPay = adrianBreakdownItem.commission;
     const houseNetProfit = (noahBreakdownItem ? noahBreakdownItem.revenue : 0) + (adrianBreakdownItem ? (adrianBreakdownItem.revenue * OWNER_RATE) : 0);
     const ticketMedio = allCompleted.length > 0 ? totalGrossShop / allCompleted.length : 0;
 
-    // Filtro ativo (Todos, Noah Ferreira, ou Adrian Santos)
+    const userEmail = session.user.email?.toLowerCase();
+    const isOwner = userRole === "ADMIN" && userEmail !== "adriansantos@gmail.com";
+    const isAdrian = userRole === "BARBER" || userEmail === "adriansantos@gmail.com" || userBarberId === "barbeiro-adrian";
+
+    // PROTEÇÃO ESTREITA DE PRIVACIDADE:
+    // Se o usuário for o funcionário Adrian Santos:
+    // - NUNCA expor faturamento bruto total do estúdio
+    // - NUNCA expor faturamento ou atendimentos do Noah Ferreira (Dono)
+    // - NUNCA expor lucro ou conta da casa (55%)
+    // - Retornar APENAS a produção de Adrian e a comissão de Adrian (45%)
+    if (isAdrian) {
+      const adrianApts = allDayAppointments.filter((apt) => apt.barberId === "barbeiro-adrian");
+      const adrianUpcoming = upcomingAppointments.filter((apt) => apt.barberId === "barbeiro-adrian");
+      const adrianCompleted = adrianApts.filter((apt) => apt.status === "COMPLETED");
+      const adrianRev = adrianCompleted.reduce((acc, apt) => acc + (apt.service?.price || 0), 0);
+      const adrianComm = Math.round(adrianRev * ADRIAN_RATE * 100) / 100;
+      const adrianTicket = adrianCompleted.length > 0 ? adrianRev / adrianCompleted.length : 0;
+
+      const adrianOnlyBreakdown = [{
+        id: "barbeiro-adrian",
+        name: "Adrian Santos",
+        role: "Barbeiro da Equipe",
+        avatar: "/barbers/adrian-santos.jpg",
+        commissionRate: ADRIAN_RATE,
+        isOwner: false,
+        totalApts: adrianApts.length,
+        completedApts: adrianCompleted.length,
+        revenue: adrianRev,
+        commission: adrianComm,
+        houseShare: 0,
+      }];
+
+      return NextResponse.json({
+        isClient: false,
+        isOwner: false,
+        userRole: "BARBER",
+        currentBarber: BARBERS.find((b) => b.id === "barbeiro-adrian") || BARBERS[1],
+        activeFilter: "barbeiro-adrian",
+        selectedDate: dateParam,
+
+        // Apenas dados do Adrian (zero dados do Dono)
+        revenue: adrianRev,
+        totalGrossShop: adrianRev,
+        houseNetProfit: 0,
+        totalCommissionsToPay: adrianComm,
+        totalEmployeeCommissions: adrianComm,
+        myCommission: adrianComm,
+        houseShare: 0,
+        ticketMedio: adrianTicket,
+
+        todayCount: adrianApts.length,
+        completedCount: adrianCompleted.length,
+        clientsCount: adrianApts.length,
+        appointments: adrianApts,
+        upcomingAppointments: adrianUpcoming,
+        barberBreakdown: adrianOnlyBreakdown,
+        barbersList: [BARBERS.find((b) => b.id === "barbeiro-adrian") || BARBERS[1]],
+      });
+    }
+
+    // Filtro ativo para o Dono (Todos, Noah Ferreira, ou Adrian Santos)
     let displayAppointments = allDayAppointments;
     let displayUpcoming = upcomingAppointments;
 
@@ -248,6 +308,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       isClient: false,
+      isOwner: true,
       userRole,
       currentBarber,
       activeFilter: barberFilterParam,

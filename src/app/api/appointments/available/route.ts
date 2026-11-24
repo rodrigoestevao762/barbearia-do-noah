@@ -4,7 +4,8 @@ import { BARBERS } from "@/lib/barbers";
 import { getAppointmentsForDate } from "@/lib/appointments-store";
 import { getBrazilNow, formatAptTimeToHHMM } from "@/lib/timezone";
 import { checkDayStatus } from "@/lib/holidays";
-import { getDayScheduleDB } from "@/lib/studio-schedule";
+import { isBarberAvailable, getBarberLunchBreakTime, parseLunchBreakSlots } from "@/lib/barber-availability";
+import { getDayScheduleDB, getBarberDayScheduleDB } from "@/lib/studio-schedule";
 
 export const dynamic = "force-dynamic";
 
@@ -91,6 +92,19 @@ export async function GET(req: Request) {
       });
     }
 
+    // 2.2 Checa se o barbeiro específico selecionado está de folga nesta data
+    if (!isBarberAvailable(barberId, cleanDateStr)) {
+      const barberName = barberId === "barbeiro-adrian" ? "Adrian Santos" : "Noah Ferreira";
+      return jsonNoStore({
+        availableTimes: [],
+        isClosed: true,
+        isSunday: false,
+        isHoliday: false,
+        isStudioClosed: false,
+        reason: `${barberName} não estará atendendo nesta data selecionada.`,
+      });
+    }
+
     // 3. Determina os horários base de acordo com o dia da semana
     // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
     const [yStr, mStr, dStr] = cleanDateStr.split("-");
@@ -105,9 +119,9 @@ export async function GET(req: Request) {
       baseHours = baseHours.filter((time) => time <= earlyClosingTime);
     }
 
-    // 4.1 Verificação de Pausa para Almoço do Barbeiro (Fixa diária ou específica desta data)
-    const lunchBreakTime = schedule.lunchBreakTime;
-    const lunchBreakSlots = schedule.lunchBreakSlots;
+    // 4.1 Verificação de Pausa para Almoço do Barbeiro Selecionado
+    const barberLunchTime = getBarberLunchBreakTime(barberId, cleanDateStr);
+    const lunchBreakSlots = parseLunchBreakSlots(barberLunchTime);
     if (lunchBreakSlots.length > 0) {
       baseHours = baseHours.filter((time) => !lunchBreakSlots.includes(time));
     }
@@ -122,18 +136,22 @@ export async function GET(req: Request) {
     const endOfDay = new Date(`${cleanDateStr}T23:59:59-03:00`);
 
     try {
-      // 6. Busca agendamentos ocupados no banco de dados
+      // 6. Busca agendamentos ocupados no banco de dados para este profissional específico
       const bookedAppointments = await prisma.appointment.findMany({
         where: {
           date: { gte: startOfDay, lte: endOfDay },
           status: { notIn: ["CANCELLED"] },
+          OR: [
+            { barberId },
+            ...(barberId === "barbeiro-noah" ? [{ barberId: null }] : []),
+          ],
         },
       });
 
       const bookedTimes = (bookedAppointments || []).map((apt) => formatAptTimeToHHMM(apt.date));
 
       // Também verifica no store em memória para contingência
-      const storedApts = getAppointmentsForDate(cleanDateStr, null);
+      const storedApts = getAppointmentsForDate(cleanDateStr, barberId);
       storedApts
         .filter((apt) => apt.status !== "CANCELLED")
         .forEach((apt) => {
@@ -149,12 +167,12 @@ export async function GET(req: Request) {
         availableTimes,
         isSaturday: dayOfWeek === 6,
         earlyClosingTime: earlyClosingTime || null,
-        lunchBreakTime: lunchBreakTime || null,
+        lunchBreakTime: barberLunchTime || null,
         lunchBreakSlots,
       });
     } catch (dbErr) {
       // Fallback em memória
-      const storedApts = getAppointmentsForDate(cleanDateStr, null);
+      const storedApts = getAppointmentsForDate(cleanDateStr, barberId);
       const bookedTimes = storedApts
         .filter((apt) => apt.status !== "CANCELLED")
         .map((apt) => formatAptTimeToHHMM(apt.date));
@@ -165,7 +183,7 @@ export async function GET(req: Request) {
         availableTimes,
         isSaturday: dayOfWeek === 6,
         earlyClosingTime: earlyClosingTime || null,
-        lunchBreakTime: lunchBreakTime || null,
+        lunchBreakTime: barberLunchTime || null,
         lunchBreakSlots,
       });
     }

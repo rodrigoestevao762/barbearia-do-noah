@@ -32,7 +32,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const notifTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const userRole = (session?.user as any)?.role || "ADMIN";
-  const isAdmin = userRole === "ADMIN";
+  const userEmail = session?.user?.email?.toLowerCase();
+  const userBarberId = (session?.user as any)?.barberId;
+  const isAdrian = userEmail === "adriansantos@gmail.com" || userBarberId === "barbeiro-adrian" || userRole === "BARBER";
+  const isAdmin = !isAdrian && userRole === "ADMIN";
 
   // Proteção de segurança: redireciona clientes ou não autenticados
   useEffect(() => {
@@ -304,7 +307,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             transition={{ delay: 0.1 }}
             className="text-gray-300 text-xs md:text-sm mt-1.5 font-light"
           >
-            Painel Administrativo Noah Barber Studio · Controle total da barbearia, equipe e faturamento.
+            {isAdmin 
+              ? "Painel Administrativo Noah Barber Studio · Controle total da barbearia, equipe e faturamento." 
+              : "Painel do Barbeiro Noah Barber Studio · Meus atendimentos, comissões e horários."}
           </motion.p>
         </div>
 

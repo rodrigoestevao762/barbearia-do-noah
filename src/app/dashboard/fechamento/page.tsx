@@ -5,6 +5,7 @@ import { getFechamentoData, closeCashRegister } from "./actions";
 import { motion } from "framer-motion";
 import { Archive, DollarSign, Wallet, Scissors, Shield, Lock, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { BARBERS } from "@/lib/barbers";
@@ -34,11 +35,22 @@ type FechamentoData = {
 
 export default function FechamentoPage() {
   const { data: session } = useSession();
+  const router = useRouter();
   const userRole = (session?.user as any)?.role || "ADMIN";
-  const isAdmin = userRole === "ADMIN";
+  const userEmail = session?.user?.email?.toLowerCase();
+  const userBarberId = (session?.user as any)?.barberId;
+  const isAdrian = userEmail === "adriansantos@gmail.com" || userBarberId === "barbeiro-adrian" || userRole === "BARBER";
+  const isAdmin = !isAdrian && userRole === "ADMIN";
 
   const [data, setData] = useState<FechamentoData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Redireciona Adrian automaticamente para seu próprio caixa pessoal
+  useEffect(() => {
+    if (!isAdmin) {
+      router.replace("/dashboard/financeiro");
+    }
+  }, [isAdmin, router]);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date();
@@ -100,10 +112,10 @@ export default function FechamentoPage() {
           </p>
         </div>
         <Link
-          href="/dashboard"
+          href="/dashboard/financeiro"
           className="inline-flex items-center gap-2 bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black px-6 py-3 rounded-xl font-bold uppercase tracking-wider text-xs hover:brightness-110 transition-all shadow-lg shadow-[#DFBA73]/20"
         >
-          <ArrowLeft className="w-4 h-4" /> Voltar ao Painel
+          <ArrowLeft className="w-4 h-4" /> Ir para Meu Caixa
         </Link>
       </div>
     );

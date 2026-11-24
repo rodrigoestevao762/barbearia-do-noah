@@ -41,7 +41,10 @@ interface FixedExpenseItem {
 export default function FinanceiroPage() {
   const { data: session } = useSession();
   const userRole = (session?.user as any)?.role || "ADMIN";
-  const isAdmin = userRole === "ADMIN";
+  const userEmail = session?.user?.email?.toLowerCase();
+  const userBarberId = (session?.user as any)?.barberId;
+  const isAdrian = userEmail === "adriansantos@gmail.com" || userBarberId === "barbeiro-adrian" || userRole === "BARBER";
+  const isAdmin = !isAdrian && userRole === "ADMIN";
 
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -50,7 +53,15 @@ export default function FinanceiroPage() {
   }, []);
 
   // Filter Tabs: 'all' (VISÃO GERAL CASA), 'barbeiro-noah' (NOAH DONO), 'barbeiro-adrian' (ADRIAN 45%)
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<string>(() => (isAdrian ? "barbeiro-adrian" : "all"));
+
+  useEffect(() => {
+    if (isAdrian) {
+      setActiveTab("barbeiro-adrian");
+      setExpenseCategory("VALE");
+      setExpenseBarber("Adrian Santos");
+    }
+  }, [isAdrian]);
 
   // Date filter (padrão dia de hoje)
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -97,7 +108,8 @@ export default function FinanceiroPage() {
   const loadFinanceData = async (dateStr: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/dashboard?date=${dateStr}&barberId=all`, { cache: "no-store" });
+      const barberParam = isAdrian ? "barbeiro-adrian" : (activeTab !== "all" ? activeTab : "all");
+      const res = await fetch(`/api/dashboard?date=${dateStr}&barberId=${barberParam}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         setDashboardData(data);
@@ -115,12 +127,14 @@ export default function FinanceiroPage() {
         setExpenses([]);
       }
 
-      // Load fixed expenses from local storage
-      const storedFixed = localStorage.getItem("noah_fixed_expenses");
-      if (storedFixed) {
-        try {
-          setFixedExpenses(JSON.parse(storedFixed));
-        } catch {}
+      // Load fixed expenses from local storage (apenas gestor precisa)
+      if (isAdmin) {
+        const storedFixed = localStorage.getItem("noah_fixed_expenses");
+        if (storedFixed) {
+          try {
+            setFixedExpenses(JSON.parse(storedFixed));
+          } catch {}
+        }
       }
     } catch (e) {
       console.error("Erro ao carregar dados financeiros:", e);
@@ -131,7 +145,7 @@ export default function FinanceiroPage() {
 
   useEffect(() => {
     loadFinanceData(selectedDate);
-  }, [selectedDate]);
+  }, [selectedDate, activeTab, isAdrian]);
 
   // Adicionar saída / vale
   const handleAddExpense = (e: React.FormEvent) => {
@@ -142,8 +156,8 @@ export default function FinanceiroPage() {
       id: Date.now(),
       description: expenseDesc,
       amount: parseFloat(expenseAmount),
-      category: expenseCategory,
-      barberName: expenseCategory === "VALE" ? expenseBarber : undefined,
+      category: isAdrian ? "VALE" : expenseCategory,
+      barberName: isAdrian ? "Adrian Santos" : (expenseCategory === "VALE" ? expenseBarber : undefined),
       date: new Date().toISOString(),
     };
 
@@ -158,11 +172,11 @@ export default function FinanceiroPage() {
   };
 
   const handleDeleteExpense = (id: number) => {
-    if (!confirm("Deseja remover este registro de saída?")) return;
+    if (!confirm("Deseja remover este registro?")) return;
     const updated = expenses.filter((e) => e.id !== id);
     setExpenses(updated);
     localStorage.setItem(`noah_expenses_${selectedDate}`, JSON.stringify(updated));
-    setToastMessage("Saída removida.");
+    setToastMessage("Registro removido.");
   };
 
   // Adicionar despesa fixa
@@ -192,9 +206,6 @@ export default function FinanceiroPage() {
   };
 
   // Cálculos baseados na aba ativa:
-  // 'all': Visão Geral da Casa
-  // 'barbeiro-noah': Apenas Noah Ferreira (Dono)
-  // 'barbeiro-adrian': Apenas Adrian Santos (45%)
   const barberBreakdown: any[] = dashboardData?.barberBreakdown || [];
   const noahBreakdown = barberBreakdown.find((b) => b.id === "barbeiro-noah") || { revenue: 0, commission: 0, houseShare: 0 };
   const adrianBreakdown = barberBreakdown.find((b) => b.id === "barbeiro-adrian") || { revenue: 0, commission: 0, houseShare: 0 };
@@ -205,7 +216,7 @@ export default function FinanceiroPage() {
 
   const totalDailyOutflows = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
-  // Valores dinâmicos por aba
+  // Valores dinâmicos por aba para o Dono
   let displayEntradas = totalGrossTeam;
   let displayComissoes = totalCommissionsToPay;
   let displayAdmin = totalContaAdmin;
@@ -213,15 +224,28 @@ export default function FinanceiroPage() {
 
   if (activeTab === "barbeiro-noah") {
     displayEntradas = noahBreakdown.revenue || 0;
-    displayComissoes = noahBreakdown.commission || 0;
-    displayAdmin = noahBreakdown.houseShare || 0;
-    displaySaldoLiquido = noahBreakdown.houseShare || 0;
+    displayComissoes = 0; // Noah é dono
+    displayAdmin = noahBreakdown.revenue || 0;
+    displaySaldoLiquido = noahBreakdown.revenue || 0;
   } else if (activeTab === "barbeiro-adrian") {
     displayEntradas = adrianBreakdown.revenue || 0;
-    displayComissoes = adrianBreakdown.commission || 0;
-    displayAdmin = adrianBreakdown.houseShare || 0;
-    displaySaldoLiquido = adrianBreakdown.houseShare || 0;
+    displayComissoes = adrianBreakdown.commission || Math.round((adrianBreakdown.revenue || 0) * 0.45 * 100) / 100;
+    displayAdmin = Math.round((adrianBreakdown.revenue || 0) * 0.55 * 100) / 100;
+    displaySaldoLiquido = displayAdmin;
   }
+
+  // Cálculos exclusivos para o Adrian (sem vazamento de dados do dono)
+  const displayedExpenses = isAdrian 
+    ? expenses.filter((e) => e.category === "VALE" && (e.barberName === "Adrian Santos" || e.barberName === "Adrian"))
+    : expenses;
+
+  const totalAdrianVales = expenses
+    .filter((e) => e.category === "VALE" && (e.barberName === "Adrian Santos" || e.barberName === "Adrian"))
+    .reduce((acc, curr) => acc + curr.amount, 0);
+
+  const adrianGross = adrianBreakdown.revenue || 0;
+  const adrianCommission = adrianBreakdown.commission || Math.round(adrianGross * 0.45 * 100) / 100;
+  const adrianNetPayout = Math.max(0, adrianCommission - totalAdrianVales);
 
   const totalFixedMonthly = fixedExpenses.reduce((acc, curr) => acc + curr.amount, 0);
 
@@ -247,15 +271,17 @@ export default function FinanceiroPage() {
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3 h-3 text-[#DFBA73]" /> GESTÃO GERAL DO DONO • 55% Noah (Dono) • 45% Adrian (Funcionário)
+              <Shield className="w-3 h-3 text-[#DFBA73]" /> {isAdmin ? "GESTÃO GERAL DO DONO • 55% Noah (Dono) • 45% Adrian (Funcionário)" : "BARBEIRO DA EQUIPE • MINHA COMISSÃO: 45%"}
             </span>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
-            Gestão Financeira
+            {isAdmin ? "Gestão Financeira" : "Meu Caixa & Comissões"}
           </h2>
           <p className="text-gray-400 mt-1 text-sm font-light">
-            Controle financeiro geral do estúdio, comissões de Adrian e faturamento do Dono Noah Ferreira.
+            {isAdmin 
+              ? "Controle financeiro geral do estúdio, comissões de Adrian e faturamento do Dono Noah Ferreira."
+              : "Acompanhe seus cortes realizados, cálculo de comissão (45%) e vales retirados no caixa."}
           </p>
         </div>
 
@@ -273,114 +299,147 @@ export default function FinanceiroPage() {
             />
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsFixedExpenseModalOpen(true)}
-            className="px-4 py-2.5 rounded-2xl bg-[#080A0E] hover:bg-white/5 border border-[#DFBA73]/30 text-[#DFBA73] hover:text-[#F5D799] font-mono text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#DFBA73]/10 font-semibold"
-          >
-            <TrendingDown className="w-3.5 h-3.5 text-[#DFBA73]" />
-            <span>DESPESA FIXA DA BARBEARIA</span>
-          </button>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setIsFixedExpenseModalOpen(true)}
+              className="px-4 py-2.5 rounded-2xl bg-[#080A0E] hover:bg-white/5 border border-[#DFBA73]/30 text-[#DFBA73] hover:text-[#F5D799] font-mono text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#DFBA73]/10 font-semibold"
+            >
+              <TrendingDown className="w-3.5 h-3.5 text-[#DFBA73]" />
+              <span>DESPESA FIXA DA BARBEARIA</span>
+            </button>
+          )}
         </div>
       </div>
 
       {/* TABS DE PROFISSIONAIS (VISÃO GERAL ESTÚDIO / NOAH DONO 55% / ADRIAN 45%) */}
-      <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto scrollbar-hide overscroll-x-contain touch-pan-y">
-        <button
-          onClick={() => setActiveTab("all")}
-          className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === "all"
-              ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
-              : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
-          }`}
-        >
-          VISÃO GERAL DO ESTÚDIO
-        </button>
+      {isAdmin ? (
+        <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto scrollbar-hide overscroll-x-contain touch-pan-y">
+          <button
+            onClick={() => setActiveTab("all")}
+            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === "all"
+                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
+                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
+            }`}
+          >
+            VISÃO GERAL DO ESTÚDIO
+          </button>
 
-        <button
-          onClick={() => setActiveTab("barbeiro-noah")}
-          className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-            activeTab === "barbeiro-noah"
-              ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
-              : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
-          }`}
-        >
-          <span>✂️</span>
-          <span>NOAH (DONO · 55%)</span>
-        </button>
+          <button
+            onClick={() => setActiveTab("barbeiro-noah")}
+            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+              activeTab === "barbeiro-noah"
+                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
+                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
+            }`}
+          >
+            <span>✂️</span>
+            <span>NOAH (DONO · 55%)</span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab("barbeiro-adrian")}
-          className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-            activeTab === "barbeiro-adrian"
-              ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
-              : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
-          }`}
-        >
-          <span>✂️</span>
-          <span>ADRIAN (FUNCIONÁRIO · 45%)</span>
-        </button>
-      </div>
+          <button
+            onClick={() => setActiveTab("barbeiro-adrian")}
+            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+              activeTab === "barbeiro-adrian"
+                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
+                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
+            }`}
+          >
+            <span>✂️</span>
+            <span>ADRIAN (FUNCIONÁRIO · 45%)</span>
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 border-b border-white/10 pb-4">
+          <div className="px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799] flex items-center gap-2">
+            <span>✂️</span>
+            <span>ADRIAN SANTOS (MEU CAIXA · 45%)</span>
+          </div>
+        </div>
+      )}
 
       {/* 4 CARDS ESTRUTURA NOAH BARBER STUDIO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1: ENTRADAS BRUTAS */}
+        {/* Card 1 */}
         <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-1.5">
-              <ArrowUpRight className="w-3.5 h-3.5 text-gray-400" /> ENTRADAS BRUTAS
+              <ArrowUpRight className="w-3.5 h-3.5 text-gray-400" /> {isAdmin ? "ENTRADAS BRUTAS" : "MINHA PRODUÇÃO BRUTA"}
             </span>
           </div>
           <h3 className="text-3xl font-serif text-white tracking-tight mb-1">
-            R$ {displayEntradas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            R$ {(isAdmin ? displayEntradas : adrianGross).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
           <p className="text-xs text-gray-400 font-light">
-            {activeTab === "all" ? "Produção total somada de toda a equipe." : `Produção bruta deste profissional.`}
+            {isAdmin 
+              ? (activeTab === "all" ? "Produção total somada de toda a equipe." : "Produção bruta deste profissional.")
+              : "Total gerado pelos seus cortes nesta data."}
           </p>
         </div>
 
-        {/* Card 2: COMISSÃO ADRIAN (45%) - Tema Dourado/Âmbar */}
+        {/* Card 2: COMISSÃO ADRIAN (45%) */}
         <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-3xl p-6 relative overflow-hidden group hover:border-[#DFBA73]/50 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono uppercase tracking-widest text-[#F5D799] font-bold flex items-center gap-1.5">
-              <Scissors className="w-3.5 h-3.5 text-[#DFBA73]" /> COMISSÃO ADRIAN (45%)
+              <Scissors className="w-3.5 h-3.5 text-[#DFBA73]" /> {isAdmin ? "COMISSÃO ADRIAN (45%)" : "MINHA COMISSÃO (45%)"}
             </span>
           </div>
           <h3 className="text-3xl font-serif text-[#DFBA73] tracking-tight mb-1">
-            R$ {displayComissoes.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            R$ {(isAdmin ? displayComissoes : adrianCommission).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
           <p className="text-xs text-[#DFBA73]/70 font-light">
-            {activeTab === "all" ? "Comissão a pagar ao funcionário Adrian Santos (45%)." : "Comissão líquida do barbeiro (45%)."}
+            {isAdmin
+              ? (activeTab === "all" ? "Comissão a pagar ao funcionário Adrian Santos (45%)." : "Comissão líquida do barbeiro (45%).")
+              : "Sua comissão líquida a receber (45%)."}
           </p>
         </div>
 
-        {/* Card 3: FATURAMENTO NOAH (DONO · 55%) */}
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold flex items-center gap-1.5">
-              <Building className="w-3.5 h-3.5 text-emerald-400" /> NOAH FERREIRA (DONO · 55%)
-            </span>
+        {/* Card 3: NOAH DONO (para o gestor) OU MEUS VALES (para o Adrian) */}
+        {isAdmin ? (
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold flex items-center gap-1.5">
+                <Building className="w-3.5 h-3.5 text-emerald-400" /> NOAH FERREIRA (DONO · 55%)
+              </span>
+            </div>
+            <h3 className="text-3xl font-serif text-emerald-400 tracking-tight mb-1">
+              R$ {displayAdmin.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </h3>
+            <p className="text-xs text-emerald-300/70 font-light">
+              Faturamento do Dono Noah: produção própria + 55% de Adrian.
+            </p>
           </div>
-          <h3 className="text-3xl font-serif text-emerald-400 tracking-tight mb-1">
-            R$ {displayAdmin.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-          </h3>
-          <p className="text-xs text-emerald-300/70 font-light">
-            Faturamento do Dono Noah: produção própria + 55% de Adrian.
-          </p>
-        </div>
+        ) : (
+          <div className="bg-rose-500/10 border border-rose-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-rose-500/50 transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-rose-300 font-bold flex items-center gap-1.5">
+                <TrendingDown className="w-3.5 h-3.5 text-rose-400" /> MEUS VALES / ADIANTAMENTOS
+              </span>
+            </div>
+            <h3 className="text-3xl font-serif text-rose-400 tracking-tight mb-1">
+              - R$ {totalAdrianVales.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </h3>
+            <p className="text-xs text-rose-300/70 font-light">
+              Total de vales e adiantamentos retirados no dia.
+            </p>
+          </div>
+        )}
 
-        {/* Card 4: SALDO LÍQUIDO DO ESTÚDIO - Tema Verde Esmeralda */}
+        {/* Card 4: SALDO LÍQUIDO ESTÚDIO (para o gestor) OU LÍQUIDO A RECEBER (para o Adrian) */}
         <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono uppercase tracking-widest text-gray-300 font-bold flex items-center gap-1.5">
-              <Wallet className="w-3.5 h-3.5 text-emerald-400" /> SALDO LÍQUIDO DO ESTÚDIO
+              <Wallet className="w-3.5 h-3.5 text-emerald-400" /> {isAdmin ? "SALDO LÍQUIDO DO ESTÚDIO" : "LÍQUIDO A RECEBER HOJE"}
             </span>
           </div>
           <h3 className="text-3xl font-serif text-white tracking-tight mb-1">
-            R$ {displaySaldoLiquido.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            R$ {(isAdmin ? displaySaldoLiquido : adrianNetPayout).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
           <p className="text-xs text-gray-400 font-light">
-            Receita do Dono retida menos saídas e vales diários.
+            {isAdmin 
+              ? "Receita do Dono retida menos saídas e vales diários."
+              : "Comissão líquida restante após desconto dos seus vales."}
           </p>
         </div>
       </div>
@@ -390,7 +449,9 @@ export default function FinanceiroPage() {
         <div className="flex items-center justify-between flex-wrap gap-4 border-b border-white/5 pb-4">
           <div className="flex items-center gap-3">
             <TrendingDown className="w-5 h-5 text-rose-400" />
-            <h3 className="text-xl font-serif text-white">Saídas e Vales do Caixa (Hoje)</h3>
+            <h3 className="text-xl font-serif text-white">
+              {isAdmin ? "Saídas e Vales do Caixa (Hoje)" : "Meus Vales e Adiantamentos (Hoje)"}
+            </h3>
           </div>
 
           <button
@@ -398,17 +459,17 @@ export default function FinanceiroPage() {
             className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
           >
             <Plus className="w-4 h-4 text-rose-400" />
-            <span>+ Registrar Saída / Vale</span>
+            <span>{isAdmin ? "+ Registrar Saída / Vale" : "+ Solicitar / Registrar Vale"}</span>
           </button>
         </div>
 
-        {expenses.length === 0 ? (
+        {displayedExpenses.length === 0 ? (
           <div className="py-12 text-center text-gray-500 font-light text-sm italic">
-            Nenhuma saída ou vale registrado hoje.
+            {isAdmin ? "Nenhuma saída ou vale registrado hoje." : "Nenhum vale registrado para você nesta data."}
           </div>
         ) : (
           <div className="space-y-3">
-            {expenses.map((exp) => (
+            {displayedExpenses.map((exp) => (
               <div
                 key={exp.id}
                 className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex items-center justify-between gap-4"
@@ -429,12 +490,14 @@ export default function FinanceiroPage() {
                   <span className="text-rose-400 font-serif font-bold text-base">
                     - R$ {exp.amount.toFixed(2)}
                   </span>
-                  <button
-                    onClick={() => handleDeleteExpense(exp.id)}
-                    className="p-1.5 text-gray-500 hover:text-red-400 transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDeleteExpense(exp.id)}
+                      className="p-1.5 text-gray-500 hover:text-red-400 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -445,7 +508,7 @@ export default function FinanceiroPage() {
       {/* SEÇÃO: FECHAMENTO DIÁRIO POR PROFISSIONAL */}
       <div className="space-y-4">
         <h3 className="text-xl font-serif text-white flex items-center gap-2">
-          <span>👤</span> Fechamento Diário por Profissional
+          <span>👤</span> {isAdmin ? "Fechamento Diário por Profissional" : "Minha Produção & Fechamento Diário"}
         </h3>
 
         <div className="space-y-4">
@@ -454,68 +517,70 @@ export default function FinanceiroPage() {
               Nenhum dado de profissional carregado para esta data.
             </p>
           ) : (
-            barberBreakdown.map((barber) => (
-              <div
-                key={barber.id}
-                className="bg-[#080A0E] border border-white/10 hover:border-white/20 rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all shadow-lg"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-white/10 shrink-0 bg-white/5 flex items-center justify-center">
-                    {barber.avatar ? (
-                      <Image
-                        src={barber.avatar}
-                        alt={barber.name}
-                        fill
-                        className="object-cover object-top"
-                        sizes="56px"
-                      />
-                    ) : (
-                      <Shield className="w-6 h-6 text-[#DFBA73]" />
-                    )}
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <h4 className="text-white font-serif font-bold text-lg">
-                        {barber.name} {barber.isOwner ? "(Dono)" : ""}
-                      </h4>
-                      <span className={`text-[10px] uppercase font-bold font-mono tracking-wider px-2.5 py-0.5 rounded-full ${
-                        barber.isOwner
-                          ? "bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799]"
-                          : "bg-amber-500/20 border border-amber-500/40 text-amber-300"
-                      }`}>
-                        {barber.isOwner ? "DONO · 55%" : "FUNCIONÁRIO · 45%"}
-                      </span>
+            barberBreakdown
+              .filter((barber) => (isAdmin ? true : !barber.isOwner))
+              .map((barber) => (
+                <div
+                  key={barber.id}
+                  className="bg-[#080A0E] border border-white/10 hover:border-white/20 rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all shadow-lg"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-white/10 shrink-0 bg-white/5 flex items-center justify-center">
+                      {barber.avatar ? (
+                        <Image
+                          src={barber.avatar}
+                          alt={barber.name}
+                          fill
+                          className="object-cover object-top"
+                          sizes="56px"
+                        />
+                      ) : (
+                        <Shield className="w-6 h-6 text-[#DFBA73]" />
+                      )}
                     </div>
-                    <p className="text-xs text-gray-400 mt-0.5 font-light">
-                      {barber.isOwner ? "Proprietário da Barbearia" : "Barbeiro da Equipe"}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-center justify-between sm:justify-end gap-6 md:gap-8 border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
-                  <div>
-                    <p className="text-[10px] text-gray-400 uppercase font-mono tracking-wider">
-                      PRODUÇÃO BRUTA: R$ {barber.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                    </p>
-                    {barber.isOwner ? (
-                      <h5 className="text-xl font-serif text-emerald-400 font-bold mt-0.5">
-                        Produção do Dono: R$ {barber.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </h5>
-                    ) : (
-                      <h5 className="text-xl font-serif text-[#DFBA73] font-bold mt-0.5">
-                        Comissão (45%): R$ {barber.commission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </h5>
-                    )}
-                    {!barber.isOwner && (
-                      <p className="text-[11px] text-emerald-400 font-mono mt-0.5">
-                        Repasse Dono Noah (55%): + R$ {barber.houseShare.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    <div>
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h4 className="text-white font-serif font-bold text-lg">
+                          {barber.name} {barber.isOwner ? "(Dono)" : ""}
+                        </h4>
+                        <span className={`text-[10px] uppercase font-bold font-mono tracking-wider px-2.5 py-0.5 rounded-full ${
+                          barber.isOwner
+                            ? "bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799]"
+                            : "bg-amber-500/20 border border-amber-500/40 text-amber-300"
+                        }`}>
+                          {barber.isOwner ? "DONO · 55%" : "FUNCIONÁRIO · 45%"}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5 font-light">
+                        {barber.isOwner ? "Proprietário da Barbearia" : "Barbeiro da Equipe"}
                       </p>
-                    )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-6 md:gap-8 border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
+                    <div>
+                      <p className="text-[10px] text-gray-400 uppercase font-mono tracking-wider">
+                        PRODUÇÃO BRUTA: R$ {barber.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      </p>
+                      {barber.isOwner ? (
+                        <h5 className="text-xl font-serif text-emerald-400 font-bold mt-0.5">
+                          Produção do Dono: R$ {barber.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        </h5>
+                      ) : (
+                        <h5 className="text-xl font-serif text-[#DFBA73] font-bold mt-0.5">
+                          Comissão (45%): R$ {barber.commission.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        </h5>
+                      )}
+                      {!barber.isOwner && isAdmin && (
+                        <p className="text-[11px] text-emerald-400 font-mono mt-0.5">
+                          Repasse Dono Noah (55%): + R$ {barber.houseShare.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
           )}
         </div>
       </div>
@@ -543,41 +608,58 @@ export default function FinanceiroPage() {
               </p>
 
               <form onSubmit={handleAddExpense} className="space-y-4">
-                <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1.5">
-                    Tipo de Lançamento
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["VALE", "INSUMOS", "OUTROS"] as const).map((cat) => (
-                      <button
-                        key={cat}
-                        type="button"
-                        onClick={() => setExpenseCategory(cat)}
-                        className={`py-2 text-xs font-mono font-semibold uppercase rounded-xl border transition-all ${
-                          expenseCategory === cat
-                            ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold border-[#DFBA73]"
-                            : "bg-white/5 border-white/10 text-gray-400 hover:text-white"
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
+                {isAdmin ? (
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1.5">
+                      Tipo de Lançamento
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(["VALE", "INSUMOS", "OUTROS"] as const).map((cat) => (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => setExpenseCategory(cat)}
+                          className={`py-2 text-xs font-mono font-semibold uppercase rounded-xl border transition-all ${
+                            expenseCategory === cat
+                              ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold border-[#DFBA73]"
+                              : "bg-white/5 border-white/10 text-gray-400 hover:text-white"
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1.5">
+                      Tipo de Lançamento
+                    </label>
+                    <div className="py-2.5 px-4 rounded-xl bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#F5D799] font-mono text-xs font-bold uppercase">
+                      VALE / ADIANTAMENTO
+                    </div>
+                  </div>
+                )}
 
                 {expenseCategory === "VALE" && (
                   <div>
                     <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1.5">
                       Profissional
                     </label>
-                    <select
-                      value={expenseBarber}
-                      onChange={(e) => setExpenseBarber(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none"
-                    >
-                      <option value="Adrian Santos">Adrian Santos</option>
-                      <option value="Noah Ferreira">Noah Ferreira (Dono)</option>
-                    </select>
+                    {isAdmin ? (
+                      <select
+                        value={expenseBarber}
+                        onChange={(e) => setExpenseBarber(e.target.value)}
+                        className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none"
+                      >
+                        <option value="Adrian Santos">Adrian Santos</option>
+                        <option value="Noah Ferreira">Noah Ferreira (Dono)</option>
+                      </select>
+                    ) : (
+                      <div className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-[#DFBA73] font-mono text-xs font-semibold">
+                        Adrian Santos (Você)
+                      </div>
+                    )}
                   </div>
                 )}
 

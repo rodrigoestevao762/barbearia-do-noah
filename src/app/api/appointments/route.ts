@@ -286,22 +286,48 @@ export async function POST(req: Request) {
   }
 }
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
 export async function GET(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    const userRole = (session?.user as any)?.role;
+    const userEmail = session?.user?.email?.toLowerCase();
+    const userBarberId = (session?.user as any)?.barberId;
+    const isOwner = userRole === "ADMIN" && userEmail !== "adriansantos@gmail.com";
+    const isAdrian = userRole === "BARBER" || userEmail === "adriansantos@gmail.com" || userBarberId === "barbeiro-adrian";
+
     const { searchParams } = new URL(req.url);
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam, 10) : 50;
 
+    const whereClause: any = {};
+    if (isAdrian) {
+      whereClause.barberId = "barbeiro-adrian";
+    } else if (isOwner) {
+      whereClause.OR = [
+        { barberId: "barbeiro-noah" },
+        { barberId: null },
+      ];
+    }
+
     let dbApts: any[] = [];
     try {
       dbApts = await prisma.appointment.findMany({
+        where: whereClause,
         take: limit,
         orderBy: { date: "desc" },
         include: { service: true, user: true, barber: true },
       });
     } catch (_) {}
 
-    const memApts = getAllStoredAppointments();
+    const memApts = getAllStoredAppointments().filter((a: any) => {
+      if (isAdrian) return a.barberId === "barbeiro-adrian";
+      if (isOwner) return a.barberId === "barbeiro-noah" || !a.barberId;
+      return true;
+    });
+
     const map = new Map<string, any>();
     memApts.forEach((a) => map.set(a.id, a));
     (dbApts || []).forEach((a) => map.set(a.id, a));

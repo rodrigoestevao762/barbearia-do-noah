@@ -7,6 +7,8 @@ declare global {
   var __studio_closed_dates: Record<string, boolean> | undefined;
   var __studio_early_closings: Record<string, string> | undefined; // ex: { "2026-11-05": "17:00" }
   var __studio_lunch_breaks: Record<string, string> | undefined;   // ex: { "DEFAULT": "12:00", "2026-11-05": "13:00" }
+  var __barber_off_dates: Record<string, boolean> | undefined;     // ex: { "barbeiro-adrian_2026-11-25": true }
+  var __barber_lunch_breaks: Record<string, string> | undefined;   // ex: { "barbeiro-adrian_DEFAULT": "13:00" }
 }
 
 function getAvailabilityFilePath(): string | null {
@@ -32,6 +34,8 @@ function loadAvailabilityFromDisk(): void {
         if (data.closedDates) global.__studio_closed_dates = data.closedDates;
         if (data.earlyClosings) global.__studio_early_closings = data.earlyClosings;
         if (data.lunchBreaks) global.__studio_lunch_breaks = data.lunchBreaks;
+        if (data.barberOffDates) global.__barber_off_dates = data.barberOffDates;
+        if (data.barberLunchBreaks) global.__barber_lunch_breaks = data.barberLunchBreaks;
       }
     }
   } catch (_) {}
@@ -53,6 +57,8 @@ function saveAvailabilityToDisk(): void {
           closedDates: global.__studio_closed_dates || {},
           earlyClosings: global.__studio_early_closings || {},
           lunchBreaks: global.__studio_lunch_breaks || {},
+          barberOffDates: global.__barber_off_dates || {},
+          barberLunchBreaks: global.__barber_lunch_breaks || {},
         },
         null,
         2
@@ -66,6 +72,8 @@ if (!global.__studio_closed_dates) {
   global.__studio_closed_dates = {};
   global.__studio_early_closings = {};
   global.__studio_lunch_breaks = {};
+  global.__barber_off_dates = {};
+  global.__barber_lunch_breaks = {};
   loadAvailabilityFromDisk();
 }
 
@@ -193,19 +201,69 @@ export function getAllClosedDates(): Record<string, boolean> {
 }
 
 /**
- * Compatibilidade legada: Noah Ferreira é sempre elegível para agendamentos.
- * A disponibilidade diária real é checada por data via isDateClosed(dateStr).
+ * Verifica se um barbeiro específico está de folga em uma data.
+ */
+export function isBarberOff(barberId: string, dateStr: string): boolean {
+  if (!global.__barber_off_dates) global.__barber_off_dates = {};
+  return Boolean(global.__barber_off_dates[`${barberId}_${dateStr}`]);
+}
+
+/**
+ * Marca ou remove folga de um barbeiro específico em uma data.
+ */
+export function setBarberOff(barberId: string, dateStr: string, isOff: boolean): void {
+  if (!global.__barber_off_dates) global.__barber_off_dates = {};
+  global.__barber_off_dates[`${barberId}_${dateStr}`] = isOff;
+  saveAvailabilityToDisk();
+}
+
+/**
+ * Obtém a pausa de almoço para um barbeiro específico (ex: "barbeiro-adrian").
+ */
+export function getBarberLunchBreakTime(barberId: string, dateStr: string): string | null {
+  if (!global.__barber_lunch_breaks) global.__barber_lunch_breaks = {};
+  const dayVal = global.__barber_lunch_breaks[`${barberId}_${dateStr}`];
+  if (dayVal === NO_LUNCH_OVERRIDE) return null;
+  if (dayVal) return dayVal;
+  const defVal = global.__barber_lunch_breaks[`${barberId}_${DEFAULT_SCHEDULE_ID}`];
+  if (defVal) return defVal;
+  return getLunchBreakTime(dateStr);
+}
+
+/**
+ * Define ou remove a pausa de almoço de um barbeiro específico.
+ */
+export function setBarberLunchBreakTime(
+  barberId: string,
+  key: string,
+  time: string | null
+): void {
+  if (!global.__barber_lunch_breaks) global.__barber_lunch_breaks = {};
+  const storageKey = `${barberId}_${key}`;
+  if (!time) {
+    delete global.__barber_lunch_breaks[storageKey];
+  } else {
+    global.__barber_lunch_breaks[storageKey] = time;
+  }
+  saveAvailabilityToDisk();
+}
+
+/**
+ * Verifica se o barbeiro está disponível na data.
+ * O estúdio fechado fecha para todos.
+ * A folga individual fecha apenas para aquele barbeiro.
  */
 export function isBarberAvailable(barberId: string, dateStr?: string): boolean {
   if (dateStr) {
-    return !isDateClosed(dateStr);
+    if (isDateClosed(dateStr)) return false;
+    if (isBarberOff(barberId, dateStr)) return false;
   }
   return true;
 }
 
 export function setBarberAvailable(barberId: string, available: boolean, dateStr?: string): boolean {
   if (dateStr) {
-    setDateClosed(dateStr, !available);
+    setBarberOff(barberId, dateStr, !available);
   }
   return available;
 }
@@ -213,5 +271,6 @@ export function setBarberAvailable(barberId: string, available: boolean, dateStr
 export function getAllBarberAvailabilities(): Record<string, boolean> {
   return {
     "barbeiro-noah": true,
+    "barbeiro-adrian": true,
   };
 }

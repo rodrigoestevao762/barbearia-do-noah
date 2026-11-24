@@ -231,3 +231,93 @@ export async function setLunchBreakTimeDB(
 
   return getDayScheduleDB(cleanDate);
 }
+
+/**
+ * Busca a escala específica de um barbeiro (ex: "barbeiro-adrian") para a data.
+ */
+export async function getBarberDayScheduleDB(
+  barberId: string,
+  dateStr: string
+): Promise<ResolvedDaySchedule> {
+  const cleanDate = (dateStr || "").substring(0, 10);
+  const studioSchedule = await getDayScheduleDB(cleanDate);
+
+  if (barberId === "barbeiro-noah") {
+    return studioSchedule;
+  }
+
+  const barberDateId = `${barberId}_${cleanDate}`;
+  const barberDefaultId = `${barberId}_${DEFAULT_SCHEDULE_ID}`;
+
+  try {
+    const rows = await prisma.studioSchedule.findMany({
+      where: { id: { in: [barberDateId, barberDefaultId] } },
+    });
+
+    const defaultRow = rows.find((r) => r.id === barberDefaultId);
+    const dateRow = rows.find((r) => r.id === barberDateId);
+
+    const isBarberDateOff = Boolean(dateRow?.isClosed);
+    const isClosed = studioSchedule.isClosed || isBarberDateOff;
+
+    return resolveScheduleValues(
+      cleanDate,
+      isClosed,
+      studioSchedule.earlyClosingTime,
+      defaultRow?.lunchBreakTime || studioSchedule.defaultLunchBreakTime,
+      dateRow?.lunchBreakTime || studioSchedule.dayOverrideLunchBreakTime
+    );
+  } catch (_) {
+    return studioSchedule;
+  }
+}
+
+/**
+ * Marca ou remove folga de um barbeiro específico no banco (sem fechar o estúdio).
+ */
+export async function setBarberOffDB(
+  barberId: string,
+  dateStr: string,
+  isOff: boolean
+): Promise<boolean> {
+  const cleanDate = dateStr.substring(0, 10);
+  const key = `${barberId}_${cleanDate}`;
+
+  try {
+    await prisma.studioSchedule.upsert({
+      where: { id: key },
+      update: { isClosed: isOff },
+      create: { id: key, isClosed: isOff },
+    });
+  } catch (err) {
+    console.error("Erro ao persistir folga do barbeiro:", err);
+  }
+
+  return isOff;
+}
+
+/**
+ * Define pausa para almoço de um barbeiro específico no banco.
+ */
+export async function setBarberLunchBreakTimeDB(
+  barberId: string,
+  dateStr: string,
+  time: string | null,
+  scope: "default" | "date" = "default"
+): Promise<ResolvedDaySchedule> {
+  const cleanDate = dateStr.substring(0, 10);
+  const cleanTime = time ? time.trim() : null;
+  const targetId = scope === "default" ? `${barberId}_${DEFAULT_SCHEDULE_ID}` : `${barberId}_${cleanDate}`;
+
+  try {
+    await prisma.studioSchedule.upsert({
+      where: { id: targetId },
+      update: { lunchBreakTime: cleanTime },
+      create: { id: targetId, lunchBreakTime: cleanTime },
+    });
+  } catch (err) {
+    console.error("Erro ao persistir pausa de almoço do barbeiro:", err);
+  }
+
+  return getBarberDayScheduleDB(barberId, cleanDate);
+}
