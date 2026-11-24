@@ -1,14 +1,13 @@
 "use client";
 
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Calendar, ChevronRight, ChevronLeft, Menu, X, Scissors, Star, MapPin, Clock, Smartphone, LogOut, ShoppingBag } from "lucide-react";
+import { Calendar, ChevronRight, ChevronLeft, Menu, X, Scissors, Star, MapPin, Clock, Smartphone, LogOut } from "lucide-react";
 import { useState, useEffect, useRef, ReactNode } from "react";
 import Link from "next/link";
 import BookingModal from "@/components/BookingModal";
 import { useSession, signOut } from "next-auth/react";
 import ExperienciaSection from "@/components/ExperienciaSection";
 import NossaAreaSection from "@/components/NossaAreaSection";
-import ServicesMenuSection from "@/components/ServicesMenuSection";
 import LogoNoahBarber from "@/components/LogoLasBarber";
 import FloatingSocialButtons from "@/components/FloatingSocialButtons";
 
@@ -262,14 +261,9 @@ export default function Home() {
           <LogoNoahBarber variant="horizontal" size={38} />
         </Link>
         
-        <div className="hidden md:flex items-center gap-10 text-xs uppercase tracking-[0.2em] text-gray-200 font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] font-mono">
+        <div className="hidden md:flex items-center gap-12 text-xs uppercase tracking-[0.2em] text-gray-200 font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] font-mono">
           <a href="#servicos" className="hover:text-[#DFBA73] transition-colors relative group py-1">
             Serviços
-            <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-[#DFBA73] transition-all duration-300 group-hover:w-full"></span>
-          </a>
-          <a href="#produtos" className="hover:text-[#DFBA73] transition-colors relative group py-1 flex items-center gap-1.5">
-            <ShoppingBag className="w-3.5 h-3.5 text-[#DFBA73]" />
-            <span>Produtos</span>
             <span className="absolute -bottom-2 left-0 w-0 h-[1px] bg-[#DFBA73] transition-all duration-300 group-hover:w-full"></span>
           </a>
           <a href="#experiencia" className="hover:text-[#DFBA73] transition-colors relative group py-1">
@@ -370,27 +364,12 @@ export default function Home() {
               </a>
 
               <a
-                href="#produtos"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-[#DFBA73]/40 active:bg-[#DFBA73]/10 flex items-center justify-between transition-all"
-              >
-                <div className="flex items-center gap-3.5">
-                  <span className="text-xs font-mono font-bold text-[#DFBA73] w-6 h-6 rounded-lg bg-[#DFBA73]/10 flex items-center justify-center border border-[#DFBA73]/30">02</span>
-                  <div>
-                    <span className="text-base font-serif text-white block">Produtos & Cosméticos</span>
-                    <span className="text-[11px] text-gray-400 font-light">Pomadas, óleos, minoxidil e bebidas</span>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-500" />
-              </a>
-
-              <a
                 href="#experiencia"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-[#DFBA73]/40 active:bg-[#DFBA73]/10 flex items-center justify-between transition-all"
               >
                 <div className="flex items-center gap-3.5">
-                  <span className="text-xs font-mono font-bold text-[#DFBA73] w-6 h-6 rounded-lg bg-[#DFBA73]/10 flex items-center justify-center border border-[#DFBA73]/30">03</span>
+                  <span className="text-xs font-mono font-bold text-[#DFBA73] w-6 h-6 rounded-lg bg-[#DFBA73]/10 flex items-center justify-center border border-[#DFBA73]/30">02</span>
                   <div>
                     <span className="text-base font-serif text-white block">A Experiência</span>
                     <span className="text-[11px] text-gray-400 font-light">Atendimento personalizado e estilo</span>
@@ -405,7 +384,7 @@ export default function Home() {
                 className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-[#DFBA73]/40 active:bg-[#DFBA73]/10 flex items-center justify-between transition-all"
               >
                 <div className="flex items-center gap-3.5">
-                  <span className="text-xs font-mono font-bold text-[#DFBA73] w-6 h-6 rounded-lg bg-[#DFBA73]/10 flex items-center justify-center border border-[#DFBA73]/30">04</span>
+                  <span className="text-xs font-mono font-bold text-[#DFBA73] w-6 h-6 rounded-lg bg-[#DFBA73]/10 flex items-center justify-center border border-[#DFBA73]/30">03</span>
                   <div>
                     <span className="text-base font-serif text-white block">O Estúdio & Equipe</span>
                     <span className="text-[11px] text-gray-400 font-light">Morada de Laranjeiras · Serra - ES</span>
@@ -680,8 +659,212 @@ export default function Home() {
         </motion.div>
       </div>
 
-      {/* SESSÃO DE SERVIÇOS & PRODUTOS OFICIAIS (BARBERBOOK CATALOG & MR. BASTOS RITUAIS) */}
-      <ServicesMenuSection onSelectService={(serviceId) => openBooking(serviceId)} />
+      {/* SESSÃO DE SERVIÇOS E PREÇOS OFICIAIS (100% MODELO MR BASTOS COM DADOS DO NOAH BARBER STUDIO) */}
+      <section id="servicos" className="py-32 md:py-40 px-6 md:px-16 lg:px-24 bg-[#050608] relative border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          
+          {/* Cabeçalho da Seção de Serviços */}
+          <div className="flex flex-col md:flex-row justify-between items-end mb-20">
+            <div className="max-w-2xl">
+              <RevealText>
+                <p className="text-[#DFBA73] uppercase tracking-[0.45em] text-xs font-semibold flex items-center gap-3 mb-4 font-mono">
+                  <span className="w-10 h-[1px] bg-[#DFBA73]"></span>
+                  Tabela Oficial
+                </p>
+              </RevealText>
+              <RevealText delay={0.1}>
+                <h2 className="text-5xl md:text-7xl font-serif mb-6 leading-tight">
+                  Nossos <span className="text-[#DFBA73] italic">Serviços</span> & Valores
+                </h2>
+              </RevealText>
+              <RevealText delay={0.2}>
+                <p className="text-gray-300 font-light text-base md:text-lg leading-relaxed">
+                  Excelência clássica, navalha afiada e respeito ao seu tempo. Escolha seu serviço ou combo preferido e garanta seu horário.
+                </p>
+              </RevealText>
+            </div>
+            <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="hidden md:block mt-8 md:mt-0">
+               <button 
+                 type="button" 
+                 onClick={() => openBooking()} 
+                 className="text-[#DFBA73] uppercase tracking-[0.2em] text-xs font-semibold border border-[#DFBA73]/40 px-8 py-4 hover:bg-[#DFBA73] hover:text-black transition-all duration-300 cursor-pointer font-mono"
+               >
+                 Agendar Qualquer Horário
+               </button>
+            </motion.div>
+          </div>
+
+          {/* 3 CARDS DE DESTAQUE (MODELO MR BASTOS) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+            {SERVICES_HIGHLIGHT.map((service, idx) => (
+              <motion.article
+                key={service.id}
+                initial={{ opacity: 0, y: 80 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ delay: idx * 0.15, duration: 0.8, ease: [0.33, 1, 0.68, 1] }}
+                className={`group relative overflow-hidden bg-gray-900 rounded-2xl border border-white/10 h-[380px] sm:h-[430px] ${
+                  idx === 1 
+                    ? "md:h-[520px] md:-translate-y-6 md:border-[#DFBA73]/50 shadow-[0_20px_50px_rgba(223,186,115,0.18)]" 
+                    : "md:h-[460px]"
+                }`}
+              >
+                <img
+                  src={service.img}
+                  alt={service.title}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1.5s] ease-out md:group-hover:scale-110 opacity-90 md:opacity-60 md:group-hover:opacity-100"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-[#050608]/40 md:via-[#050608]/60 to-transparent opacity-90 md:group-hover:opacity-100 transition-opacity pointer-events-none" />
+                
+                {/* Badge Superior */}
+                <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10 pointer-events-none">
+                  <span className="px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-mono font-bold shadow-md">
+                    {service.badge}
+                  </span>
+                </div>
+
+                <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 md:p-10 translate-y-0 md:translate-y-8 md:group-hover:translate-y-0 transition-transform duration-700 ease-out pointer-events-none z-10">
+                  <div className="flex justify-between items-center mb-1.5 sm:mb-3">
+                    <h3 className="text-2xl sm:text-3xl font-serif text-white">{service.title}</h3>
+                  </div>
+                  <p className="text-gray-300 md:text-gray-400 text-xs sm:text-sm font-light mb-3 sm:mb-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700 delay-100 max-w-[95%] md:max-w-[85%] leading-relaxed line-clamp-2 md:line-clamp-none">
+                    {service.desc}
+                  </p>
+                  <div className="flex justify-between items-center border-t border-white/10 pt-3 sm:pt-5">
+                    <span className="text-[#DFBA73] font-mono tracking-widest text-xl sm:text-2xl font-bold">{service.price}</span>
+                    <div className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#DFBA73] md:border-white/20 bg-[#DFBA73] md:bg-transparent text-black md:text-white flex items-center gap-1.5 sm:gap-2 text-xs uppercase tracking-wider font-semibold md:group-hover:bg-[#DFBA73] md:group-hover:border-[#DFBA73] md:group-hover:text-black transition-all duration-300 font-mono">
+                      <span>Agendar</span>
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => openBooking(service.id)}
+                  aria-label={`Agendar ${service.title} por ${service.price}`}
+                  className="absolute inset-0 z-20 cursor-pointer rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#DFBA73] focus-visible:outline-offset-[-2px]"
+                />
+              </motion.article>
+            ))}
+          </div>
+
+          {/* TABELA COMPLETA DE SERVIÇOS E COMBOS (MODELO MR BASTOS) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            
+            {/* SERVIÇOS INDIVIDUAIS (COLUNA DA ESQUERDA) */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="lg:col-span-7 bg-[#02050A]/70 border border-white/10 rounded-3xl p-6 md:p-10 backdrop-blur-md"
+            >
+              <div className="flex items-center gap-3 mb-8 pb-5 border-b border-white/10">
+                <Scissors className="w-5 h-5 text-[#DFBA73]" />
+                <h3 className="font-serif text-2xl text-white tracking-wide">Serviços Individuais</h3>
+              </div>
+
+              <ul className="space-y-6">
+                {INDIVIDUAL_SERVICES.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => openBooking(item.id)}
+                      className="w-full text-left group flex items-baseline justify-between py-3 border-b border-white/[0.04] hover:border-[#DFBA73]/40 cursor-pointer transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#DFBA73] focus-visible:outline-offset-4 rounded-lg"
+                    >
+                      <span className="block flex-1 pr-4">
+                        <span className="flex items-center gap-3">
+                          <span className="text-white text-lg font-serif group-hover:text-[#F5D799] transition-colors">
+                            {item.name}
+                          </span>
+                        </span>
+                        <span className="block text-gray-400 text-xs font-light mt-0.5">
+                          {item.desc}
+                        </span>
+                      </span>
+
+                      <span className="flex items-center gap-4 shrink-0">
+                        <span className="text-white font-mono text-lg font-semibold tracking-wider group-hover:text-[#DFBA73] transition-colors">
+                          {item.price}
+                        </span>
+                        <span className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-gray-400 group-hover:border-[#DFBA73] group-hover:bg-[#DFBA73] group-hover:text-black transition-all duration-300">
+                          <ChevronRight className="w-4 h-4" />
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* COMBOS ESPECIAIS (COLUNA DA DIREITA - MODELO MR BASTOS) */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="lg:col-span-5 flex flex-col justify-between gap-6"
+            >
+              <div className="bg-gradient-to-b from-[#DFBA73]/10 via-[#02050A]/90 to-[#02050A] border border-[#DFBA73]/30 rounded-3xl p-6 md:p-10 relative overflow-hidden h-full flex flex-col justify-between">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-[#DFBA73]/10 rounded-full blur-3xl pointer-events-none" />
+
+                <div>
+                  <div className="flex items-center justify-between mb-8 pb-5 border-b border-white/10">
+                    <div className="flex items-center gap-3">
+                      <Star className="w-5 h-5 text-[#DFBA73]" />
+                      <h3 className="font-serif text-2xl text-white tracking-wide">Combos</h3>
+                    </div>
+                    <span className="text-[10px] uppercase tracking-[0.3em] text-[#DFBA73] font-semibold font-mono">
+                      Mais Vantagem
+                    </span>
+                  </div>
+
+                  <ul className="space-y-5">
+                    {COMBOS.map((combo) => (
+                      <li key={combo.id}>
+                        <button
+                          type="button"
+                          onClick={() => openBooking(combo.id)}
+                          className="w-full text-left block p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-[#DFBA73]/50 hover:bg-[#DFBA73]/5 cursor-pointer transition-all duration-300 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#DFBA73] focus-visible:outline-offset-2"
+                        >
+                          <span className="flex items-center justify-between mb-1.5">
+                            <span className="text-white font-serif text-xl group-hover:text-[#F5D799] transition-colors">
+                              {combo.name}
+                            </span>
+                            <span className="text-[#DFBA73] font-mono text-xl font-bold">
+                              {combo.price}
+                            </span>
+                          </span>
+                          <span className="block text-gray-400 text-xs font-light mb-3">
+                            {combo.desc}
+                          </span>
+                          <span className="flex items-center justify-between pt-2 border-t border-white/5">
+                            <span className="text-[10px] uppercase tracking-wider text-gray-400 font-mono font-medium">
+                              {combo.badge}
+                            </span>
+                            <span className="text-xs uppercase tracking-widest text-[#DFBA73] font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform font-mono">
+                              Agendar Combo <ChevronRight className="w-3.5 h-3.5" />
+                            </span>
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-white/10 text-center font-mono">
+                  <p className="text-xs text-gray-400 font-light">
+                    Atendimento com hora marcada ou ordem de chegada.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
 
       {/* SESSÃO: A EXPERIÊNCIA (100% MODELO MR BASTOS COM RETRATOS DO NOAH BARBER STUDIO) */}
       <ExperienciaSection />
