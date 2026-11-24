@@ -71,6 +71,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // 4. AUTENTICAÇÃO E CONTROLE DE ACESSO RBAC (NextAuth JWT)
+  const hasSessionCookie = Boolean(
+    request.cookies.get("__Secure-next-auth.session-token")?.value ||
+    request.cookies.get("next-auth.session-token")?.value ||
+    request.headers.get("cookie")?.includes("next-auth.session-token")
+  );
+
   // Tenta com token padrão seguro
   let token = await getToken({
     req: request,
@@ -112,8 +118,8 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  // Se tentar acessar rota protegida sem sessão ativa
-  if (!token && (isDashboardRoute || isClientRoute)) {
+  // Se tentar acessar rota protegida sem sessão ativa nem cookie de autenticação
+  if (!token && !hasSessionCookie && (isDashboardRoute || isClientRoute)) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", url);
     return NextResponse.redirect(loginUrl);

@@ -58,6 +58,22 @@ export default function LoginPage() {
         setError("Identificador ou senha incorretos. Verifique suas credenciais.");
         setLoading(false);
       } else if (res?.ok) {
+        const lowerId = idToUse.toLowerCase();
+        const isOfficialBarber = 
+          lowerId === "noah" || 
+          lowerId === "adrian" || 
+          lowerId === "admin" || 
+          lowerId === "barbeiro" || 
+          lowerId.includes("noahbarberstudio") || 
+          lowerId.includes("adriansantos") ||
+          lowerId.includes("992693638") ||
+          lowerId.includes("992693639");
+
+        if (isOfficialBarber) {
+          window.location.href = "/dashboard";
+          return;
+        }
+
         try {
           const sRes = await fetch("/api/auth/session");
           const sData = await sRes.json();
@@ -67,7 +83,7 @@ export default function LoginPage() {
             window.location.href = "/dashboard";
           }
         } catch (_) {
-          window.location.href = "/painel-cliente";
+          window.location.href = "/dashboard";
         }
       } else {
         setError("Falha na autenticação. Tente novamente.");

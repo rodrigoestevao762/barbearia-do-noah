@@ -28,10 +28,10 @@ const GALLERY_VIDEOS = [
   },
   {
     src: "/studio/video-3.mp4",
-    poster: "/studio/hero-3.jpg",
-    tag: "Design Exclusivo",
-    title: "Espelho com Halo de LED",
-    desc: "Iluminação em arco e visagismo individualizado",
+    poster: "/studio/hero-2.jpg",
+    tag: "Arte da Barbearia",
+    title: "Degradê Preciso & Acabamento Navalhado",
+    desc: "Cortes modernos, transição suave na zero e visagismo sob medida",
     col: "col-span-1 row-span-1",
   },
   {
@@ -45,9 +45,9 @@ const GALLERY_VIDEOS = [
   {
     src: "/studio/video-5.mp4",
     poster: "/studio/hero-3.jpg",
-    tag: "Recepção Exclusiva",
-    title: "Ambiente 100% Climatizado",
-    desc: "Espaço refrigerado, poltronas confortáveis e som ambiente",
+    tag: "Alta Precisão",
+    title: "Rituais de Corte & Estilo Masculino",
+    desc: "Alinhamento de barba, texturização e finalização com produtos premium",
     col: "col-span-1 row-span-1",
   },
   {
