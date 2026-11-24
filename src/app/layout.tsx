@@ -44,14 +44,14 @@ export const metadata: Metadata = {
   authors: [{ name: "Noah Barber Studio" }],
   icons: {
     icon: [
-      { url: "/brand/logo-square-512.png", sizes: "512x512", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/logo-square-512.png?v=noah-2026", sizes: "512x512", type: "image/png" },
+      { url: "/icon-512.png?v=noah-2026", sizes: "512x512", type: "image/png" },
+      { url: "/icon-192.png?v=noah-2026", sizes: "192x192", type: "image/png" },
+      { url: "/icon.png?v=noah-2026", sizes: "32x32", type: "image/png" },
       { url: "/favicon.ico", sizes: "any" },
     ],
     apple: [
-      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-icon.png?v=noah-2026", sizes: "180x180", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
   },
@@ -63,10 +63,16 @@ export const metadata: Metadata = {
     siteName: "Noah Barber Studio",
     images: [
       {
-        url: `${SITE_URL}/opengraph-image.png`,
-        width: 1024,
-        height: 574,
+        url: `${SITE_URL}/brand/noah-og-banner.png?v=noah-2026`,
+        width: 1200,
+        height: 630,
         alt: "Noah Barber Studio Oficial",
+      },
+      {
+        url: `${SITE_URL}/opengraph-image.png?v=noah-2026`,
+        width: 1200,
+        height: 630,
+        alt: "Noah Barber Studio",
       },
     ],
     locale: "pt_BR",
@@ -76,7 +82,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Noah Barber Studio",
     description: "Estúdio de barbearia privativo e cortes de alta precisão no Noah Barber Studio.",
-    images: [`${SITE_URL}/twitter-image.png`],
+    images: [`${SITE_URL}/brand/noah-og-banner.png?v=noah-2026`],
   },
   alternates: {
     canonical: SITE_URL,
