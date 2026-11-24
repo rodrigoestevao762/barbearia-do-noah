@@ -200,7 +200,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         className="md:hidden sticky top-0 z-40 bg-[#050608]/95 backdrop-blur-xl border-b border-white/10 px-4 pb-3.5 flex items-center justify-between"
         style={{ paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 0.85rem), 2.75rem)" }}
       >
-        <Link href="/dashboard" className="flex items-center gap-2.5">
+        <Link 
+          href="/dashboard" 
+          onClick={(e) => {
+            if (pathname === "/dashboard") {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          className="flex items-center gap-2.5 cursor-pointer"
+          title="Voltar ao topo"
+        >
           <LogoLasBarber variant="emblem" size={28} />
           <div className="flex flex-col">
             <span className="text-xs font-serif font-bold text-white tracking-widest uppercase">NOAH STUDIO</span>

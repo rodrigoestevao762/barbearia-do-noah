@@ -257,7 +257,15 @@ export default function Home() {
         transition={{ duration: 0.8, delay: 1 }}
         className="fixed top-0 left-0 w-full px-6 py-6 md:px-12 md:py-8 flex justify-between items-center z-50 bg-transparent pointer-events-auto"
       >
-        <Link href="/" className="cursor-pointer group drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+        <Link 
+          href="/" 
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          className="cursor-pointer group drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"
+          title="Voltar ao topo"
+        >
           <LogoNoahBarber variant="horizontal" size={38} />
         </Link>
         
@@ -331,7 +339,16 @@ export default function Home() {
           >
             {/* Topo do Menu Mobile */}
             <div className="flex items-center justify-between pb-5 border-b border-white/10 shrink-0">
-              <LogoNoahBarber variant="horizontal" size={32} />
+              <div
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="cursor-pointer group"
+                title="Voltar ao topo"
+              >
+                <LogoNoahBarber variant="horizontal" size={32} />
+              </div>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -889,7 +906,9 @@ export default function Home() {
             whileInView={{ scale: 1, opacity: 1 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="w-24 h-24 rounded-full border border-[#DFBA73]/40 flex items-center justify-center mb-12 backdrop-blur-md bg-black/60 shadow-[0_0_30px_rgba(223,186,115,0.25)]"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            title="Voltar ao topo"
+            className="w-24 h-24 rounded-full border border-[#DFBA73]/40 flex items-center justify-center mb-12 backdrop-blur-md bg-black/60 shadow-[0_0_30px_rgba(223,186,115,0.25)] cursor-pointer hover:scale-105 transition-transform"
           >
             <LogoNoahBarber variant="emblem" size={76} />
           </motion.div>
@@ -950,7 +969,11 @@ export default function Home() {
           transition={{ delay: 1.5, duration: 2 }}
           className="w-full border-t border-white/10 py-8 flex flex-col md:flex-row items-center justify-between px-6 md:px-12 z-20 bg-[#02050A]/90 backdrop-blur-xl"
         >
-           <div className="flex items-center gap-2 mb-4 md:mb-0">
+           <div 
+             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+             className="flex items-center gap-2 mb-4 md:mb-0 cursor-pointer group"
+             title="Voltar ao topo"
+           >
               <LogoNoahBarber variant="horizontal" size={32} />
            </div>
            <p className="text-gray-400 text-[10px] tracking-[0.3em] uppercase font-mono">
