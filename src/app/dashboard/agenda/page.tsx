@@ -159,16 +159,22 @@ export default function AgendaPage() {
       .then((res) => res.json())
       .then((data) => {
         const list = Array.isArray(data) ? data : data?.barbers || [];
+        const studioOwner = list.find((b: any) =>
+          isAdrian ? b.id === "barbeiro-adrian" : (b.id === "barbeiro-noah" || b.id === "barbeiro-dono")
+        );
+        if (studioOwner) {
+          setIsOwnerAvailable(studioOwner.isAvailable !== false);
+          setEarlyClosing(studioOwner.earlyClosingTime || "20:00");
+        }
+
         const targetBarberId = isAdrian ? "barbeiro-adrian" : controlledBarberId;
         const target = list.find((b: any) => b.id === targetBarberId || (!isAdrian && targetBarberId === "barbeiro-noah" && b.id === "barbeiro-dono"));
         if (target) {
-          setIsOwnerAvailable(target.isAvailable !== false);
           setLunchBreak(target.lunchBreakTime || null);
           setDefaultLunchBreak(target.defaultLunchBreakTime || null);
           setIsLunchBreakFixed(Boolean(target.isLunchBreakFixed));
           setHasLunchDateOverride(Boolean(target.hasLunchDateOverride));
           setLunchBreakScope(target.hasLunchDateOverride ? "date" : "default");
-          if (target.earlyClosingTime) setEarlyClosing(target.earlyClosingTime);
         }
       })
       .catch(() => {});
@@ -299,6 +305,62 @@ export default function AgendaPage() {
     } catch (e) {}
   };
 
+  // Aprovação / Recusa de Reagendamento solicitado pelo cliente
+  const handleApproveReschedule = async (apt: any) => {
+    try {
+      const res = await fetch("/api/dashboard", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: apt.id,
+          action: "APPROVE_RESCHEDULE",
+          requestedDate: apt.requestedDate,
+        }),
+      });
+      if (res.ok) {
+        setToastMessage("Reagendamento aprovado com sucesso!");
+        fetchAgenda();
+        if (apt.user?.phone) {
+          const barberName = BARBERS.find((b) => b.id === apt.barberId)?.name || "Noah Ferreira";
+          const newDateFormatted = apt.requestedDate ? apt.requestedDate.substring(0, 10).split("-").reverse().join("/") : "";
+          const newTimeFormatted = apt.requestedDate ? getDisplayTime(apt.requestedDate) : "";
+          const msg = `Olá, ${apt.user.name}! Aqui é o ${barberName} do Noah Barber Studio. Sua solicitação de reagendamento para o dia ${newDateFormatted} às ${newTimeFormatted} foi APROVADA com sucesso! Seu horário já está garantido. Te aguardo no estúdio!`;
+          const digits = apt.user.phone.replace(/\D/g, "");
+          const clean = digits.startsWith("55") ? digits : `55${digits}`;
+          window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, "_blank");
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleRejectReschedule = async (apt: any) => {
+    if (!confirm("Deseja recusar esta solicitação de reagendamento? O horário original será mantido.")) return;
+    try {
+      const res = await fetch("/api/dashboard", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: apt.id, action: "REJECT_RESCHEDULE" }),
+      });
+      if (res.ok) {
+        setToastMessage("Solicitação de reagendamento recusada. Horário original mantido.");
+        fetchAgenda();
+        if (apt.user?.phone) {
+          const barberName = BARBERS.find((b) => b.id === apt.barberId)?.name || "Noah Ferreira";
+          const originalDate = apt.date ? apt.date.substring(0, 10).split("-").reverse().join("/") : "";
+          const originalTime = getDisplayTime(apt.date);
+          const msg = `Olá, ${apt.user.name}! Aqui é o ${barberName} do Noah Barber Studio. Infelizmente não consegui liberar o novo horário solicitado para reagendamento. Seu horário original para o dia ${originalDate} às ${originalTime} continua ATIVO e confirmado! Se precisar de outro dia, me avise por aqui!`;
+          const digits = apt.user.phone.replace(/\D/g, "");
+          const clean = digits.startsWith("55") ? digits : `55${digits}`;
+          window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, "_blank");
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const openEditModal = (apt: any) => {
     setEditingApt(apt);
     const dayStr = apt.date ? apt.date.substring(0, 10) : selectedDate;
@@ -388,6 +450,9 @@ export default function AgendaPage() {
   };
 
   const currentControlledBarber = BARBERS.find((b) => b.id === controlledBarberId) || BARBERS[0];
+  const pendingRequests = appointments.filter(
+    (a) => a.status === "RESCHEDULE_REQUESTED" || a.status === "CANCEL_REQUESTED"
+  );
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-16">
@@ -597,6 +662,8 @@ export default function AgendaPage() {
                   <option value="18:00" className="bg-[#080A0E] text-white">18:00</option>
                   <option value="17:00" className="bg-[#080A0E] text-white">17:00</option>
                   <option value="16:00" className="bg-[#080A0E] text-white">16:00</option>
+                  <option value="15:00" className="bg-[#080A0E] text-white">15:00</option>
+                  <option value="14:00" className="bg-[#080A0E] text-white">14:00</option>
                 </select>
               </div>
             </div>
@@ -711,6 +778,91 @@ export default function AgendaPage() {
         </div>
       </div>
 
+      {/* SEÇÃO DE SOLICITAÇÕES PENDENTES DE CLIENTES (REAGENDAMENTO / CANCELAMENTO) */}
+      {pendingRequests.length > 0 && (
+        <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-3xl p-5 md:p-6 space-y-4 shadow-xl">
+          <div className="flex items-center gap-2 text-[#DFBA73]">
+            <AlertCircle className="w-5 h-5" />
+            <h3 className="font-serif text-lg font-bold">
+              Solicitações de Clientes Pendentes ({pendingRequests.length})
+            </h3>
+          </div>
+
+          <div className="grid gap-3">
+            {pendingRequests.map((apt) => {
+              const isReschedule = apt.status === "RESCHEDULE_REQUESTED";
+              const currentTime = getDisplayTime(apt.date);
+              const requestedTime = apt.requestedDate ? getDisplayTime(apt.requestedDate) : "";
+              const requestedDate = apt.requestedDate ? apt.requestedDate.substring(0, 10).split("-").reverse().join("/") : "";
+
+              return (
+                <div
+                  key={apt.id}
+                  className="p-4 bg-[#080A0E] border border-[#DFBA73]/30 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4"
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                          isReschedule
+                            ? "bg-[#DFBA73]/20 text-[#F5D799] border border-[#DFBA73]/30"
+                            : "bg-red-500/20 text-red-400 border border-red-500/30"
+                        }`}
+                      >
+                        {isReschedule ? "📅 Solicitação de Reagendamento" : "❌ Solicitação de Cancelamento"}
+                      </span>
+                    </div>
+
+                    <h4 className="text-white font-medium text-base">
+                      {apt.user?.name || "Cliente"} — <span className="text-gray-400 text-sm">{apt.service?.name}</span>
+                    </h4>
+
+                    {isReschedule ? (
+                      <p className="text-xs text-gray-300 mt-1">
+                        Horário atual: <strong className="text-gray-400">{currentTime}</strong> → Novo horário solicitado:{" "}
+                        <strong className="text-[#F5D799]">
+                          {requestedDate || "Novo horário"} {requestedTime ? `às ${requestedTime}` : ""}
+                        </strong>
+                      </p>
+                    ) : (
+                      <p className="text-xs text-gray-300 mt-1">
+                        Cliente solicitou cancelamento do horário das <strong className="text-red-300">{currentTime}</strong>.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {isReschedule ? (
+                      <>
+                        <button
+                          onClick={() => handleApproveReschedule(apt)}
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#F5D799] to-[#DFBA73] text-black font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all flex items-center gap-1.5 cursor-pointer shadow-md"
+                        >
+                          <Check className="w-3.5 h-3.5" /> Aprovar Reagendamento
+                        </button>
+                        <button
+                          onClick={() => handleRejectReschedule(apt)}
+                          className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-semibold cursor-pointer"
+                        >
+                          Recusar
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => updateStatus(apt.id, "CANCELLED")}
+                        className="px-4 py-2 rounded-xl bg-red-500/20 text-red-300 border border-red-500/30 font-bold text-xs uppercase tracking-wider hover:bg-red-500 hover:text-white transition-all cursor-pointer"
+                      >
+                        Confirmar Cancelamento
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* CARD 3: LISTA DE HORÁRIOS DA AGENDA */}
       <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-2xl space-y-5">
         <div className="flex justify-between items-center pb-4 border-b border-white/5">
@@ -791,10 +943,22 @@ export default function AgendaPage() {
                           ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10"
                           : apt.status === "CANCELLED"
                           ? "border-red-500/30 text-red-400 bg-red-500/10"
+                          : apt.status === "RESCHEDULE_REQUESTED"
+                          ? "border-[#DFBA73]/40 text-[#F5D799] bg-[#DFBA73]/15"
+                          : apt.status === "CANCEL_REQUESTED"
+                          ? "border-amber-500/40 text-amber-300 bg-amber-500/15"
                           : "border-[#DFBA73]/30 text-[#F5D799] bg-[#DFBA73]/10"
                       }`}
                     >
-                      {apt.status === "COMPLETED" ? "CONCLUÍDO" : apt.status === "CANCELLED" ? "CANCELADO" : "CONFIRMADO"}
+                      {apt.status === "COMPLETED"
+                        ? "CONCLUÍDO"
+                        : apt.status === "CANCELLED"
+                        ? "CANCELADO"
+                        : apt.status === "RESCHEDULE_REQUESTED"
+                        ? "REAGENDAMENTO"
+                        : apt.status === "CANCEL_REQUESTED"
+                        ? "CANCELAMENTO"
+                        : "CONFIRMADO"}
                     </span>
 
                     {/* WhatsApp Action */}

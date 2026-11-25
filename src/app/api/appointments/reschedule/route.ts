@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { updateStoredAppointment, getStoredAppointmentById } from "@/lib/appointments-store";
-import { checkDayStatusDB, getDayScheduleDB } from "@/lib/studio-schedule";
+import { checkDayStatusDB, getDayScheduleDB, getBarberDayScheduleDB } from "@/lib/studio-schedule";
 import { getBrazilNow, parseBrazilDateTime } from "@/lib/timezone";
 
 export async function POST(req: Request) {
@@ -62,6 +62,21 @@ export async function POST(req: Request) {
 
     if (!apt) {
       return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
+    }
+
+    const targetBarberId = apt.barberId || "barbeiro-noah";
+    const barberDaySchedule = await getBarberDayScheduleDB(targetBarberId, requestedDate);
+    if (barberDaySchedule.isClosed) {
+      return NextResponse.json(
+        { error: "O profissional selecionado não estará atendendo nesta data." },
+        { status: 400 }
+      );
+    }
+    if (barberDaySchedule.lunchBreakSlots.includes(requestedTime)) {
+      return NextResponse.json(
+        { error: `O horário das ${requestedTime} está bloqueado para pausa de almoço.` },
+        { status: 400 }
+      );
     }
 
     // Proteção de permissão: clientes só podem reagendar seus próprios agendamentos

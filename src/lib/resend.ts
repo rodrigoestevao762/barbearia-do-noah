@@ -4,8 +4,8 @@ const resendApiKey = process.env.RESEND_API_KEY;
 
 export const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://barbeariadonoah.com.br";
-const DEFAULT_FROM = process.env.RESEND_FROM || "Noah Barber Studio <agendamento@barbeariadonoah.com.br>";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://barbearia-do-noah.vercel.app";
+const DEFAULT_FROM = process.env.RESEND_FROM || "Noah Barber Studio <onboarding@resend.dev>";
 
 /**
  * 1. Confirmação de Agendamento Enviada para o Cliente VIP

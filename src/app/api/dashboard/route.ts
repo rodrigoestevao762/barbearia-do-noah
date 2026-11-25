@@ -133,7 +133,12 @@ export async function GET(req: Request) {
       const map = new Map<string, any>();
       (dbAppointments || []).forEach((a) => map.set(a.id, a));
       (memAppointments || []).forEach((a) => {
-        if (!map.has(a.id)) map.set(a.id, a);
+        const existing = map.get(a.id);
+        if (!existing) {
+          map.set(a.id, a);
+        } else if (a.requestedDate && !existing.requestedDate) {
+          map.set(a.id, { ...existing, requestedDate: a.requestedDate });
+        }
       });
       allDayAppointments = Array.from(map.values()).filter(
         (a) => !a.id?.includes("almir") && !a.user?.name?.toLowerCase().includes("almir")
@@ -466,15 +471,19 @@ export async function PATCH(req: Request) {
       let currentApt: any = null;
       try {
         currentApt = await prisma.appointment.findUnique({ where: { id } });
-      } catch (_) {
-        currentApt = getStoredAppointmentById(id);
-      }
+      } catch (_) {}
 
-      if (!currentApt || !currentApt.requestedDate) {
+      const storedApt = getStoredAppointmentById(id);
+      const effectiveRequestedDate = storedApt?.requestedDate || currentApt?.requestedDate || body.requestedDate;
+
+      if (!currentApt && !storedApt) {
+        return NextResponse.json({ error: "Agendamento não encontrado." }, { status: 404 });
+      }
+      if (!effectiveRequestedDate) {
         return NextResponse.json({ error: "Nenhuma solicitação de reagendamento encontrada." }, { status: 400 });
       }
 
-      const newDate = new Date(currentApt.requestedDate);
+      const newDate = new Date(effectiveRequestedDate);
 
       try {
         const updated = await prisma.appointment.update({

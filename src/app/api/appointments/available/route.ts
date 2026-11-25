@@ -92,8 +92,10 @@ export async function GET(req: Request) {
       });
     }
 
-    // 2.2 Checa se o barbeiro específico selecionado está de folga nesta data
-    if (!isBarberAvailable(barberId, cleanDateStr)) {
+    // 2.2 Checa no PostgreSQL se o barbeiro específico selecionado está de folga nesta data
+    const barberSchedule = await getBarberDayScheduleDB(barberId, cleanDateStr);
+    const isBarberOffToday = !isBarberAvailable(barberId, cleanDateStr) || barberSchedule.isClosed;
+    if (isBarberOffToday) {
       const barberName = barberId === "barbeiro-adrian" ? "Adrian Santos" : "Noah Ferreira";
       return jsonNoStore({
         availableTimes: [],
@@ -119,9 +121,11 @@ export async function GET(req: Request) {
       baseHours = baseHours.filter((time) => time <= earlyClosingTime);
     }
 
-    // 4.1 Verificação de Pausa para Almoço do Barbeiro Selecionado
-    const barberLunchTime = getBarberLunchBreakTime(barberId, cleanDateStr);
-    const lunchBreakSlots = parseLunchBreakSlots(barberLunchTime);
+    // 4.1 Verificação de Pausa para Almoço do Barbeiro Selecionado (PostgreSQL + fallback memória)
+    const barberLunchTime = barberSchedule.lunchBreakTime || getBarberLunchBreakTime(barberId, cleanDateStr);
+    const lunchBreakSlots = barberSchedule.lunchBreakSlots.length > 0
+      ? barberSchedule.lunchBreakSlots
+      : parseLunchBreakSlots(barberLunchTime);
     if (lunchBreakSlots.length > 0) {
       baseHours = baseHours.filter((time) => !lunchBreakSlots.includes(time));
     }

@@ -188,7 +188,8 @@ export default function ClientDashboard() {
 
   // Ação de Cancelamento pelo Cliente (Regra dos 30 minutos)
   const handleClientCancel = async (apt: any) => {
-    if (!confirm("Deseja realmente cancelar este agendamento?\n\n• Dentro de 30 minutos: o cancelamento é imediato e libera a vaga no sistema.\n• Após 30 minutos: será enviada uma solicitação para Noah Ferreira aprovar.")) {
+    const cancelBarberName = apt.barber?.name || getBarberById(apt.barberId).name || "Noah Ferreira";
+    if (!confirm(`Deseja realmente cancelar este agendamento?\n\n• Dentro de 30 minutos: o cancelamento é imediato e libera a vaga no sistema.\n• Após 30 minutos: será enviada uma solicitação para ${cancelBarberName} aprovar.`)) {
       return;
     }
 
@@ -218,7 +219,7 @@ export default function ClientDashboard() {
           title: isDirect ? "Agendamento Cancelado!" : "Cancelamento Solicitado!",
           description: isDirect
             ? `Seu agendamento de ${apt.service?.name || "serviço"} foi cancelado com sucesso e a vaga foi liberada no estúdio.`
-            : `Como já se passaram mais de 30 minutos do agendamento, sua solicitação foi enviada para Noah Ferreira confirmar.`,
+            : `Como já se passaram mais de 30 minutos do agendamento, sua solicitação foi enviada para ${barberName} confirmar.`,
           serviceName: apt.service?.name,
           barberName,
           barberPhone,
@@ -519,11 +520,15 @@ export default function ClientDashboard() {
               >
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
                   <div className="flex items-start gap-4">
-                    {/* Foto de Noah Ferreira */}
+                    {/* Foto do Profissional (Noah ou Adrian) */}
                     <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-md shadow-[#DFBA73]/20 shrink-0 hidden sm:block">
                       <Image
-                        src="/barbers/noah-ferreira.jpg"
-                        alt="Noah Ferreira"
+                        src={
+                          (upcomingApt.barberId === "barbeiro-adrian" || upcomingApt.barber?.id === "barbeiro-adrian")
+                            ? "/barbers/adrian-santos.jpg"
+                            : "/barbers/noah-ferreira.jpg"
+                        }
+                        alt={upcomingApt.barber?.name || "Noah Ferreira"}
                         fill
                         className="object-cover object-top"
                         sizes="64px"
@@ -553,13 +558,13 @@ export default function ClientDashboard() {
                       <p className="text-xs text-gray-300 mt-2">
                         Barbeiro responsável: <strong className="text-white">{upcomingApt.barber?.name || "Noah Ferreira (Master Barber)"}</strong> ·{" "}
                         <a
-                          href="https://www.google.com/maps/search/?api=1&query=Rua+dos+Yp%C3%AAs,+365E+-+Centro"
+                          href="https://www.google.com/maps/search/?api=1&query=Noah+Barber+Studio+Av+Paulo+Pereira+Gomes+281+Morada+de+Laranjeiras+Serra+ES"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-[#DFBA73] hover:text-white underline transition-colors"
-                          title="Abrir localização do studio no Google Maps"
+                          title="Abrir localização do Noah Barber Studio no Google Maps"
                         >
-                          Rua dos Ypês, Nº 365E — Centro (Ver no Mapa)
+                          Av. Paulo Pereira Gomes, 281 - Loja 9 · Serra - ES (Ver no Mapa)
                         </a>
                       </p>
                     </div>
@@ -607,8 +612,12 @@ export default function ClientDashboard() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-[#DFBA73]/40 shadow-md shrink-0 hidden sm:block">
                     <Image
-                      src="/barbers/noah-ferreira.jpg"
-                      alt="Noah Ferreira"
+                      src={
+                        (lastApt.barberId === "barbeiro-adrian" || lastApt.barber?.id === "barbeiro-adrian")
+                          ? "/barbers/adrian-santos.jpg"
+                          : "/barbers/noah-ferreira.jpg"
+                      }
+                      alt={lastApt.barber?.name || "Noah Ferreira"}
                       fill
                       className="object-cover object-top"
                       sizes="56px"
@@ -769,7 +778,7 @@ export default function ClientDashboard() {
                   Barbeiro: <strong className="text-white">{rescheduleApt.barber?.name || "Noah Ferreira"}</strong>
                 </p>
                 <p className="text-[11px] text-[#F5D799] pt-1">
-                  💡 A solicitação será atualizada e você poderá notificar Noah no WhatsApp com 1 clique.
+                  💡 A solicitação será atualizada e você poderá notificar {rescheduleApt.barber?.name || "o barbeiro"} no WhatsApp com 1 clique.
                 </p>
               </div>
 
@@ -785,7 +794,7 @@ export default function ClientDashboard() {
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 bg-[#25D366] text-white px-3 py-2 rounded-lg font-bold text-xs uppercase tracking-wider hover:bg-[#128C7E] transition-all"
                     >
-                      <MessageCircle className="w-4 h-4" /> Notificar Noah no WhatsApp
+                      <MessageCircle className="w-4 h-4" /> Notificar no WhatsApp
                     </a>
                   )}
                 </div>
@@ -941,12 +950,12 @@ export default function ClientDashboard() {
                 </div>
               </div>
 
-              {/* Card de Envio Oficial no WhatsApp de Noah Ferreira */}
+              {/* Card de Envio Oficial no WhatsApp do Studio */}
               <div className="w-full bg-white/[0.03] border border-[#25D366]/40 rounded-2xl p-5 mb-6 text-left shadow-xl">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-3 h-3 rounded-full bg-[#25D366] animate-pulse" />
                   <p className="text-xs font-semibold text-[#25D366] uppercase tracking-wider font-mono">
-                    Notificar Noah Ferreira no WhatsApp
+                    Notificar {actionSuccessModal.barberName} no WhatsApp
                   </p>
                 </div>
                 <p className="text-xs text-gray-300 leading-relaxed mb-4">

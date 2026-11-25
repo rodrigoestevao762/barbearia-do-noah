@@ -10,14 +10,14 @@ export default function SettingsPage() {
         
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-4">
-             <h3 className="text-xl font-medium text-white flex items-center gap-2"><Sparkles className="w-5 h-5 text-[#DFBA73]"/> Meus Serviços Autorais</h3>
-             <p className="text-gray-300 text-sm">Serviços e combos oficiais de Noah Ferreira (corte, barba, pigmentação, barboterapia e hidratação) com tabela de preços atualizada.</p>
-             <button className="px-6 py-3 bg-white/10 text-white rounded-lg opacity-50 cursor-not-allowed font-mono text-xs uppercase tracking-wider">Tabela de Serviços 100% Ativa</button>
+             <h3 className="text-xl font-medium text-white flex items-center gap-2"><Sparkles className="w-5 h-5 text-[#DFBA73]"/> Serviços & Regras da Equipe</h3>
+             <p className="text-gray-300 text-sm">Serviços e combos oficiais do Noah Barber Studio com tabela de preços atualizada e repasse oficial (55% Noah Ferreira Dono · 45% Adrian Santos Funcionário).</p>
+             <button className="px-6 py-3 bg-white/10 text-white rounded-lg opacity-50 cursor-not-allowed font-mono text-xs uppercase tracking-wider">Tabela & Comissões 100% Ativas</button>
           </div>
           <div className="space-y-4">
              <h3 className="text-xl font-medium text-white flex items-center gap-2"><Bell className="w-5 h-5 text-amber-400"/> Notificações e Horários</h3>
-             <p className="text-gray-300 text-sm">Horário oficial: Segunda a Sábado das 08:30 às 20:00. Domingos e feriados sob agendamento VIP antecipado.</p>
-             <button className="px-6 py-3 bg-white/10 text-white rounded-lg opacity-50 cursor-not-allowed font-mono text-xs uppercase tracking-wider">08:30 às 20:00 Configurado</button>
+             <p className="text-gray-300 text-sm">Horário oficial: Segunda a Sábado das 09:00 às 20:00 (Fechado aos Domingos). Localização: Av. Paulo Pereira Gomes, 281 - Loja 9, Morada de Laranjeiras, Serra - ES.</p>
+             <button className="px-6 py-3 bg-white/10 text-white rounded-lg opacity-50 cursor-not-allowed font-mono text-xs uppercase tracking-wider">09:00 às 20:00 Configurado</button>
           </div>
         </div>
       </div>

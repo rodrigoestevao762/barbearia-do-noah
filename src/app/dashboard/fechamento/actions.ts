@@ -129,8 +129,9 @@ export async function getFechamentoData(dateStr?: string) {
       });
 
       const total = bApts.reduce((acc, app) => acc + (app.service?.price || 0), 0);
-      const commission = Math.round(total * BARBER_COMMISSION_RATE * 100) / 100;
-      const houseShare = Math.round(total * HOUSE_COMMISSION_RATE * 100) / 100;
+      const rate = barber.isOwner ? 0.55 : 0.45;
+      const commission = Math.round(total * rate * 100) / 100;
+      const houseShare = barber.isOwner ? total : Math.round(total * 0.55 * 100) / 100;
       totalRevenue += total;
 
       return {
@@ -141,14 +142,16 @@ export async function getFechamentoData(dateStr?: string) {
         total,
         commission,
         houseShare,
-        rate: BARBER_COMMISSION_RATE,
+        rate,
         isOwner: Boolean(barber.isOwner),
         aptsCount: bApts.length,
       };
     });
 
-    const totalCommissions = Math.round(totalRevenue * BARBER_COMMISSION_RATE * 100) / 100;
-    const houseShare = Math.round(totalRevenue * HOUSE_COMMISSION_RATE * 100) / 100;
+    const adrianFallback = barberRevenues.find(b => !b.isOwner);
+    const noahFallback = barberRevenues.find(b => b.isOwner);
+    const totalCommissions = adrianFallback ? adrianFallback.commission : Math.round(totalRevenue * 0.45 * 100) / 100;
+    const houseShare = Math.round(((noahFallback ? noahFallback.total : 0) + (adrianFallback ? adrianFallback.total * 0.55 : 0)) * 100) / 100;
 
     const sanitizedClosings = rawClosings.map((c: any) => ({
       ...c,

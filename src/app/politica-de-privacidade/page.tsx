@@ -57,7 +57,7 @@ export default function PoliticaPrivacidadePage() {
               Quem Somos e Compromisso com a Privacidade
             </h2>
             <p className="text-gray-400 font-light leading-relaxed">
-              O <strong>Noah Barber Studio</strong>, estúdio privado e individual de barbearia conduzido por Noah Ferreira, atua como controlador dos dados pessoais fornecidos pelos clientes através deste site e aplicativo móvel (PWA). Garantimos confidencialidade absoluta para cada informação coletada.
+              O <strong>Noah Barber Studio</strong>, barbearia de alto padrão conduzida pelo Master Barber <strong>Noah Ferreira</strong> e sua equipe (<strong>Adrian Santos</strong>), atua como controlador dos dados pessoais fornecidos pelos clientes através deste site e aplicativo móvel (PWA). Garantimos confidencialidade absoluta para cada informação coletada.
             </p>
           </section>
 
@@ -100,8 +100,8 @@ export default function PoliticaPrivacidadePage() {
               Todos os dados são utilizados unicamente para execução do agendamento dos serviços de barbearia:
             </p>
             <ul className="list-disc pl-5 space-y-1.5 text-gray-400 text-sm">
-              <li>Reserva exclusiva de horário no estúdio privativo com Noah Ferreira;</li>
-              <li>Histórico de cortes e preferências para controle do cartão fidelidade VIP;</li>
+              <li>Reserva exclusiva de horário no Noah Barber Studio com o profissional escolhido (Noah Ferreira ou Adrian Santos);</li>
+              <li>Histórico de cortes e preferências para controle do atendimento VIP;</li>
               <li>Comunicação operacional rápida via WhatsApp caso ocorra alguma remarcação.</li>
             </ul>
           </section>
@@ -162,7 +162,7 @@ export default function PoliticaPrivacidadePage() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-500/40 text-amber-400 transition-all text-xs font-semibold"
               >
-                <MapPin className="w-4 h-4" /> Rua dos Ypês, 365E - Centro (@noahbarberstudio)
+                <MapPin className="w-4 h-4" /> Av. Paulo Pereira Gomes, 281 - Loja 9, Serra - ES (@studio.nbarber)
               </a>
               <a
                 href="mailto:noahbarberstudio@gmail.com"

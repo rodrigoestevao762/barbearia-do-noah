@@ -35,7 +35,7 @@ export const BARBERS: BarberData[] = [
     id: "barbeiro-adrian",
     name: "Adrian Santos",
     email: "adriansantos@gmail.com",
-    phone: "5527992693639",
+    phone: "5527992693638",
     phoneDisplay: "(27) 99269-3638",
     role: "BARBER",
     specialty: "Cortes Modernos, Degradê & Barboterapia",

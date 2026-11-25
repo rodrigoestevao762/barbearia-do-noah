@@ -890,7 +890,19 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              {nextApt.user?.phone && (
+                <a
+                  href={`https://wa.me/55${String(nextApt.user.phone).replace(/\D/g, "")}?text=${encodeURIComponent(
+                    `Olá, ${nextApt.user.name || "Cliente"}! Sou o ${BARBERS.find((b) => b.id === nextApt.barberId)?.name.split(" ")[0] || "Noah"} da Noah Barber Studio. Confirmando seu atendimento às ${getDisplayTime(nextApt.date)}!`
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-3 rounded-2xl bg-[#25D366]/15 hover:bg-[#25D366] text-[#25D366] hover:text-white border border-[#25D366]/40 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer"
+                >
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                </a>
+              )}
               <button
                 onClick={() => updateStatus(nextApt.id, "COMPLETED")}
                 className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold text-xs uppercase font-mono tracking-wider shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 flex items-center gap-2 cursor-pointer"

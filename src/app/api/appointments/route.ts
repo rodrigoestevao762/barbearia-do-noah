@@ -6,7 +6,7 @@ import { OFFICIAL_SERVICES } from '@/lib/services';
 import { addStoredAppointment, getAllStoredAppointments } from '@/lib/appointments-store';
 import { upsertStoredUser } from '@/lib/users-store';
 import { getBrazilNow, getBrazilDateAndTimeString, parseBrazilDateTime } from '@/lib/timezone';
-import { checkDayStatusDB, getDayScheduleDB } from '@/lib/studio-schedule';
+import { checkDayStatusDB, getDayScheduleDB, getBarberDayScheduleDB } from '@/lib/studio-schedule';
 import { isBarberAvailable } from '@/lib/barber-availability';
 import { sendAppointmentConfirmationEmail, sendNewBookingNotificationToBarber } from '@/lib/resend';
 
@@ -52,10 +52,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: dayCheck.reason }, { status: 400 });
       }
 
-      // 2.2 Validação de Escala Flexível, Saída Antecipada e Pausa para Almoço no Banco PostgreSQL
-      if (!isBarberAvailable(assignedBarber.id, requestedBrazil.date)) {
+      // 2.2 Validação de Folga, Saída Antecipada e Pausa para Almoço individual no Banco PostgreSQL
+      const barberDaySchedule = await getBarberDayScheduleDB(assignedBarber.id, requestedBrazil.date);
+      if (!isBarberAvailable(assignedBarber.id, requestedBrazil.date) || barberDaySchedule.isClosed) {
         return NextResponse.json(
-          { error: "Este profissional não está disponível para agendamentos nesta data." },
+          { error: `${assignedBarber.name} não estará atendendo nesta data selecionada.` },
           { status: 400 }
         );
       }
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
         );
       }
 
-      if (daySchedule.lunchBreakSlots.includes(requestedBrazil.time)) {
+      if (barberDaySchedule.lunchBreakSlots.includes(requestedBrazil.time)) {
         return NextResponse.json(
           { error: `O horário das ${requestedBrazil.time} está reservado para pausa de almoço.` },
           { status: 400 }
@@ -116,7 +117,7 @@ export async function POST(req: Request) {
       user: {
         id: persistentClient.id,
         name: persistentClient.name,
-        phone: persistentClient.phone || rawPhone || "(69) 99999-9999",
+        phone: persistentClient.phone || rawPhone || "(27) 99999-9999",
         email: persistentClient.email || formattedEmail || undefined,
       },
       status: appointmentStatus,
