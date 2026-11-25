@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useRef, useEffect } from "react";
 import { MapPin, Clock, ChevronRight, Star, ExternalLink, Scissors, Calendar } from "lucide-react";
 import { BARBERS } from "@/lib/barbers";
 
@@ -114,46 +114,63 @@ function GoogleReviewCard() {
   );
 }
 
-// Card de Vídeo com IntersectionObserver para evitar pulos e tela preta no celular
+// Card de Vídeo estabilizado em GPU para evitar tremor e pulos durante o scroll no celular
 function GalleryCard({
   item,
 }: {
   item: (typeof GALLERY_VIDEOS)[0];
   index: number;
 }) {
-  const [hovered, setHovered] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // IntersectionObserver: toca APENAS quando o vídeo estiver visível na tela
-    // Isso evita tela preta, pulos de layout e sobrecarga de decodificador no celular
+    let playTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    // IntersectionObserver com rootMargin generoso: evita liga/desliga brusco ao rolar entre vídeos
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          if (playTimeout) {
+            clearTimeout(playTimeout);
+            playTimeout = null;
+          }
           if (entry.isIntersecting) {
-            video.play().catch(() => {});
+            playTimeout = setTimeout(() => {
+              if (video.paused) {
+                video.play().catch(() => {});
+              }
+            }, 60);
           } else {
-            video.pause();
+            if (!video.paused) {
+              video.pause();
+            }
           }
         });
       },
-      { threshold: 0.25 }
+      { rootMargin: "120px 0px", threshold: 0.05 }
     );
 
     observer.observe(video);
-    return () => observer.disconnect();
+    return () => {
+      if (playTimeout) clearTimeout(playTimeout);
+      observer.disconnect();
+    };
   }, []);
+
+  const isWide = item.col.includes("col-span-2");
 
   return (
     <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`group relative overflow-hidden rounded-2xl cursor-pointer ${item.col} border border-white/10 hover:border-[#DFBA73]/50 transition-colors duration-300 shadow-2xl bg-[#080A0E]`}
+      className={`group relative overflow-hidden rounded-2xl cursor-pointer ${item.col} ${
+        isWide ? "h-[260px] md:h-[320px]" : "h-[260px]"
+      } border border-white/10 md:hover:border-[#DFBA73]/50 transition-colors duration-300 shadow-2xl bg-[#080A0E]`}
       style={{
-        minHeight: item.col.includes("col-span-2") ? 320 : 260,
+        contain: "layout paint",
+        transform: "translate3d(0, 0, 0)",
+        backfaceVisibility: "hidden",
       }}
     >
       <video
@@ -164,30 +181,28 @@ function GalleryCard({
         muted
         playsInline
         preload="metadata"
-        className="absolute inset-0 w-full h-full object-cover"
+        disablePictureInPicture
+        disableRemotePlayback
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        style={{
+          transform: "translate3d(0, 0, 0)",
+          backfaceVisibility: "hidden",
+        }}
       />
 
       {/* Gradiente sutil inferior para estética limpa */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#050608]/80 via-transparent to-transparent pointer-events-none" />
 
-      {/* Brilho dourado ao passar o mouse */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-br from-[#DFBA73]/15 via-transparent to-transparent pointer-events-none transition-opacity duration-300 ${
-          hovered ? "opacity-100" : "opacity-0"
-        }`}
-      />
+      {/* Brilho dourado ao passar o mouse (apenas CSS, sem re-render no scroll) */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#DFBA73]/15 via-transparent to-transparent pointer-events-none transition-opacity duration-300 opacity-0 md:group-hover:opacity-100" />
 
       {/* Linha dourada inferior */}
-      <div
-        className={`absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#DFBA73] to-transparent origin-left transition-opacity duration-300 pointer-events-none ${
-          hovered ? "opacity-100" : "opacity-0"
-        }`}
-      />
+      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#DFBA73] to-transparent origin-left transition-opacity duration-300 pointer-events-none opacity-0 md:group-hover:opacity-100" />
 
       {/* Selo minimalista e legenda autêntica das comodidades do studio */}
       <div className="absolute bottom-0 inset-x-0 p-4 sm:p-5 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none z-10 flex flex-col justify-end">
-        <span className="text-[10px] font-mono tracking-widest uppercase text-[#DFBA73] bg-black/70 w-fit px-2.5 py-0.5 rounded-full border border-white/10 backdrop-blur-md flex items-center gap-1.5 shadow-md mb-1.5 font-bold">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#DFBA73] animate-pulse"></span>
+        <span className="text-[10px] font-mono tracking-widest uppercase text-[#DFBA73] bg-black/85 w-fit px-2.5 py-0.5 rounded-full border border-white/10 flex items-center gap-1.5 shadow-md mb-1.5 font-bold">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#DFBA73]"></span>
           <span>{item.tag}</span>
         </span>
         <h4 className="text-white font-serif text-base sm:text-lg font-semibold leading-tight drop-shadow-md">
@@ -206,20 +221,10 @@ export default function NossaAreaSection({
 }: {
   onSelectBarber?: (barberId: string) => void;
 }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const titleY = useTransform(scrollYProgress, [0, 0.35], [50, 0]);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
-
   return (
     <section
-      ref={sectionRef}
       id="nossa-area"
-      className="relative bg-[#02050A] py-28 md:py-40 px-5 md:px-12 lg:px-24 overflow-hidden border-t border-white/5"
+      className="relative bg-[#02050A] py-28 md:py-40 px-5 md:px-12 lg:px-24 overflow-x-clip border-t border-white/5"
     >
       {/* Luzes atmosféricas douradas */}
       <div className="absolute -top-60 -left-40 w-[600px] h-[600px] bg-[#DFBA73]/5 rounded-full blur-[120px] pointer-events-none" />
@@ -231,7 +236,13 @@ export default function NossaAreaSection({
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-12">
 
           {/* Título */}
-          <motion.div style={{ y: titleY, opacity: titleOpacity }} className="flex-1">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="flex-1"
+          >
             <p className="text-[#DFBA73] uppercase tracking-[0.45em] text-xs font-semibold flex items-center gap-3 mb-8 font-mono">
               <span className="w-8 h-[1px] bg-[#DFBA73]" />
               O Estúdio & Localização

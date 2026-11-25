@@ -23,10 +23,11 @@ import { BARBERS, BARBER_COMMISSION_RATE, HOUSE_COMMISSION_RATE } from "@/lib/ba
 import { useSession } from "next-auth/react";
 
 interface StoredExpenseItem {
-  id: number;
+  id: string;
   description: string;
   amount: number;
-  category: "VALE" | "INSUMOS" | "OUTROS";
+  category: "FIXA" | "INSUMOS" | "VALE" | "OUTROS";
+  barberId?: string;
   barberName?: string;
   date: string;
 }
@@ -63,7 +64,7 @@ export default function FinanceiroPage() {
     }
   }, [isAdrian]);
 
-  // Date filter (padrão dia de hoje)
+  // Date filter (padrão dia de hoje) e Mês selecionado
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date();
     const year = d.getFullYear();
@@ -71,17 +72,23 @@ export default function FinanceiroPage() {
     const day = String(d.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   });
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
+  const [expenseScopeView, setExpenseScopeView] = useState<"month" | "day">("month");
 
   // Financial stats from API
   const [dashboardData, setDashboardData] = useState<any>(null);
 
-  // Saídas e Vales do Caixa
+  // Saídas, Despesas Mensais e Vales (PostgreSQL)
   const [expenses, setExpenses] = useState<StoredExpenseItem[]>([]);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [expenseDesc, setExpenseDesc] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
-  const [expenseCategory, setExpenseCategory] = useState<"VALE" | "INSUMOS" | "OUTROS">("VALE");
+  const [expenseCategory, setExpenseCategory] = useState<"FIXA" | "INSUMOS" | "VALE" | "OUTROS">("VALE");
   const [expenseBarber, setExpenseBarber] = useState("Adrian Santos");
+  const [isSavingExpense, setIsSavingExpense] = useState(false);
 
   // Despesas Fixas da Barbearia
   const [isFixedExpenseModalOpen, setIsFixedExpenseModalOpen] = useState(false);
@@ -104,30 +111,27 @@ export default function FinanceiroPage() {
     }
   }, [toastMessage]);
 
-  // Carrega dados da API do Dashboard para a data
-  const loadFinanceData = async (dateStr: string) => {
+  // Carrega dados da API do Dashboard (Dia + Mês) e Despesas do PostgreSQL
+  const loadFinanceData = async (dateStr: string, monthStr: string) => {
     setLoading(true);
     try {
       const barberParam = isAdrian ? "barbeiro-adrian" : (activeTab !== "all" ? activeTab : "all");
-      const res = await fetch(`/api/dashboard?date=${dateStr}&barberId=${barberParam}`, { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
+      const [dashRes, expRes] = await Promise.all([
+        fetch(`/api/dashboard?date=${dateStr}&month=${monthStr}&barberId=${barberParam}`, { cache: "no-store" }),
+        fetch(`/api/expenses?month=${monthStr}`, { cache: "no-store" }),
+      ]);
+
+      if (dashRes.ok) {
+        const data = await dashRes.json();
         setDashboardData(data);
       }
 
-      // Load expenses from local storage for that date
-      const stored = localStorage.getItem(`noah_expenses_${dateStr}`);
-      if (stored) {
-        try {
-          setExpenses(JSON.parse(stored));
-        } catch {
-          setExpenses([]);
-        }
-      } else {
-        setExpenses([]);
+      if (expRes.ok) {
+        const expData = await expRes.json();
+        setExpenses(Array.isArray(expData) ? expData : []);
       }
 
-      // Load fixed expenses from local storage (apenas gestor precisa)
+      // Load fixed expenses template from local storage (apenas gestor precisa)
       if (isAdmin) {
         const storedFixed = localStorage.getItem("noah_fixed_expenses");
         if (storedFixed) {
@@ -144,39 +148,86 @@ export default function FinanceiroPage() {
   };
 
   useEffect(() => {
-    loadFinanceData(selectedDate);
-  }, [selectedDate, activeTab, isAdrian]);
+    loadFinanceData(selectedDate, selectedMonth);
+  }, [selectedDate, selectedMonth, activeTab, isAdrian]);
 
-  // Adicionar saída / vale
-  const handleAddExpense = (e: React.FormEvent) => {
+  // Adicionar saída / despesa / vale no PostgreSQL
+  const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!expenseDesc || !expenseAmount) return;
+    if (!expenseDesc || !expenseAmount || isSavingExpense) return;
+    setIsSavingExpense(true);
 
-    const newExp: StoredExpenseItem = {
-      id: Date.now(),
-      description: expenseDesc,
-      amount: parseFloat(expenseAmount),
-      category: isAdrian ? "VALE" : expenseCategory,
-      barberName: isAdrian ? "Adrian Santos" : (expenseCategory === "VALE" ? expenseBarber : undefined),
-      date: new Date().toISOString(),
-    };
+    const targetBarberId = isAdrian
+      ? "barbeiro-adrian"
+      : expenseCategory === "VALE"
+      ? expenseBarber === "Adrian Santos"
+        ? "barbeiro-adrian"
+        : "barbeiro-noah"
+      : "studio";
 
-    const updated = [newExp, ...expenses];
-    setExpenses(updated);
-    localStorage.setItem(`noah_expenses_${selectedDate}`, JSON.stringify(updated));
+    try {
+      const res = await fetch("/api/expenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: expenseDesc,
+          amount: parseFloat(expenseAmount),
+          category: isAdrian ? "VALE" : expenseCategory,
+          barberId: targetBarberId,
+          date: selectedDate.startsWith(selectedMonth) ? selectedDate : `${selectedMonth}-01`,
+        }),
+      });
 
-    setExpenseDesc("");
-    setExpenseAmount("");
-    setIsExpenseModalOpen(false);
-    setToastMessage(`Saída de R$ ${newExp.amount.toFixed(2)} registrada com sucesso.`);
+      if (res.ok) {
+        setExpenseDesc("");
+        setExpenseAmount("");
+        setIsExpenseModalOpen(false);
+        setToastMessage("Lançamento registrado no banco com sucesso!");
+        await loadFinanceData(selectedDate, selectedMonth);
+      } else {
+        const err = await res.json();
+        setToastMessage(err.error || "Erro ao registrar lançamento.");
+      }
+    } catch {
+      setToastMessage("Erro de conexão ao salvar despesa.");
+    } finally {
+      setIsSavingExpense(false);
+    }
   };
 
-  const handleDeleteExpense = (id: number) => {
+  const handleLaunchFixedToMonth = async (item: FixedExpenseItem) => {
+    try {
+      const res = await fetch("/api/expenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: item.title,
+          amount: item.amount,
+          category: "FIXA",
+          barberId: "studio",
+          date: selectedDate.startsWith(selectedMonth) ? selectedDate : `${selectedMonth}-01`,
+        }),
+      });
+      if (res.ok) {
+        setToastMessage(`"${item.title}" lançada nas despesas de ${selectedMonth.split("-").reverse().join("/")}.`);
+        await loadFinanceData(selectedDate, selectedMonth);
+      }
+    } catch {
+      setToastMessage("Erro ao lançar despesa fixa.");
+    }
+  };
+
+  const handleDeleteExpense = async (id: string) => {
     if (!confirm("Deseja remover este registro?")) return;
-    const updated = expenses.filter((e) => e.id !== id);
-    setExpenses(updated);
-    localStorage.setItem(`noah_expenses_${selectedDate}`, JSON.stringify(updated));
-    setToastMessage("Registro removido.");
+    try {
+      const res = await fetch(`/api/expenses?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (res.ok) {
+        setToastMessage("Registro removido.");
+        await loadFinanceData(selectedDate, selectedMonth);
+      }
+    } catch {
+      setToastMessage("Erro ao remover registro.");
+    }
   };
 
   // Adicionar despesa fixa
@@ -214,19 +265,23 @@ export default function FinanceiroPage() {
   const totalCommissionsToPay = dashboardData?.totalCommissionsToPay ?? (Math.round(totalGrossTeam * BARBER_COMMISSION_RATE * 100) / 100);
   const totalContaAdmin = dashboardData?.houseNetProfit ?? (Math.round(totalGrossTeam * HOUSE_COMMISSION_RATE * 100) / 100);
 
-  const totalDailyOutflows = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+  // Despesas filtradas por dia vs mês
+  const dayExpenses = expenses.filter((e) => e.date.slice(0, 10) === selectedDate);
+  const studioDayOutflows = dayExpenses
+    .filter((e) => e.barberId !== "barbeiro-adrian")
+    .reduce((acc, curr) => acc + curr.amount, 0);
 
-  // Valores dinâmicos por aba para o Dono
+  // Valores dinâmicos por aba para o Dono (Dia)
   let displayEntradas = totalGrossTeam;
   let displayComissoes = totalCommissionsToPay;
   let displayAdmin = totalContaAdmin;
-  let displaySaldoLiquido = Math.max(0, totalContaAdmin - totalDailyOutflows);
+  let displaySaldoLiquido = totalContaAdmin - studioDayOutflows;
 
   if (activeTab === "barbeiro-noah") {
     displayEntradas = noahBreakdown.revenue || 0;
     displayComissoes = 0; // Noah é dono
     displayAdmin = noahBreakdown.revenue || 0;
-    displaySaldoLiquido = noahBreakdown.revenue || 0;
+    displaySaldoLiquido = (noahBreakdown.revenue || 0) - studioDayOutflows;
   } else if (activeTab === "barbeiro-adrian") {
     displayEntradas = adrianBreakdown.revenue || 0;
     displayComissoes = adrianBreakdown.commission || Math.round((adrianBreakdown.revenue || 0) * 0.45 * 100) / 100;
@@ -235,19 +290,57 @@ export default function FinanceiroPage() {
   }
 
   // Cálculos exclusivos para o Adrian (sem vazamento de dados do dono)
-  const displayedExpenses = isAdrian 
-    ? expenses.filter((e) => e.category === "VALE" && (e.barberName === "Adrian Santos" || e.barberName === "Adrian"))
-    : expenses;
+  const scopedExpenses = expenseScopeView === "day" ? dayExpenses : expenses;
+  const displayedExpenses = isAdrian
+    ? scopedExpenses.filter((e) => e.barberId === "barbeiro-adrian")
+    : scopedExpenses;
 
-  const totalAdrianVales = expenses
-    .filter((e) => e.category === "VALE" && (e.barberName === "Adrian Santos" || e.barberName === "Adrian"))
+  const totalAdrianDayVales = dayExpenses
+    .filter((e) => e.barberId === "barbeiro-adrian")
     .reduce((acc, curr) => acc + curr.amount, 0);
 
   const adrianGross = adrianBreakdown.revenue || 0;
   const adrianCommission = adrianBreakdown.commission || Math.round(adrianGross * 0.45 * 100) / 100;
-  const adrianNetPayout = Math.max(0, adrianCommission - totalAdrianVales);
+  const adrianNetPayout = adrianCommission - totalAdrianDayVales;
 
   const totalFixedMonthly = fixedExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+
+  // Balanço Mensal (vindo direto da API com dados reais do PostgreSQL)
+  const monthly = dashboardData?.monthlySummary || null;
+  let monthGross = 0;
+  let monthNetProd = 0;
+  let monthExpenses = 0;
+  let monthNetProfit = 0;
+  let monthCompletedCount = 0;
+  let monthLabel = selectedMonth.split("-").reverse().join("/");
+
+  if (monthly) {
+    if (isAdrian) {
+      monthGross = monthly.grossRevenue ?? 0;
+      monthNetProd = monthly.netProduction ?? 0;
+      monthExpenses = monthly.expenses ?? 0;
+      monthNetProfit = monthly.netProfit ?? 0;
+      monthCompletedCount = monthly.completedCount ?? 0;
+    } else if (activeTab === "barbeiro-noah") {
+      monthGross = monthly.noah?.gross ?? 0;
+      monthNetProd = monthly.noah?.ownPlusHouseShare ?? 0;
+      monthExpenses = monthly.noah?.expenses ?? 0;
+      monthNetProfit = monthly.studioNetProfit ?? 0;
+      monthCompletedCount = monthly.noah?.completedCount ?? 0;
+    } else if (activeTab === "barbeiro-adrian") {
+      monthGross = monthly.adrian?.gross ?? 0;
+      monthNetProd = monthly.adrian?.commission ?? 0;
+      monthExpenses = monthly.adrian?.vales ?? 0;
+      monthNetProfit = monthly.adrian?.netProfit ?? 0;
+      monthCompletedCount = monthly.adrian?.completedCount ?? 0;
+    } else {
+      monthGross = monthly.studioGross ?? 0;
+      monthNetProd = monthly.noahNetProduction ?? 0;
+      monthExpenses = monthly.studioExpenses ?? 0;
+      monthNetProfit = monthly.studioNetProfit ?? 0;
+      monthCompletedCount = monthly.totalCompletedCount ?? 0;
+    }
+  }
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-[1200px] mx-auto space-y-8 pb-16">
@@ -285,16 +378,31 @@ export default function FinanceiroPage() {
           </p>
         </div>
 
-        {/* Date Filter & Despesa Fixa Button */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        {/* Date Filter, Month Filter & Despesa Fixa Button */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2 bg-[#080A0E] border border-white/10 rounded-2xl px-4 py-2.5 shadow-inner">
             <label className="text-xs text-gray-400 uppercase font-mono tracking-widest font-semibold">
-              FILTRAR POR DATA:
+              DIA:
             </label>
             <input
               type="date"
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                if (e.target.value) setSelectedMonth(e.target.value.slice(0, 7));
+              }}
+              className="bg-transparent text-white text-xs font-mono outline-none cursor-pointer [&::-webkit-calendar-picker-indicator]:invert"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 bg-[#080A0E] border border-[#DFBA73]/30 rounded-2xl px-4 py-2.5 shadow-inner">
+            <label className="text-xs text-[#DFBA73] uppercase font-mono tracking-widest font-semibold">
+              MÊS:
+            </label>
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
               className="bg-transparent text-white text-xs font-mono outline-none cursor-pointer [&::-webkit-calendar-picker-indicator]:invert"
             />
           </div>
@@ -418,7 +526,7 @@ export default function FinanceiroPage() {
               </span>
             </div>
             <h3 className="text-3xl font-serif text-rose-400 tracking-tight mb-1">
-              - R$ {totalAdrianVales.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              - R$ {totalAdrianDayVales.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </h3>
             <p className="text-xs text-rose-300/70 font-light">
               Total de vales e adiantamentos retirados no dia.
@@ -430,42 +538,224 @@ export default function FinanceiroPage() {
         <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono uppercase tracking-widest text-gray-300 font-bold flex items-center gap-1.5">
-              <Wallet className="w-3.5 h-3.5 text-emerald-400" /> {isAdmin ? "SALDO LÍQUIDO DO ESTÚDIO" : "LÍQUIDO A RECEBER HOJE"}
+              <Wallet className="w-3.5 h-3.5 text-emerald-400" /> {isAdmin ? "SALDO LÍQUIDO DO DIA" : "LÍQUIDO A RECEBER HOJE"}
             </span>
           </div>
-          <h3 className="text-3xl font-serif text-white tracking-tight mb-1">
+          <h3 className={`text-3xl font-serif tracking-tight mb-1 ${(isAdmin ? displaySaldoLiquido : adrianNetPayout) < 0 ? "text-rose-400" : "text-white"}`}>
             R$ {(isAdmin ? displaySaldoLiquido : adrianNetPayout).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
           <p className="text-xs text-gray-400 font-light">
             {isAdmin 
-              ? "Receita do Dono retida menos saídas e vales diários."
+              ? "Receita do Dono retida menos saídas diárias."
               : "Comissão líquida restante após desconto dos seus vales."}
           </p>
         </div>
       </div>
 
-      {/* SEÇÃO: SAÍDAS E VALES DO CAIXA (HOJE) */}
+      {/* ━━━ BALANÇO & LUCRO MENSAL INDIVIDUALIZADO (NOAH & ADRIAN) ━━━ */}
+      <div className="bg-gradient-to-br from-[#0B0E14] via-[#080A0E] to-[#050608] border border-[#DFBA73]/30 rounded-3xl p-6 md:p-7 space-y-6 shadow-2xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#DFBA73] font-bold">
+              CONTROLE MENSAL ({monthLabel})
+            </span>
+            <h3 className="text-2xl font-serif text-white mt-1">
+              {isAdmin
+                ? activeTab === "barbeiro-noah"
+                  ? "Balanço Mensal — Noah Ferreira (Dono)"
+                  : activeTab === "barbeiro-adrian"
+                  ? "Balanço Mensal — Adrian Santos (45%)"
+                  : "Balanço Mensal do Estúdio (Produção, Despesas & Lucro)"
+                : "Meu Balanço Mensal Individual (Adrian Santos)"}
+            </h3>
+            <p className="text-xs text-gray-400 font-light mt-0.5">
+              {monthCompletedCount} {monthCompletedCount === 1 ? "atendimento concluído" : "atendimentos concluídos"} no mês {monthLabel}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (isAdmin && activeTab !== "barbeiro-adrian") {
+                setExpenseCategory("FIXA");
+              } else {
+                setExpenseCategory("VALE");
+                setExpenseBarber("Adrian Santos");
+              }
+              setIsExpenseModalOpen(true);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:brightness-110 transition-all cursor-pointer shadow-lg shadow-[#DFBA73]/20 shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{isAdmin ? "Lançar Despesa do Mês" : "Lançar Vale / Gasto"}</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Produção Bruta do Mês */}
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-semibold block mb-2">
+              {isAdrian ? "MINHA PRODUÇÃO BRUTA (MÊS)" : "PRODUÇÃO BRUTA DO MÊS"}
+            </span>
+            <p className="text-2xl font-serif text-white font-bold">
+              R$ {monthGross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+            <p className="text-[11px] text-gray-400 mt-1 font-light">
+              Total faturado em cortes/serviços no mês.
+            </p>
+          </div>
+
+          {/* Produção Líquida do Mês */}
+          <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-2xl p-5">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#F5D799] font-bold block mb-2">
+              {isAdrian || activeTab === "barbeiro-adrian"
+                ? "PRODUÇÃO LÍQUIDA · 45% (MÊS)"
+                : "PRODUÇÃO LÍQUIDA DONO (MÊS)"}
+            </span>
+            <p className="text-2xl font-serif text-[#DFBA73] font-bold">
+              R$ {monthNetProd.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+            <p className="text-[11px] text-[#DFBA73]/80 mt-1 font-light">
+              {isAdrian || activeTab === "barbeiro-adrian"
+                ? "Sua parte líquida (45%) antes dos vales."
+                : "Produção do Noah + repasse de 55% do Adrian."}
+            </p>
+          </div>
+
+          {/* Despesa Mensal */}
+          <div className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-5">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-rose-300 font-bold block mb-2">
+              {isAdrian || activeTab === "barbeiro-adrian"
+                ? "MEUS VALES / GASTOS (MÊS)"
+                : "DESPESA MENSAL DO ESTÚDIO"}
+            </span>
+            <p className="text-2xl font-serif text-rose-400 font-bold">
+              - R$ {monthExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+            <p className="text-[11px] text-rose-300/80 mt-1 font-light">
+              {isAdrian || activeTab === "barbeiro-adrian"
+                ? "Vales e adiantamentos retirados no mês."
+                : "Despesas fixas, insumos e gastos lançados no mês."}
+            </p>
+          </div>
+
+          {/* Lucro Líquido do Mês */}
+          <div className={`${monthNetProfit >= 0 ? "bg-emerald-500/10 border-emerald-500/30" : "bg-rose-500/15 border-rose-500/40"} border rounded-2xl p-5`}>
+            <span className={`text-[10px] font-mono uppercase tracking-widest font-bold block mb-2 ${monthNetProfit >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
+              {isAdrian || activeTab === "barbeiro-adrian"
+                ? "LUCRO LÍQUIDO A RECEBER (MÊS)"
+                : "LUCRO LÍQUIDO DO MÊS"}
+            </span>
+            <p className={`text-2xl font-serif font-bold ${monthNetProfit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+              R$ {monthNetProfit.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+            <p className={`text-[11px] mt-1 font-light ${monthNetProfit >= 0 ? "text-emerald-300/80" : "text-rose-300/80"}`}>
+              Produção líquida menos despesas do mês.
+            </p>
+          </div>
+        </div>
+
+        {/* Comparativo Individualizado no Mês (Visível apenas para o Dono Noah) */}
+        {isAdmin && monthly && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-white/10">
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-[#DFBA73] font-bold">
+                  NOAH FERREIRA (DONO · MÊS)
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Bruto próprio: <strong className="text-white">R$ {(monthly.noah?.gross ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong> • {monthly.noah?.completedCount ?? 0} cortes
+                </p>
+                <p className="text-xs text-emerald-400 mt-0.5">
+                  c/ 55% Adrian: <strong>R$ {(monthly.noah?.ownPlusHouseShare ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong>
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] font-mono text-gray-400 uppercase block">Lucro Líquido</span>
+                <span className={`text-lg font-serif font-bold ${(monthly.studioNetProfit ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  R$ {(monthly.studioNetProfit ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-amber-300 font-bold">
+                  ADRIAN SANTOS (45% · MÊS)
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Bruto: <strong className="text-white">R$ {(monthly.adrian?.gross ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong> • Comissão 45%: <strong className="text-[#DFBA73]">R$ {(monthly.adrian?.commission ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong>
+                </p>
+                <p className="text-xs text-rose-400 mt-0.5">
+                  Vales no mês: - R$ {(monthly.adrian?.vales ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] font-mono text-gray-400 uppercase block">Líquido Adrian</span>
+                <span className="text-lg font-serif font-bold text-[#DFBA73]">
+                  R$ {(monthly.adrian?.netProfit ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* SEÇÃO: SAÍDAS, DESPESAS E VALES DO CAIXA (MÊS OU DIA) */}
       <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-7 space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-4 border-b border-white/5 pb-4">
           <div className="flex items-center gap-3">
             <TrendingDown className="w-5 h-5 text-rose-400" />
             <h3 className="text-xl font-serif text-white">
-              {isAdmin ? "Saídas e Vales do Caixa (Hoje)" : "Meus Vales e Adiantamentos (Hoje)"}
+              {isAdmin
+                ? expenseScopeView === "month"
+                  ? `Despesas & Vales do Mês (${monthLabel})`
+                  : "Saídas e Vales do Dia"
+                : expenseScopeView === "month"
+                ? `Meus Vales e Gastos do Mês (${monthLabel})`
+                : "Meus Vales e Adiantamentos (Dia)"}
             </h3>
           </div>
 
-          <button
-            onClick={() => setIsExpenseModalOpen(true)}
-            className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
-          >
-            <Plus className="w-4 h-4 text-rose-400" />
-            <span>{isAdmin ? "+ Registrar Saída / Vale" : "+ Solicitar / Registrar Vale"}</span>
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center bg-[#050608] border border-white/10 rounded-xl p-1">
+              <button
+                type="button"
+                onClick={() => setExpenseScopeView("month")}
+                className={`px-3 py-1 rounded-lg text-[10px] font-mono uppercase font-bold transition-all cursor-pointer ${
+                  expenseScopeView === "month"
+                    ? "bg-[#DFBA73] text-black"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Mês ({monthLabel})
+              </button>
+              <button
+                type="button"
+                onClick={() => setExpenseScopeView("day")}
+                className={`px-3 py-1 rounded-lg text-[10px] font-mono uppercase font-bold transition-all cursor-pointer ${
+                  expenseScopeView === "day"
+                    ? "bg-[#DFBA73] text-black"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Só Dia
+              </button>
+            </div>
+
+            <button
+              onClick={() => setIsExpenseModalOpen(true)}
+              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-mono text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-rose-400" />
+              <span>{isAdmin ? "Registrar Despesa / Vale" : "Registrar Vale"}</span>
+            </button>
+          </div>
         </div>
 
         {displayedExpenses.length === 0 ? (
           <div className="py-12 text-center text-gray-500 font-light text-sm italic">
-            {isAdmin ? "Nenhuma saída ou vale registrado hoje." : "Nenhum vale registrado para você nesta data."}
+            {isAdmin ? "Nenhuma despesa ou vale registrado neste período." : "Nenhum vale registrado para você neste período."}
           </div>
         ) : (
           <div className="space-y-3">
@@ -475,14 +765,14 @@ export default function FinanceiroPage() {
                 className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex items-center justify-between gap-4"
               >
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-white font-medium text-sm">{exp.description}</span>
                     <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
                       {exp.category} {exp.barberName ? `• ${exp.barberName}` : ""}
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 font-mono mt-0.5">
-                    {new Date(exp.date).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(exp.date).toLocaleDateString("pt-BR")} • {new Date(exp.date).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>
 
@@ -490,10 +780,11 @@ export default function FinanceiroPage() {
                   <span className="text-rose-400 font-serif font-bold text-base">
                     - R$ {exp.amount.toFixed(2)}
                   </span>
-                  {isAdmin && (
+                  {(isAdmin || exp.barberId === "barbeiro-adrian") && (
                     <button
                       onClick={() => handleDeleteExpense(exp.id)}
                       className="p-1.5 text-gray-500 hover:text-red-400 transition-colors cursor-pointer"
+                      title="Excluir registro"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -613,8 +904,8 @@ export default function FinanceiroPage() {
                     <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1.5">
                       Tipo de Lançamento
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {(["VALE", "INSUMOS", "OUTROS"] as const).map((cat) => (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {(["FIXA", "INSUMOS", "VALE", "OUTROS"] as const).map((cat) => (
                         <button
                           key={cat}
                           type="button"
@@ -742,13 +1033,21 @@ export default function FinanceiroPage() {
                       <p className="text-white text-xs font-medium">{f.title}</p>
                       <span className="text-[10px] text-gray-400 font-mono">{f.category}</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <span className="text-white font-mono text-xs font-bold">
                         R$ {f.amount.toFixed(2)}
                       </span>
                       <button
+                        type="button"
+                        onClick={() => handleLaunchFixedToMonth(f)}
+                        className="px-2.5 py-1 rounded-lg bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#DFBA73] hover:text-black border border-[#DFBA73]/30 text-[10px] font-mono font-bold uppercase transition-all cursor-pointer"
+                        title="Lançar esta despesa no mês atual"
+                      >
+                        Lançar no Mês
+                      </button>
+                      <button
                         onClick={() => handleDeleteFixedExpense(f.id)}
-                        className="text-gray-500 hover:text-red-400"
+                        className="text-gray-500 hover:text-red-400 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

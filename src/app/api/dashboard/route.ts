@@ -12,6 +12,7 @@ import {
   getLocalDateString 
 } from '@/lib/appointments-store';
 import { parseBrazilDateTime } from '@/lib/timezone';
+import { parseExpenseRecord } from '@/lib/expenses';
 
 export const dynamic = 'force-dynamic';
 
@@ -225,6 +226,81 @@ export async function GET(req: Request) {
     const isOwner = userRole === "ADMIN" && userEmail !== "adriansantos@gmail.com";
     const isAdrian = userRole === "BARBER" || userEmail === "adriansantos@gmail.com" || userBarberId === "barbeiro-adrian";
 
+    // CÁLCULO MENSAL INDIVIDUALIZADO (PRODUÇÃO BRUTA, LÍQUIDA, DESPESAS E LUCRO DO MÊS)
+    const monthParam = (searchParams.get("month") || dateParam.slice(0, 7));
+    const [mYear, mMonth] = monthParam.split("-").map(Number);
+    const lastDayOfMonth = new Date(mYear, mMonth, 0).getDate();
+    const startOfMonth = new Date(`${monthParam}-01T00:00:00-03:00`);
+    const endOfMonth = new Date(`${monthParam}-${String(lastDayOfMonth).padStart(2, "0")}T23:59:59-03:00`);
+
+    let monthCompletedApts: any[] = [];
+    let monthExpensesList: ReturnType<typeof parseExpenseRecord>[] = [];
+
+    try {
+      const dbMonthApts = await prisma.appointment.findMany({
+        where: {
+          date: { gte: startOfMonth, lte: endOfMonth },
+          status: "COMPLETED",
+        },
+        include: { service: true },
+      });
+
+      const memMonthApts = getAllStoredAppointments().filter((a: any) => {
+        if (a.status !== "COMPLETED") return false;
+        const d = new Date(a.date);
+        return d >= startOfMonth && d <= endOfMonth;
+      });
+
+      const monthMap = new Map<string, any>();
+      (dbMonthApts || []).forEach((a: any) => monthMap.set(a.id, a));
+      (memMonthApts || []).forEach((a: any) => {
+        if (!monthMap.has(a.id)) monthMap.set(a.id, a);
+      });
+      monthCompletedApts = Array.from(monthMap.values()).filter(
+        (a: any) => !a.id?.includes("almir") && !a.user?.name?.toLowerCase().includes("almir")
+      );
+
+      const dbMonthExpenses = await prisma.expense.findMany({
+        where: {
+          date: { gte: startOfMonth, lte: endOfMonth },
+        },
+      });
+      monthExpensesList = (dbMonthExpenses || []).map(parseExpenseRecord);
+    } catch (_) {
+      monthCompletedApts = getAllStoredAppointments().filter((a: any) => {
+        if (a.status !== "COMPLETED") return false;
+        const d = new Date(a.date);
+        return d >= startOfMonth && d <= endOfMonth && !a.id?.includes("almir") && !a.user?.name?.toLowerCase().includes("almir");
+      });
+    }
+
+    const noahMonthApts = monthCompletedApts.filter(
+      (apt) => apt.barberId === "barbeiro-noah" || apt.barberId === "barbeiro-dono" || !apt.barberId
+    );
+    const adrianMonthApts = monthCompletedApts.filter((apt) => apt.barberId === "barbeiro-adrian");
+
+    const noahMonthGross = Math.round(noahMonthApts.reduce((acc, a) => acc + (a.service?.price || 0), 0) * 100) / 100;
+    const adrianMonthGross = Math.round(adrianMonthApts.reduce((acc, a) => acc + (a.service?.price || 0), 0) * 100) / 100;
+    const adrianMonthCommission = Math.round(adrianMonthGross * ADRIAN_RATE * 100) / 100;
+    const adrianMonthHouseShare = Math.round(adrianMonthGross * OWNER_RATE * 100) / 100;
+
+    const studioMonthExpenses = Math.round(
+      monthExpensesList
+        .filter((e) => e.barberId !== "barbeiro-adrian")
+        .reduce((acc, e) => acc + e.amount, 0) * 100
+    ) / 100;
+    const adrianMonthVales = Math.round(
+      monthExpensesList
+        .filter((e) => e.barberId === "barbeiro-adrian")
+        .reduce((acc, e) => acc + e.amount, 0) * 100
+    ) / 100;
+
+    const studioMonthGross = Math.round((noahMonthGross + adrianMonthGross) * 100) / 100;
+    const noahMonthNetProduction = Math.round((noahMonthGross + adrianMonthHouseShare) * 100) / 100;
+    const studioMonthNetProfit = Math.round((noahMonthNetProduction - studioMonthExpenses) * 100) / 100;
+    const noahOwnNetProfit = Math.round((noahMonthGross - studioMonthExpenses) * 100) / 100;
+    const adrianMonthNetProfit = Math.round((adrianMonthCommission - adrianMonthVales) * 100) / 100;
+
     // PROTEÇÃO ESTREITA DE PRIVACIDADE:
     // Se o usuário for o funcionário Adrian Santos:
     // - NUNCA expor faturamento bruto total do estúdio
@@ -278,6 +354,17 @@ export async function GET(req: Request) {
         upcomingAppointments: adrianUpcoming,
         barberBreakdown: adrianOnlyBreakdown,
         barbersList: [BARBERS.find((b) => b.id === "barbeiro-adrian") || BARBERS[1]],
+
+        // Resumo Mensal Exclusivo do Adrian
+        monthlySummary: {
+          month: monthParam,
+          grossRevenue: adrianMonthGross,
+          netProduction: adrianMonthCommission,
+          expenses: adrianMonthVales,
+          netProfit: adrianMonthNetProfit,
+          completedCount: adrianMonthApts.length,
+          ticketMedio: adrianMonthApts.length > 0 ? adrianMonthGross / adrianMonthApts.length : 0,
+        },
       });
     }
 
@@ -332,6 +419,34 @@ export async function GET(req: Request) {
       upcomingAppointments: displayUpcoming,
       barberBreakdown: breakdown,
       barbersList: BARBERS,
+
+      // Resumo Mensal Completo do Dono + Individualizado (Noah & Adrian)
+      monthlySummary: {
+        month: monthParam,
+        studioGross: studioMonthGross,
+        noahNetProduction: noahMonthNetProduction,
+        studioExpenses: studioMonthExpenses,
+        studioNetProfit: studioMonthNetProfit,
+        totalCompletedCount: monthCompletedApts.length,
+        noah: {
+          gross: noahMonthGross,
+          netProduction: noahMonthGross,
+          ownPlusHouseShare: noahMonthNetProduction,
+          expenses: studioMonthExpenses,
+          netProfit: noahOwnNetProfit,
+          completedCount: noahMonthApts.length,
+          ticketMedio: noahMonthApts.length > 0 ? noahMonthGross / noahMonthApts.length : 0,
+        },
+        adrian: {
+          gross: adrianMonthGross,
+          commission: adrianMonthCommission,
+          houseShare: adrianMonthHouseShare,
+          vales: adrianMonthVales,
+          netProfit: adrianMonthNetProfit,
+          completedCount: adrianMonthApts.length,
+          ticketMedio: adrianMonthApts.length > 0 ? adrianMonthGross / adrianMonthApts.length : 0,
+        },
+      },
     });
   } catch (error) {
     return NextResponse.json({ error: "Erro ao buscar dados do dashboard" }, { status: 500 });

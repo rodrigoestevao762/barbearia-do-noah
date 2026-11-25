@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { BARBERS, BarberData, BARBER_COMMISSION_RATE, HOUSE_COMMISSION_RATE } from "@/lib/barbers";
 import { OFFICIAL_SERVICES, ServiceItem } from "@/lib/services";
@@ -581,6 +582,104 @@ export default function DashboardPage() {
           </p>
         </div>
       </div>
+
+      {/* ━━━ RESUMO MENSAL INDIVIDUALIZADO (PRODUÇÃO BRUTA, LÍQUIDA, DESPESAS E LUCRO DO MÊS) ━━━ */}
+      {dashboardData?.monthlySummary && (() => {
+        const ms = dashboardData.monthlySummary;
+        const monthFormatted = (ms.month || selectedDate.slice(0, 7)).split("-").reverse().join("/");
+        let mGross = 0;
+        let mNetProd = 0;
+        let mExpenses = 0;
+        let mNetProfit = 0;
+        let mTitle = "";
+
+        if (isAdrian) {
+          mGross = ms.grossRevenue ?? 0;
+          mNetProd = ms.netProduction ?? 0;
+          mExpenses = ms.expenses ?? 0;
+          mNetProfit = ms.netProfit ?? 0;
+          mTitle = `Meu Fechamento do Mês (${monthFormatted})`;
+        } else if (activeBarberFilter === "barbeiro-noah") {
+          mGross = ms.noah?.gross ?? 0;
+          mNetProd = ms.noah?.ownPlusHouseShare ?? 0;
+          mExpenses = ms.noah?.expenses ?? 0;
+          mNetProfit = ms.studioNetProfit ?? 0;
+          mTitle = `Balanço Mensal Noah Dono (${monthFormatted})`;
+        } else if (activeBarberFilter === "barbeiro-adrian") {
+          mGross = ms.adrian?.gross ?? 0;
+          mNetProd = ms.adrian?.commission ?? 0;
+          mExpenses = ms.adrian?.vales ?? 0;
+          mNetProfit = ms.adrian?.netProfit ?? 0;
+          mTitle = `Balanço Mensal Adrian 45% (${monthFormatted})`;
+        } else {
+          mGross = ms.studioGross ?? 0;
+          mNetProd = ms.noahNetProduction ?? 0;
+          mExpenses = ms.studioExpenses ?? 0;
+          mNetProfit = ms.studioNetProfit ?? 0;
+          mTitle = `Balanço Mensal do Estúdio (${monthFormatted})`;
+        }
+
+        return (
+          <div className="bg-[#080A0E] border border-[#DFBA73]/25 rounded-3xl p-5 md:p-6 shadow-xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-3">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#DFBA73] font-bold">
+                  CONTROLE MENSAL INDIVIDUALIZADO
+                </span>
+                <h3 className="text-lg font-serif text-white mt-0.5">{mTitle}</h3>
+              </div>
+              <Link
+                href="/dashboard/financeiro"
+                className="px-4 py-2 rounded-xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#DFBA73] hover:text-black border border-[#DFBA73]/30 text-[11px] font-mono font-bold uppercase tracking-wider transition-all text-center shrink-0"
+              >
+                {isAdmin ? "Gerenciar Despesas & Lucro →" : "Ver Meu Caixa & Vales →"}
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4">
+                <span className="text-[10px] font-mono uppercase text-gray-400 block mb-1">
+                  Produção Bruta (Mês)
+                </span>
+                <p className="text-lg sm:text-xl font-serif text-white font-bold">
+                  R$ {mGross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/25 rounded-2xl p-4">
+                <span className="text-[10px] font-mono uppercase text-[#F5D799] block mb-1">
+                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
+                    ? "Produção Líquida (45%)"
+                    : "Produção Líquida (Dono)"}
+                </span>
+                <p className="text-lg sm:text-xl font-serif text-[#DFBA73] font-bold">
+                  R$ {mNetProd.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              <div className="bg-rose-500/10 border border-rose-500/25 rounded-2xl p-4">
+                <span className="text-[10px] font-mono uppercase text-rose-300 block mb-1">
+                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
+                    ? "Meus Vales / Gastos (Mês)"
+                    : "Despesa Mensal"}
+                </span>
+                <p className="text-lg sm:text-xl font-serif text-rose-400 font-bold">
+                  - R$ {mExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              <div className={`${mNetProfit >= 0 ? "bg-emerald-500/10 border-emerald-500/25" : "bg-rose-500/15 border-rose-500/35"} border rounded-2xl p-4`}>
+                <span className={`text-[10px] font-mono uppercase block mb-1 ${mNetProfit >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
+                  Lucro Líquido (Mês)
+                </span>
+                <p className={`text-lg sm:text-xl font-serif font-bold ${mNetProfit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  R$ {mNetProfit.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ━━━ CARD DE DISPONIBILIDADE DO STUDIO & CONTROLE DA AGENDA (PADRÃO LAS BARBER STUDIO COM FOTOS DE NOAH E ADRIAN) ━━━ */}
       <div className="bg-[#080A0E] border-2 border-white/10 rounded-3xl p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-2xl relative">
