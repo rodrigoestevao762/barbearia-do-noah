@@ -221,6 +221,15 @@ export default function NossaAreaSection({
 }: {
   onSelectBarber?: (barberId: string) => void;
 }) {
+  useEffect(() => {
+    BARBERS.forEach((b) => {
+      if (b.avatar) {
+        const img = new window.Image();
+        img.src = b.avatar;
+      }
+    });
+  }, []);
+
   return (
     <section
       id="nossa-area"
@@ -369,16 +378,17 @@ export default function NossaAreaSection({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {BARBERS.map((barber, idx) => {
+          {BARBERS.map((barber) => {
             const isOwner = barber.role === "ADMIN";
             return (
-              <motion.article
+              <article
                 key={barber.id}
-                initial={{ opacity: 0, y: 36 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.75, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative rounded-3xl overflow-hidden border border-white/10 bg-[#050608] hover:border-[#DFBA73]/50 transition-all duration-500 shadow-2xl flex flex-col"
+                className="group relative rounded-3xl overflow-hidden border border-white/10 bg-[#050608] md:hover:border-[#DFBA73]/50 transition-colors duration-300 shadow-2xl flex flex-col"
+                style={{
+                  contain: "layout paint",
+                  transform: "translate3d(0, 0, 0)",
+                  backfaceVisibility: "hidden",
+                }}
               >
                 <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#080A0E]">
                   <img
@@ -386,8 +396,13 @@ export default function NossaAreaSection({
                     alt={`${barber.name} - Noah Barber Studio`}
                     width={720}
                     height={960}
-                    loading="lazy"
-                    className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                    loading="eager"
+                    decoding="async"
+                    className="w-full h-full object-cover object-top md:transition-transform md:duration-700 md:group-hover:scale-105"
+                    style={{
+                      transform: "translate3d(0, 0, 0)",
+                      backfaceVisibility: "hidden",
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-[#050608]/20 to-transparent pointer-events-none" />
                   <div className="absolute top-4 left-4 z-10">
@@ -406,7 +421,7 @@ export default function NossaAreaSection({
 
                 <div className="p-6 flex-1 flex flex-col justify-between gap-4 -mt-6 relative z-10">
                   <div>
-                    <h4 className="text-2xl font-serif text-white group-hover:text-[#F5D799] transition-colors">
+                    <h4 className="text-2xl font-serif text-white md:group-hover:text-[#F5D799] transition-colors">
                       {barber.name}
                     </h4>
                     <p className="text-xs font-semibold text-[#DFBA73] mt-1 font-mono">
@@ -421,7 +436,7 @@ export default function NossaAreaSection({
                     <button
                       type="button"
                       onClick={() => onSelectBarber(barber.id)}
-                      className="w-full py-3.5 px-4 rounded-xl bg-white/[0.04] hover:bg-[#DFBA73] text-gray-200 hover:text-black border border-white/10 hover:border-[#DFBA73] text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer font-mono shadow-md"
+                      className="w-full py-3.5 px-4 rounded-xl bg-white/[0.04] hover:bg-[#DFBA73] text-gray-200 hover:text-black border border-white/10 hover:border-[#DFBA73] text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-colors duration-300 cursor-pointer font-mono shadow-md"
                     >
                       <Calendar className="w-3.5 h-3.5" />
                       <span>Agendar com {barber.name.split(" ")[0]}</span>
@@ -429,14 +444,14 @@ export default function NossaAreaSection({
                   ) : (
                     <a
                       href="#servicos"
-                      className="w-full py-3.5 px-4 rounded-xl bg-white/[0.04] hover:bg-[#DFBA73] text-gray-200 hover:text-black border border-white/10 hover:border-[#DFBA73] text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer font-mono shadow-md"
+                      className="w-full py-3.5 px-4 rounded-xl bg-white/[0.04] hover:bg-[#DFBA73] text-gray-200 hover:text-black border border-white/10 hover:border-[#DFBA73] text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-colors duration-300 cursor-pointer font-mono shadow-md"
                     >
                       <Calendar className="w-3.5 h-3.5" />
                       <span>Agendar Horário</span>
                     </a>
                   )}
                 </div>
-              </motion.article>
+              </article>
             );
           })}
         </div>

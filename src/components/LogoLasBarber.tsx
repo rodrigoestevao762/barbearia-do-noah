@@ -26,6 +26,8 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
           width={size}
           height={size}
           priority
+          loading="eager"
+          decoding="sync"
           className="object-cover w-full h-full drop-shadow-[0_4px_16px_rgba(223,186,115,0.25)]"
         />
       </div>
@@ -34,7 +36,7 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
 
   // Se for horizontal (navbar, header, footer):
   return (
-    <div className={`inline-flex items-center gap-2.5 sm:gap-3 select-none ${className}`}>
+    <div className={`inline-flex items-center gap-2.5 sm:gap-3 select-none shrink-0 ${className}`}>
       <div 
         className="relative inline-flex items-center justify-center shrink-0 rounded-xl overflow-hidden shadow-md shadow-black/50 border border-[#DFBA73]/30"
         style={{ width: size, height: size }}
@@ -45,6 +47,8 @@ export const LogoNoahBarber: React.FC<LogoNoahBarberProps> = ({
           width={size}
           height={size}
           priority
+          loading="eager"
+          decoding="sync"
           className="object-cover w-full h-full"
         />
       </div>

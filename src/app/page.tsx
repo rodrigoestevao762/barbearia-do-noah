@@ -206,7 +206,7 @@ export default function Home() {
       img.src = src;
     });
 
-    const loaderTimer = setTimeout(() => setIsLoading(false), 500);
+    const loaderTimer = setTimeout(() => setIsLoading(false), 450);
     const timer = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % HERO_IMAGES.length);
     }, 6000);
@@ -223,42 +223,35 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#050608] text-white font-sans selection:bg-[#DFBA73] selection:text-black">
       
-      {/* LOADER INICIAL COM LOGO NOAH BARBER STUDIO */}
+      {/* LOADER INICIAL ESTABILIZADO COM LOGO NOAH BARBER STUDIO */}
       <AnimatePresence>
         {isLoading && (
-          <motion.div 
-            initial={{ y: 0 }}
-            exit={{ y: "-100%" }}
-            transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
-            className="fixed inset-0 z-[100] bg-[#050608] flex items-center justify-center flex-col"
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="fixed inset-0 z-[100] bg-[#050608] flex items-center justify-center flex-col pointer-events-none"
           >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              className="p-3 rounded-full border border-[#DFBA73]/30 bg-black/40 shadow-2xl shadow-[#DFBA73]/20"
-            >
-              <LogoNoahBarber variant="emblem" size={80} />
-            </motion.div>
-            <motion.p 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }}
-              className="mt-6 font-serif text-[#DFBA73] tracking-[0.3em] uppercase text-sm font-bold font-mono"
-            >
+            <div className="p-2.5 rounded-3xl border border-[#DFBA73]/40 bg-black/60 shadow-2xl shadow-[#DFBA73]/20">
+              <LogoNoahBarber variant="emblem" size={84} />
+            </div>
+            <p className="mt-5 font-serif text-[#DFBA73] tracking-[0.3em] uppercase text-sm font-bold font-mono">
               NOAH BARBER STUDIO
-            </motion.p>
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* NAVBAR COM SAFE AREA PARA CÂMERA MOBILE */}
-      <motion.nav 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? -20 : 0 }}
-        transition={{ duration: 0.8, delay: 1 }}
-        className="fixed top-0 left-0 w-full px-5 md:px-12 flex justify-between items-center z-50 bg-gradient-to-b from-black/85 via-black/40 to-transparent pointer-events-auto transition-all"
+      {/* NAVBAR COM SAFE AREA PARA CÂMERA MOBILE (SEM CONFLITO DE TRANSITION-ALL / PULO) */}
+      <nav
+        className={`fixed top-0 left-0 w-full px-5 md:px-12 flex justify-between items-center z-50 bg-gradient-to-b from-black/85 via-black/40 to-transparent pointer-events-auto transition-opacity duration-500 ${
+          isLoading ? "opacity-0" : "opacity-100"
+        }`}
         style={{
           paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 1.25rem), 3.5rem)",
           paddingBottom: "1.25rem",
+          transform: "translate3d(0, 0, 0)",
+          backfaceVisibility: "hidden",
         }}
       >
         <Link 
@@ -329,7 +322,7 @@ export default function Home() {
         >
           <Menu className="w-8 h-8" />
         </button>
-      </motion.nav>
+      </nav>
 
       {/* MENU MOBILE CINEMATOGRÁFICO DE LUXO (MODELO MR BASTOS) */}
       <AnimatePresence>
@@ -596,7 +589,7 @@ export default function Home() {
 
         {/* Textos Centrais com Máscara e Brilho Impecável */}
         <div className="relative z-20 text-center flex flex-col items-center mt-16 md:mt-20 px-4">
-          <RevealText delay={1.2}>
+          <RevealText delay={0.5}>
             <p className="text-[#DFBA73] uppercase tracking-[0.4em] text-xs md:text-sm font-semibold mb-4 md:mb-6 flex items-center gap-3 md:gap-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] font-mono">
               <span className="w-8 md:w-12 h-[1px] bg-[#DFBA73]"></span>
               Atendimento Exclusivo • Estilo Único
@@ -605,21 +598,21 @@ export default function Home() {
           </RevealText>
           
           <h1 className="text-5xl sm:text-6xl md:text-[7rem] font-serif leading-[0.92] tracking-tight uppercase flex flex-col items-center drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
-            <RevealText delay={1.3}>
+            <RevealText delay={0.6}>
               VISUAL{" "}
               <span className="italic text-transparent [-webkit-text-stroke:1px_white] hover:text-white transition-colors duration-500 cursor-pointer">
                 IMPECÁVEL,
               </span>
             </RevealText>
-            <RevealText delay={1.4}>
+            <RevealText delay={0.7}>
               <span className="text-[#DFBA73]">ESTILO</span> ÚNICO.
             </RevealText>
           </h1>
 
           <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? 20 : 0 }} 
-            transition={{ delay: 1.8, duration: 1 }}
+            initial={{ opacity: 0, y: 16 }} 
+            animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? 16 : 0 }} 
+            transition={{ delay: 0.75, duration: 0.6 }}
             className="mt-8 md:mt-12 flex gap-6"
           >
             <div onClick={() => openBooking()}>
@@ -635,7 +628,7 @@ export default function Home() {
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: isLoading ? 0 : 1 }} 
-          transition={{ delay: 2, duration: 1 }}
+          transition={{ delay: 0.85, duration: 0.6 }}
           className="absolute bottom-12 left-6 md:left-12 flex items-center gap-6 z-20"
         >
            <button 
@@ -908,17 +901,13 @@ export default function Home() {
         <div className="relative z-10 w-full max-w-7xl mx-auto px-8 flex flex-col items-center justify-center flex-1 py-32">
           
           {/* Medalhão da Logo em Círculo com Vidro Soprado */}
-          <motion.div 
-            initial={{ scale: 0.8, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
+          <div
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             title="Voltar ao topo"
-            className="w-24 h-24 rounded-full border border-[#DFBA73]/40 flex items-center justify-center mb-12 backdrop-blur-md bg-black/60 shadow-[0_0_30px_rgba(223,186,115,0.25)] cursor-pointer hover:scale-105 transition-transform"
+            className="w-24 h-24 rounded-full border border-[#DFBA73]/40 flex items-center justify-center mb-12 backdrop-blur-md bg-black/60 shadow-[0_0_30px_rgba(223,186,115,0.25)] cursor-pointer md:hover:scale-105 transition-transform"
           >
             <LogoNoahBarber variant="emblem" size={76} />
-          </motion.div>
+          </div>
 
           {/* Título Monumental */}
           <div className="text-center space-y-4 mb-16 relative">
