@@ -476,38 +476,44 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-16 relative font-sans">
-      {/* Toast Feedback */}
+      {/* Toast Feedback (Padrão LAS Barber Studio) */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-24 right-6 z-[160] bg-[#080A0E] border border-[#DFBA73]/50 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 max-w-md backdrop-blur-md"
+            className="fixed top-24 right-6 z-[160] bg-[#080A0E] border-2 border-[#DFBA73] text-white px-6 py-4 rounded-3xl shadow-2xl shadow-[#DFBA73]/25 flex items-center gap-4 max-w-md backdrop-blur-md"
           >
-            <CheckCircle2 className="w-5 h-5 text-[#DFBA73] shrink-0" />
-            <p className="text-gray-200 text-xs font-mono">{toastMessage}</p>
-            <button onClick={() => setToastMessage(null)} className="text-gray-400 hover:text-white p-1 ml-auto">
+            <div className="w-10 h-10 rounded-full bg-[#DFBA73]/20 text-[#F5D799] border border-[#DFBA73]/40 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-serif font-bold text-sm text-[#DFBA73]">Caixa do Studio Atualizado</h4>
+              <p className="text-gray-200 text-xs mt-0.5 leading-snug font-mono">{toastMessage}</p>
+            </div>
+            <button onClick={() => setToastMessage(null)} className="text-gray-400 hover:text-white p-1">
               <X className="w-4 h-4" />
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* HEADER NOAH BARBER STUDIO STYLE */}
+      {/* HEADER PADRÃO LAS BARBER STUDIO COM IDENTIDADE NOAH BARBER STUDIO */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3.5 h-3.5 text-[#DFBA73]" /> {isAdmin ? "PROPRIETÁRIO (DONO) • 55% Noah (Dono) / 45% Adrian (Funcionário)" : "BARBEIRO DA EQUIPE • MINHA COMISSÃO: 45%"}
+            <span className="text-[10px] bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono shadow-lg shadow-[#DFBA73]/20">
+              <Shield className="w-3.5 h-3.5" /> {isAdmin ? "PROPRIETÁRIO (DONO) • 55% Noah / 45% Adrian" : "BARBEIRO DA EQUIPE • MINHA COMISSÃO: 45%"}
             </span>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
-            {isAdmin ? "Painel Geral da Barbearia" : "Meus Atendimentos & Comissões"}
+            {isAdmin ? "Painel do Studio" : "Meus Atendimentos"} •{" "}
+            <span className="text-[#F5D799] italic">{isAdmin ? "Noah Ferreira" : "Adrian Santos"}</span>
           </h2>
           <p className="text-xs text-gray-400 mt-1 font-light">
-            {isAdmin 
+            {isAdmin
               ? "Controle total do Noah Barber Studio, comissão de Adrian Santos (45%) e faturamento de Noah Ferreira (Dono · 55%)."
               : "Acompanhe seus horários de hoje, clientes atendidos e o cálculo da sua comissão de 45%."}
           </p>
@@ -534,234 +540,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* TABS DE FILTRO DE PROFISSIONAL (VISÃO GERAL / NOAH / ADRIAN) */}
-      {isAdmin ? (
-        <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto scrollbar-hide overscroll-x-contain touch-pan-y">
-          <button
-            onClick={() => setActiveBarberFilter("all")}
-            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap ${
-              activeBarberFilter === "all"
-                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
-                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
-            }`}
-          >
-            VISÃO GERAL DO ESTÚDIO
-          </button>
-
-          <button
-            onClick={() => setActiveBarberFilter("barbeiro-noah")}
-            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-              activeBarberFilter === "barbeiro-noah"
-                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
-                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
-            }`}
-          >
-            <span>✂️</span>
-            <span>NOAH FERREIRA (DONO · 55%)</span>
-          </button>
-
-          <button
-            onClick={() => setActiveBarberFilter("barbeiro-adrian")}
-            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
-              activeBarberFilter === "barbeiro-adrian"
-                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
-                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
-            }`}
-          >
-            <span>✂️</span>
-            <span>ADRIAN SANTOS (45%)</span>
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center gap-2 border-b border-white/10 pb-4">
-          <div className="px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799] flex items-center gap-2">
-            <span>✂️</span>
-            <span>ADRIAN SANTOS (MINHA PRODUÇÃO · 45%)</span>
-          </div>
-        </div>
-      )}
-
-      {/* CARDS PRINCIPAIS: FATURAMENTO, ADRIAN (45%), NOAH DONO (55%), ATENDIMENTOS */}
-      <div className={`grid grid-cols-1 sm:grid-cols-2 ${isAdmin ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-5`}>
-        {/* Card 1: Faturamento Bruto */}
-        <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all shadow-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-1.5">
-              <DollarSign className="w-3.5 h-3.5 text-gray-400" /> {isAdmin ? "FATURAMENTO BRUTO" : "MINHA PRODUÇÃO BRUTA"}
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-gray-400">
-              <ArrowUpRight className="w-4 h-4" />
-            </div>
-          </div>
-          <h3 className="text-3xl font-serif text-white tracking-tight mb-1">
-            R$ {currentGross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-          </h3>
-          <p className="text-xs text-gray-400 font-light">
-            {isAdmin 
-              ? (activeBarberFilter === "all" ? "Produção total somada da equipe." : "Produção bruta do profissional.")
-              : "Total bruto gerado pelos seus atendimentos hoje."}
-          </p>
-        </div>
-
-        {/* Card 2: Adrian Santos (45%) */}
-        <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-3xl p-6 relative overflow-hidden group hover:border-[#DFBA73]/50 transition-all shadow-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#F5D799] font-bold flex items-center gap-1.5">
-              <Scissors className="w-3.5 h-3.5 text-[#DFBA73]" /> {isAdmin ? "ADRIAN SANTOS (45%)" : "MINHA COMISSÃO (45%)"}
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-[#DFBA73]/20 flex items-center justify-center text-[#DFBA73]">
-              <Scissors className="w-4 h-4" />
-            </div>
-          </div>
-          <h3 className="text-3xl font-serif text-[#DFBA73] tracking-tight mb-1">
-            R$ {currentCommissions.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-          </h3>
-          <p className="text-xs text-[#DFBA73]/70 font-light">
-            {isAdmin 
-              ? (activeBarberFilter === "barbeiro-noah" ? "Noah é o Dono (não comissionado)." : "Comissão do funcionário Adrian Santos (45%).")
-              : "Sua comissão líquida a receber (45%)."}
-          </p>
-        </div>
-
-        {/* Card 3: Noah Ferreira (Dono · 55%) - EXCLUSIVO PARA O DONO */}
-        {isAdmin && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-all shadow-xl">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold flex items-center gap-1.5">
-                <Wallet className="w-3.5 h-3.5 text-emerald-400" /> NOAH FERREIRA (DONO · 55%)
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <Building className="w-4 h-4" />
-              </div>
-            </div>
-            <h3 className="text-3xl font-serif text-emerald-400 tracking-tight mb-1">
-              R$ {currentHouseShare.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-            </h3>
-            <p className="text-xs text-emerald-300/70 font-light">
-              Faturamento do Dono Noah: produção própria + 55% de Adrian.
-            </p>
-          </div>
-        )}
-
-        {/* Card 4: Atendimentos & Ticket Médio */}
-        <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all shadow-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-1.5">
-              <CheckCircle className="w-3.5 h-3.5 text-gray-400" /> {isAdmin ? "ATENDIMENTOS" : "MEUS ATENDIMENTOS"}
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-gray-400">
-              <Sparkles className="w-4 h-4" />
-            </div>
-          </div>
-          <h3 className="text-3xl font-serif text-white tracking-tight mb-1">
-            {currentCompleted} cortes
-          </h3>
-          <p className="text-xs text-gray-400 font-light">
-            Ticket médio: R$ {currentTicketMedio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-          </p>
-        </div>
-      </div>
-
-      {/* ━━━ RESUMO MENSAL INDIVIDUALIZADO (PRODUÇÃO BRUTA, LÍQUIDA, DESPESAS E LUCRO DO MÊS) ━━━ */}
-      {dashboardData?.monthlySummary && (() => {
-        const ms = dashboardData.monthlySummary;
-        const monthFormatted = (ms.month || selectedDate.slice(0, 7)).split("-").reverse().join("/");
-        let mGross = 0;
-        let mNetProd = 0;
-        let mExpenses = 0;
-        let mNetProfit = 0;
-        let mTitle = "";
-
-        if (isAdrian) {
-          mGross = ms.grossRevenue ?? 0;
-          mNetProd = ms.netProduction ?? 0;
-          mExpenses = ms.expenses ?? 0;
-          mNetProfit = ms.netProfit ?? 0;
-          mTitle = `Meu Fechamento do Mês (${monthFormatted})`;
-        } else if (activeBarberFilter === "barbeiro-noah") {
-          mGross = ms.noah?.gross ?? 0;
-          mNetProd = ms.noah?.ownPlusHouseShare ?? 0;
-          mExpenses = ms.noah?.expenses ?? 0;
-          mNetProfit = ms.studioNetProfit ?? 0;
-          mTitle = `Balanço Mensal Noah Dono (${monthFormatted})`;
-        } else if (activeBarberFilter === "barbeiro-adrian") {
-          mGross = ms.adrian?.gross ?? 0;
-          mNetProd = ms.adrian?.commission ?? 0;
-          mExpenses = ms.adrian?.vales ?? 0;
-          mNetProfit = ms.adrian?.netProfit ?? 0;
-          mTitle = `Balanço Mensal Adrian 45% (${monthFormatted})`;
-        } else {
-          mGross = ms.studioGross ?? 0;
-          mNetProd = ms.noahNetProduction ?? 0;
-          mExpenses = ms.studioExpenses ?? 0;
-          mNetProfit = ms.studioNetProfit ?? 0;
-          mTitle = `Balanço Mensal do Estúdio (${monthFormatted})`;
-        }
-
-        return (
-          <div className="bg-[#080A0E] border border-[#DFBA73]/25 rounded-3xl p-5 md:p-6 shadow-xl space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-3">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#DFBA73] font-bold">
-                  CONTROLE MENSAL INDIVIDUALIZADO
-                </span>
-                <h3 className="text-lg font-serif text-white mt-0.5">{mTitle}</h3>
-              </div>
-              <Link
-                href="/dashboard/financeiro"
-                className="px-4 py-2 rounded-xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#DFBA73] hover:text-black border border-[#DFBA73]/30 text-[11px] font-mono font-bold uppercase tracking-wider transition-all text-center shrink-0"
-              >
-                {isAdmin ? "Gerenciar Despesas & Lucro →" : "Ver Meu Caixa & Vales →"}
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4">
-                <span className="text-[10px] font-mono uppercase text-gray-400 block mb-1">
-                  Produção Bruta (Mês)
-                </span>
-                <p className="text-lg sm:text-xl font-serif text-white font-bold">
-                  R$ {mGross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-
-              <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/25 rounded-2xl p-4">
-                <span className="text-[10px] font-mono uppercase text-[#F5D799] block mb-1">
-                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
-                    ? "Produção Líquida (45%)"
-                    : "Produção Líquida (Dono)"}
-                </span>
-                <p className="text-lg sm:text-xl font-serif text-[#DFBA73] font-bold">
-                  R$ {mNetProd.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-
-              <div className="bg-rose-500/10 border border-rose-500/25 rounded-2xl p-4">
-                <span className="text-[10px] font-mono uppercase text-rose-300 block mb-1">
-                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
-                    ? "Meus Vales / Gastos (Mês)"
-                    : "Despesa Mensal"}
-                </span>
-                <p className="text-lg sm:text-xl font-serif text-rose-400 font-bold">
-                  - R$ {mExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-
-              <div className={`${mNetProfit >= 0 ? "bg-emerald-500/10 border-emerald-500/25" : "bg-rose-500/15 border-rose-500/35"} border rounded-2xl p-4`}>
-                <span className={`text-[10px] font-mono uppercase block mb-1 ${mNetProfit >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
-                  Lucro Líquido (Mês)
-                </span>
-                <p className={`text-lg sm:text-xl font-serif font-bold ${mNetProfit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                  R$ {mNetProfit.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* ━━━ CARD DE DISPONIBILIDADE DO STUDIO & CONTROLE DA AGENDA (PADRÃO LAS BARBER STUDIO COM FOTOS DE NOAH E ADRIAN) ━━━ */}
-      <div className="bg-[#080A0E] border-2 border-white/10 rounded-3xl p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-2xl relative">
+      {/* ━━━ CARD 1: DISPONIBILIDADE DO STUDIO & CONTROLE DA AGENDA (PADRÃO LAS BARBER STUDIO COM FOTOS DE NOAH E ADRIAN) ━━━ */}
+      <div className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-2xl relative">
         <div className="flex items-center gap-5">
           {/* FOTO DO BARBEIRO SELECIONADO (NOAH OU ADRIAN) */}
           <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shrink-0 shadow-lg shadow-black/50">
@@ -936,74 +716,338 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* PRÓXIMOS ATENDIMENTOS CONFIRMADOS */}
+      {/* ━━━ CARD 2: PRÓXIMOS AGENDAMENTOS CONFIRMADOS (PADRÃO LAS BARBER STUDIO) ━━━ */}
       {nextApt ? (
-        <div className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-2xl">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-                <h3 className="text-xs font-mono uppercase tracking-widest text-[#DFBA73] font-bold">
-                  Próximo Atendimento Confirmado
-                </h3>
+        <div className="bg-gradient-to-r from-[#DFBA73]/15 via-[#080A0E] to-[#050608] border-2 border-[#DFBA73]/40 rounded-3xl p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-[#DFBA73]/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+
+          <div className="flex items-start gap-5 relative z-10">
+            <div className="w-12 h-12 rounded-2xl bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799] flex items-center justify-center shrink-0 mt-1 shadow-inner">
+              <Clock className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[#F5D799] bg-[#DFBA73]/20 border border-[#DFBA73]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" /> Próximos Agendamentos Confirmados
+                </span>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-gray-300 font-mono">
+                  {upcomingList.length} {upcomingList.length === 1 ? "cliente na fila" : "clientes na fila"}
+                </span>
               </div>
-              <p className="text-xl sm:text-2xl font-serif text-white">
-                {nextApt.user?.name || "Cliente"} — <span className="text-gray-300">{nextApt.service?.name}</span>
-              </p>
-              <div className="flex items-center gap-4 text-xs text-gray-400 font-mono flex-wrap">
-                <span>🕒 {getDisplayTime(nextApt.date)}</span>
-                <span>•</span>
-                <span>✂️ {BARBERS.find((b) => b.id === nextApt.barberId)?.name || "Noah Ferreira"}</span>
+              <h3 className="text-xl md:text-2xl font-serif text-white mt-1">
+                Próximo cliente: <span className="text-[#F5D799]">{nextApt.user?.name || "Cliente"}</span> em{" "}
+                {new Date(nextApt.date).toLocaleDateString("pt-BR")} às {getDisplayTime(nextApt.date)}
+              </h3>
+              <p className="text-xs text-gray-300 mt-1 flex items-center flex-wrap gap-2">
+                <span>Serviço: <strong>{nextApt.service?.name}</strong> (R$ {Number(nextApt.service?.price || 0).toFixed(2)})</span>
                 <span>•</span>
                 <span className="text-[#DFBA73]">
-                  {nextApt.barberId === "barbeiro-adrian" 
-                    ? `Comissão Adrian: R$ ${(Math.round((nextApt.service?.price || 0) * 0.45 * 100) / 100).toFixed(2)} (45%)` 
-                    : `Atendimento do Dono: R$ ${(nextApt.service?.price || 0).toFixed(2)}`}
+                  ✂️ {BARBERS.find((b) => b.id === nextApt.barberId)?.name || "Noah Ferreira"}
+                </span>
+                <span>•</span>
+                <span className="text-[#F5D799] font-mono">
+                  {nextApt.barberId === "barbeiro-adrian"
+                    ? `Comissão Adrian: R$ ${(Math.round((nextApt.service?.price || 0) * 0.45 * 100) / 100).toFixed(2)} (45%)`
+                    : `Atendimento Dono: R$ ${(nextApt.service?.price || 0).toFixed(2)}`}
                 </span>
                 {nextApt.user?.phone && (
                   <>
                     <span>•</span>
-                    <span>whatsapp: {nextApt.user.phone}</span>
+                    <span className="font-mono">whatsapp: {nextApt.user.phone}</span>
                   </>
                 )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              {nextApt.user?.phone && (
-                <a
-                  href={`https://wa.me/55${String(nextApt.user.phone).replace(/\D/g, "")}?text=${encodeURIComponent(
-                    `Olá, ${nextApt.user.name || "Cliente"}! Sou o ${BARBERS.find((b) => b.id === nextApt.barberId)?.name.split(" ")[0] || "Noah"} da Noah Barber Studio. Confirmando seu atendimento às ${getDisplayTime(nextApt.date)}!`
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-3 rounded-2xl bg-[#25D366]/15 hover:bg-[#25D366] text-[#25D366] hover:text-white border border-[#25D366]/40 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer"
-                >
-                  <MessageCircle className="w-4 h-4" /> WhatsApp
-                </a>
-              )}
-              <button
-                onClick={() => setExtraServiceApt(nextApt)}
-                className="px-4 py-3 rounded-2xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#F5D799] hover:text-black border border-[#DFBA73]/40 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" /> Serviço Extra
-              </button>
-              <button
-                onClick={() => updateStatus(nextApt.id, "COMPLETED")}
-                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold text-xs uppercase font-mono tracking-wider shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 flex items-center gap-2 cursor-pointer"
-              >
-                <CheckCircle2 className="w-4 h-4" /> Concluir Atendimento
-              </button>
-              <a
-                href="/dashboard/agenda"
-                className="px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-gray-300 font-mono text-xs uppercase tracking-wider flex items-center gap-1.5"
-              >
-                Ver Agenda <ChevronRight className="w-3.5 h-3.5" />
-              </a>
+              </p>
             </div>
           </div>
+
+          <div className="flex items-center gap-3 flex-wrap relative z-10">
+            {nextApt.user?.phone && (
+              <a
+                href={`https://wa.me/55${String(nextApt.user.phone).replace(/\D/g, "")}?text=${encodeURIComponent(
+                  `Olá, ${nextApt.user.name || "Cliente"}! Sou o ${BARBERS.find((b) => b.id === nextApt.barberId)?.name.split(" ")[0] || "Noah"} da Noah Barber Studio. Confirmando seu atendimento às ${getDisplayTime(nextApt.date)}!`
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-3 rounded-2xl bg-[#25D366]/15 hover:bg-[#25D366] text-[#25D366] hover:text-white border border-[#25D366]/40 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4" /> WhatsApp
+              </a>
+            )}
+            <button
+              onClick={() => setExtraServiceApt(nextApt)}
+              className="px-4 py-3 rounded-2xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#F5D799] hover:text-black border border-[#DFBA73]/40 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Serviço Extra
+            </button>
+            <button
+              onClick={() => updateStatus(nextApt.id, "COMPLETED")}
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold text-xs uppercase font-mono tracking-wider shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 flex items-center gap-2 cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4" /> Concluir Atendimento
+            </button>
+            <Link
+              href="/dashboard/agenda"
+              className="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider font-mono transition-all flex items-center gap-1"
+            >
+              <span>Ver na Agenda</span>
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-gray-400 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-serif text-white">Próximos Agendamentos Confirmados</h4>
+              <p className="text-xs text-gray-400">Não há nenhum atendimento futuro pendente no momento.</p>
+            </div>
+          </div>
+          <span className="text-xs font-mono text-gray-500">0 agendados</span>
+        </div>
+      )}
+
+      {/* TABS DE FILTRO DE PROFISSIONAL (VISÃO GERAL / NOAH / ADRIAN) */}
+      {isAdmin ? (
+        <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto scrollbar-hide overscroll-x-contain touch-pan-y">
+          <button
+            onClick={() => setActiveBarberFilter("all")}
+            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeBarberFilter === "all"
+                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
+                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
+            }`}
+          >
+            VISÃO GERAL DO ESTÚDIO
+          </button>
+
+          <button
+            onClick={() => setActiveBarberFilter("barbeiro-noah")}
+            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+              activeBarberFilter === "barbeiro-noah"
+                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
+                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
+            }`}
+          >
+            <span>✂️</span>
+            <span>NOAH FERREIRA (DONO · 55%)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveBarberFilter("barbeiro-adrian")}
+            className={`px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 ${
+              activeBarberFilter === "barbeiro-adrian"
+                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow-lg shadow-[#DFBA73]/25 border border-[#DFBA73]"
+                : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5"
+            }`}
+          >
+            <span>✂️</span>
+            <span>ADRIAN SANTOS (45%)</span>
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 border-b border-white/10 pb-4">
+          <div className="px-5 py-2.5 rounded-2xl font-mono text-xs uppercase tracking-wider font-bold bg-[#DFBA73]/20 border border-[#DFBA73]/40 text-[#F5D799] flex items-center gap-2">
+            <span>✂️</span>
+            <span>ADRIAN SANTOS (MINHA PRODUÇÃO · 45%)</span>
+          </div>
+        </div>
+      )}
+
+      {/* BENTO METRICS GRID (ESTILO LAS BARBER STUDIO COM REGRAS 55%/45% DO NOAH) */}
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${isAdmin ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-5`}>
+        {/* Card 1: Destaque Dourado (Padrão LAS Bento Card 1) */}
+        <div className="bg-gradient-to-br from-[#DFBA73]/15 via-[#080A0E] to-[#050608] border border-[#DFBA73]/40 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between shadow-2xl">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#DFBA73]/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+          <div className="flex justify-between items-start relative z-10">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-[#F5D799] font-mono">
+                {isAdmin ? "Faturamento Bruto" : "Minha Produção Bruta"}
+              </p>
+              <h3 className="text-3xl font-serif font-bold text-white mt-2">
+                R$ {currentGross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </h3>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#F5D799] to-[#DFBA73] text-black flex items-center justify-center shadow-lg shadow-[#DFBA73]/20 shrink-0">
+              <DollarSign className="w-6 h-6" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-300 mt-4 pt-3 border-t border-white/10 font-light relative z-10">
+            {isAdmin
+              ? activeBarberFilter === "all"
+                ? "Soma do faturamento concluído pela equipe na data."
+                : "Produção bruta concluída por este profissional."
+              : "Total bruto gerado pelos seus atendimentos concluídos."}
+          </p>
+        </div>
+
+        {/* Card 2: Comissão Adrian (45%) */}
+        <div className="bg-[#080A0E] border border-white/10 hover:border-[#DFBA73]/40 transition-all rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-[#DFBA73] font-mono">
+                {isAdmin ? "Adrian Santos (45%)" : "Minha Comissão (45%)"}
+              </p>
+              <h3 className="text-3xl font-serif font-bold text-[#F5D799] mt-2">
+                R$ {currentCommissions.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </h3>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#DFBA73] shrink-0">
+              <Scissors className="w-5 h-5" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-4 pt-3 border-t border-white/10 font-light">
+            {isAdmin
+              ? activeBarberFilter === "barbeiro-noah"
+                ? "Noah é o Dono (não comissionado)."
+                : "Repasse de 45% sobre cortes do funcionário Adrian."
+              : "Sua comissão líquida a receber (45%)."}
+          </p>
+        </div>
+
+        {/* Card 3: Noah Ferreira (Dono · 55%) - EXCLUSIVO PARA O DONO */}
+        {isAdmin && (
+          <div className="bg-[#080A0E] border border-white/10 hover:border-emerald-500/40 transition-all rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 font-mono">
+                  Noah Ferreira (Dono · 55%)
+                </p>
+                <h3 className="text-3xl font-serif font-bold text-emerald-400 mt-2">
+                  R$ {currentHouseShare.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </h3>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-emerald-400 shrink-0">
+                <Building className="w-5 h-5" />
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-4 pt-3 border-t border-white/10 font-light">
+              Produção própria do Dono + repasse de 55% do Adrian.
+            </p>
+          </div>
+        )}
+
+        {/* Card 4: Atendimentos & Ticket Médio */}
+        <div className="bg-[#080A0E] border border-white/10 hover:border-white/20 transition-all rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 font-mono">
+                {isAdmin ? "Atendimentos Concluídos" : "Meus Atendimentos"}
+              </p>
+              <h3 className="text-3xl font-serif font-bold text-white mt-2">
+                {currentCompleted} cortes
+              </h3>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#DFBA73] shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-4 pt-3 border-t border-white/10 font-light">
+            Ticket médio: <span className="text-white font-mono">R$ {currentTicketMedio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+          </p>
+        </div>
+      </div>
+
+      {/* ━━━ RESUMO MENSAL INDIVIDUALIZADO (PRODUÇÃO BRUTA, LÍQUIDA, DESPESAS E LUCRO DO MÊS) ━━━ */}
+      {dashboardData?.monthlySummary && (() => {
+        const ms = dashboardData.monthlySummary;
+        const monthFormatted = (ms.month || selectedDate.slice(0, 7)).split("-").reverse().join("/");
+        let mGross = 0;
+        let mNetProd = 0;
+        let mExpenses = 0;
+        let mNetProfit = 0;
+        let mTitle = "";
+
+        if (isAdrian) {
+          mGross = ms.grossRevenue ?? 0;
+          mNetProd = ms.netProduction ?? 0;
+          mExpenses = ms.expenses ?? 0;
+          mNetProfit = ms.netProfit ?? 0;
+          mTitle = `Meu Fechamento do Mês (${monthFormatted})`;
+        } else if (activeBarberFilter === "barbeiro-noah") {
+          mGross = ms.noah?.gross ?? 0;
+          mNetProd = ms.noah?.ownPlusHouseShare ?? 0;
+          mExpenses = ms.noah?.expenses ?? 0;
+          mNetProfit = ms.studioNetProfit ?? 0;
+          mTitle = `Balanço Mensal Noah Dono (${monthFormatted})`;
+        } else if (activeBarberFilter === "barbeiro-adrian") {
+          mGross = ms.adrian?.gross ?? 0;
+          mNetProd = ms.adrian?.commission ?? 0;
+          mExpenses = ms.adrian?.vales ?? 0;
+          mNetProfit = ms.adrian?.netProfit ?? 0;
+          mTitle = `Balanço Mensal Adrian 45% (${monthFormatted})`;
+        } else {
+          mGross = ms.studioGross ?? 0;
+          mNetProd = ms.noahNetProduction ?? 0;
+          mExpenses = ms.studioExpenses ?? 0;
+          mNetProfit = ms.studioNetProfit ?? 0;
+          mTitle = `Balanço Mensal do Estúdio (${monthFormatted})`;
+        }
+
+        return (
+          <div className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 md:p-7 shadow-2xl space-y-5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#DFBA73]/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 relative z-10">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#DFBA73] font-bold">
+                  CONTROLE MENSAL INDIVIDUALIZADO
+                </span>
+                <h3 className="text-xl font-serif text-white mt-0.5">{mTitle}</h3>
+              </div>
+              <Link
+                href="/dashboard/financeiro"
+                className="px-4 py-2 rounded-xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#DFBA73] hover:text-black border border-[#DFBA73]/30 text-[11px] font-mono font-bold uppercase tracking-wider transition-all text-center shrink-0"
+              >
+                {isAdmin ? "Gerenciar Despesas & Lucro →" : "Ver Meu Caixa & Vales →"}
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-10">
+              <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-4">
+                <span className="text-[10px] font-mono uppercase text-gray-400 block mb-1">
+                  Produção Bruta (Mês)
+                </span>
+                <p className="text-lg sm:text-xl font-serif text-white font-bold">
+                  R$ {mGross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-2xl p-4">
+                <span className="text-[10px] font-mono uppercase text-[#F5D799] block mb-1">
+                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
+                    ? "Produção Líquida (45%)"
+                    : "Produção Líquida (Dono)"}
+                </span>
+                <p className="text-lg sm:text-xl font-serif text-[#DFBA73] font-bold">
+                  R$ {mNetProd.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              <div className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-4">
+                <span className="text-[10px] font-mono uppercase text-rose-300 block mb-1">
+                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
+                    ? "Meus Vales / Gastos (Mês)"
+                    : "Despesa Mensal"}
+                </span>
+                <p className="text-lg sm:text-xl font-serif text-rose-400 font-bold">
+                  - R$ {mExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              <div className={`${mNetProfit >= 0 ? "bg-emerald-500/10 border-emerald-500/30" : "bg-rose-500/15 border-rose-500/35"} border rounded-2xl p-4`}>
+                <span className={`text-[10px] font-mono uppercase block mb-1 ${mNetProfit >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
+                  Lucro Líquido (Mês)
+                </span>
+                <p className={`text-lg sm:text-xl font-serif font-bold ${mNetProfit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  R$ {mNetProfit.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* DETALHAMENTO DA EQUIPE (NOAH 55% + ADRIAN 45%) - EXCLUSIVO PARA O GESTOR */}
       {isAdmin && (
@@ -1123,9 +1167,9 @@ export default function DashboardPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-14 h-14 rounded-2xl bg-[#050608] border border-white/10 flex flex-col items-center justify-center font-mono shrink-0 shadow-md">
+                    <div className="w-16 h-16 rounded-2xl bg-[#050608] border border-[#DFBA73]/30 flex flex-col items-center justify-center font-mono shrink-0 shadow-md">
                       <span className="text-[9px] text-gray-500 font-light">HORA</span>
-                      <span className="text-sm font-bold text-white">{aptTime}</span>
+                      <span className="text-sm font-bold text-[#F5D799]">{aptTime}</span>
                     </div>
 
                     <div className="min-w-0">

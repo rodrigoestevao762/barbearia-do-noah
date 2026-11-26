@@ -134,16 +134,16 @@ export default function FechamentoPage() {
 
   return (
     <div className="max-w-5xl mx-auto pb-16 space-y-8">
-      {/* HEADER OFICIAL PADRÃO NOAH BARBER STUDIO */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-6">
+      {/* HEADER OFICIAL PADRÃO LAS BARBER STUDIO */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3 h-3 text-[#DFBA73]" /> GESTÃO & ADMINISTRAÇÃO
+            <span className="text-[10px] bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono shadow-lg shadow-[#DFBA73]/20">
+              <Shield className="w-3 h-3" /> GESTÃO & ADMINISTRAÇÃO
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
-            Fechamento de Caixa
+            Fechamento de <span className="text-[#F5D799] italic">Caixa</span>
           </h2>
           <p className="text-xs text-gray-400 mt-1 font-light">
             Conferência final do dia com repasse de 55% para Noah Ferreira (Dono) e 45% para Adrian Santos (Funcionário).

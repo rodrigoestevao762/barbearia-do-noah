@@ -290,8 +290,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="hidden md:flex pl-36 pr-12 pt-10 justify-between items-end relative z-20">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3.5 h-3.5 text-[#DFBA73]" /> {isAdmin ? "PROPRIETÁRIO (DONO)" : "BARBEIRO DA EQUIPE"}
+            <span className="text-[10px] bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 shadow-md shadow-[#DFBA73]/20 font-mono">
+              <Shield className="w-3.5 h-3.5 text-black" /> {isAdmin ? "PROPRIETÁRIO (DONO)" : "BARBEIRO DA EQUIPE"}
             </span>
           </div>
           <motion.h1 
@@ -299,7 +299,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl md:text-5xl font-serif text-white tracking-tight"
           >
-            {greeting}, <span className="text-white italic">{userName} {isAdmin ? "(DONO)" : ""}</span>
+            {greeting}, <span className="text-[#F5D799] italic">{userName} {isAdmin ? "(DONO)" : ""}</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }}
@@ -317,10 +317,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex items-center gap-3 relative">
           <Link
             href="/"
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-gray-300 transition-all shadow-sm font-mono tracking-wider uppercase"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-[#DFBA73] hover:text-black border border-white/10 text-xs font-bold text-gray-300 transition-all shadow-sm font-mono tracking-wider uppercase group"
             title="Voltar ao Site"
           >
-            <Home className="w-4 h-4 text-[#DFBA73]" />
+            <Home className="w-4 h-4 text-[#DFBA73] group-hover:text-black transition-colors" />
             <span>Voltar ao Site</span>
           </Link>
 

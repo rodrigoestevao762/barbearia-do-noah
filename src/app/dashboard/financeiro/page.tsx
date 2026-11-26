@@ -359,20 +359,28 @@ export default function FinanceiroPage() {
         )}
       </AnimatePresence>
 
-      {/* HEADER NOAH BARBER STUDIO STYLE */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-6">
+      {/* HEADER PADRÃO LAS BARBER STUDIO COM IDENTIDADE NOAH BARBER STUDIO */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3 h-3 text-[#DFBA73]" /> {isAdmin ? "GESTÃO GERAL DO DONO • 55% Noah (Dono) • 45% Adrian (Funcionário)" : "BARBEIRO DA EQUIPE • MINHA COMISSÃO: 45%"}
+            <span className="text-[10px] bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono shadow-lg shadow-[#DFBA73]/20">
+              <Shield className="w-3 h-3" /> {isAdmin ? "GESTÃO GERAL DO DONO • 55% Noah • 45% Adrian" : "BARBEIRO DA EQUIPE • MINHA COMISSÃO: 45%"}
             </span>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
-            {isAdmin ? "Gestão Financeira" : "Meu Caixa & Comissões"}
+            {isAdmin ? (
+              <>
+                Gestão <span className="bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] bg-clip-text text-transparent italic">Financeira</span>
+              </>
+            ) : (
+              <>
+                Meu Caixa <span className="bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] bg-clip-text text-transparent italic">& Comissões</span>
+              </>
+            )}
           </h2>
           <p className="text-gray-400 mt-1 text-sm font-light">
-            {isAdmin 
+            {isAdmin
               ? "Controle financeiro geral do estúdio, comissões de Adrian e faturamento do Dono Noah Ferreira."
               : "Acompanhe seus cortes realizados, cálculo de comissão (45%) e vales retirados no caixa."}
           </p>
@@ -467,88 +475,170 @@ export default function FinanceiroPage() {
         </div>
       )}
 
-      {/* 4 CARDS ESTRUTURA NOAH BARBER STUDIO */}
+      {/* 4 BENTO CARDS ESTRUTURA LAS BARBER STUDIO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1 */}
-        <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-1.5">
-              <ArrowUpRight className="w-3.5 h-3.5 text-gray-400" /> {isAdmin ? "ENTRADAS BRUTAS" : "MINHA PRODUÇÃO BRUTA"}
+        {/* Card 1: Entradas Brutas */}
+        <div className="p-6 rounded-3xl bg-[#080A0E] border border-white/10 hover:border-white/20 transition-all relative overflow-hidden group shadow-xl">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#DFBA73]/5 rounded-full blur-2xl group-hover:bg-[#DFBA73]/10 transition-colors" />
+          <div className="flex items-center justify-between mb-4 relative z-10">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-semibold">
+              {isAdmin ? "ENTRADAS BRUTAS" : "MINHA PRODUÇÃO BRUTA"}
             </span>
+            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#DFBA73]">
+              <ArrowUpRight className="w-4 h-4" />
+            </div>
           </div>
-          <h3 className="text-3xl font-serif text-white tracking-tight mb-1">
+          <h3 className="text-3xl font-serif text-white tracking-tight mb-1 relative z-10">
             R$ {(isAdmin ? displayEntradas : adrianGross).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
-          <p className="text-xs text-gray-400 font-light">
-            {isAdmin 
-              ? (activeTab === "all" ? "Produção total somada de toda a equipe." : "Produção bruta deste profissional.")
+          <p className="text-xs text-gray-400 font-light relative z-10">
+            {isAdmin
+              ? activeTab === "all"
+                ? "Produção total somada de toda a equipe."
+                : "Produção bruta deste profissional."
               : "Total gerado pelos seus cortes nesta data."}
           </p>
         </div>
 
-        {/* Card 2: COMISSÃO ADRIAN (45%) */}
-        <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-3xl p-6 relative overflow-hidden group hover:border-[#DFBA73]/50 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#F5D799] font-bold flex items-center gap-1.5">
-              <Scissors className="w-3.5 h-3.5 text-[#DFBA73]" /> {isAdmin ? "COMISSÃO ADRIAN (45%)" : "MINHA COMISSÃO (45%)"}
+        {/* Card 2: Comissão Adrian (45%) */}
+        <div className="p-6 rounded-3xl bg-[#080A0E] border border-[#DFBA73]/30 hover:border-[#DFBA73]/50 transition-all relative overflow-hidden group shadow-xl">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#DFBA73]/10 rounded-full blur-2xl group-hover:bg-[#DFBA73]/15 transition-colors" />
+          <div className="flex items-center justify-between mb-4 relative z-10">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#F5D799] font-bold">
+              {isAdmin ? "COMISSÃO ADRIAN (45%)" : "MINHA COMISSÃO (45%)"}
             </span>
+            <div className="w-9 h-9 rounded-xl bg-[#DFBA73]/15 border border-[#DFBA73]/30 flex items-center justify-center text-[#F5D799]">
+              <Scissors className="w-4 h-4" />
+            </div>
           </div>
-          <h3 className="text-3xl font-serif text-[#DFBA73] tracking-tight mb-1">
+          <h3 className="text-3xl font-serif text-[#F5D799] tracking-tight mb-1 relative z-10">
             R$ {(isAdmin ? displayComissoes : adrianCommission).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
-          <p className="text-xs text-[#DFBA73]/70 font-light">
+          <p className="text-xs text-[#DFBA73]/80 font-light relative z-10">
             {isAdmin
-              ? (activeTab === "all" ? "Comissão a pagar ao funcionário Adrian Santos (45%)." : "Comissão líquida do barbeiro (45%).")
+              ? activeTab === "all"
+                ? "Comissão a pagar ao funcionário Adrian Santos (45%)."
+                : "Comissão líquida do barbeiro (45%)."
               : "Sua comissão líquida a receber (45%)."}
           </p>
         </div>
 
-        {/* Card 3: NOAH DONO (para o gestor) OU MEUS VALES (para o Adrian) */}
+        {/* Card 3: Noah Dono (para o gestor) OU Meus Vales (para o Adrian) */}
         {isAdmin ? (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold flex items-center gap-1.5">
-                <Building className="w-3.5 h-3.5 text-emerald-400" /> NOAH FERREIRA (DONO · 55%)
+          <div className="p-6 rounded-3xl bg-[#080A0E] border border-emerald-500/30 hover:border-emerald-500/50 transition-all relative overflow-hidden group shadow-xl">
+            <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors" />
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold">
+                NOAH FERREIRA (DONO · 55%)
               </span>
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <Building className="w-4 h-4" />
+              </div>
             </div>
-            <h3 className="text-3xl font-serif text-emerald-400 tracking-tight mb-1">
+            <h3 className="text-3xl font-serif text-emerald-400 tracking-tight mb-1 relative z-10">
               R$ {displayAdmin.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </h3>
-            <p className="text-xs text-emerald-300/70 font-light">
+            <p className="text-xs text-emerald-300/70 font-light relative z-10">
               Faturamento do Dono Noah: produção própria + 55% de Adrian.
             </p>
           </div>
         ) : (
-          <div className="bg-rose-500/10 border border-rose-500/30 rounded-3xl p-6 relative overflow-hidden group hover:border-rose-500/50 transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-rose-300 font-bold flex items-center gap-1.5">
-                <TrendingDown className="w-3.5 h-3.5 text-rose-400" /> MEUS VALES / ADIANTAMENTOS
+          <div className="p-6 rounded-3xl bg-[#080A0E] border border-rose-500/30 hover:border-rose-500/50 transition-all relative overflow-hidden group shadow-xl">
+            <div className="absolute -right-4 -top-4 w-24 h-24 bg-rose-500/5 rounded-full blur-2xl group-hover:bg-rose-500/10 transition-colors" />
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-rose-300 font-bold">
+                MEUS VALES / ADIANTAMENTOS
               </span>
+              <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                <TrendingDown className="w-4 h-4" />
+              </div>
             </div>
-            <h3 className="text-3xl font-serif text-rose-400 tracking-tight mb-1">
+            <h3 className="text-3xl font-serif text-rose-400 tracking-tight mb-1 relative z-10">
               - R$ {totalAdrianDayVales.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </h3>
-            <p className="text-xs text-rose-300/70 font-light">
+            <p className="text-xs text-rose-300/70 font-light relative z-10">
               Total de vales e adiantamentos retirados no dia.
             </p>
           </div>
         )}
 
-        {/* Card 4: SALDO LÍQUIDO ESTÚDIO (para o gestor) OU LÍQUIDO A RECEBER (para o Adrian) */}
-        <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 relative overflow-hidden group hover:border-white/20 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-300 font-bold flex items-center gap-1.5">
-              <Wallet className="w-3.5 h-3.5 text-emerald-400" /> {isAdmin ? "SALDO LÍQUIDO DO DIA" : "LÍQUIDO A RECEBER HOJE"}
+        {/* Card 4: Saldo Líquido do Dia / Líquido a Receber Hoje */}
+        <div className="p-6 rounded-3xl bg-[#080A0E] border border-white/10 hover:border-[#DFBA73]/30 transition-all relative overflow-hidden group shadow-xl">
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#DFBA73]/5 rounded-full blur-2xl group-hover:bg-[#DFBA73]/10 transition-colors" />
+          <div className="flex items-center justify-between mb-4 relative z-10">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-300 font-bold">
+              {isAdmin ? "SALDO LÍQUIDO DO DIA" : "LÍQUIDO A RECEBER HOJE"}
             </span>
+            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-emerald-400">
+              <Wallet className="w-4 h-4" />
+            </div>
           </div>
-          <h3 className={`text-3xl font-serif tracking-tight mb-1 ${(isAdmin ? displaySaldoLiquido : adrianNetPayout) < 0 ? "text-rose-400" : "text-white"}`}>
+          <h3 className={`text-3xl font-serif tracking-tight mb-1 relative z-10 ${(isAdmin ? displaySaldoLiquido : adrianNetPayout) < 0 ? "text-rose-400" : "text-white"}`}>
             R$ {(isAdmin ? displaySaldoLiquido : adrianNetPayout).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h3>
-          <p className="text-xs text-gray-400 font-light">
-            {isAdmin 
+          <p className="text-xs text-gray-400 font-light relative z-10">
+            {isAdmin
               ? "Receita do Dono retida menos saídas diárias."
               : "Comissão líquida restante após desconto dos seus vales."}
           </p>
+        </div>
+      </div>
+
+      {/* ━━━ CARD DE DESTAQUE CENTRAL DO CAIXA (PADRÃO LAS BARBER STUDIO COM FOTO NOAH / ADRIAN) ━━━ */}
+      <div className="p-8 md:p-10 rounded-3xl border bg-gradient-to-r from-[#080A0E] via-[#0b0e14] to-[#080A0E] border-[#DFBA73]/30 shadow-xl shadow-black/60 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-52 h-52 bg-[#DFBA73]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex items-center gap-6 relative z-10">
+          <div className="relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shadow-lg shadow-black/60 shrink-0">
+            <Image
+              src={
+                isAdrian || activeTab === "barbeiro-adrian"
+                  ? "/barbers/adrian-santos.jpg"
+                  : "/barbers/noah-ferreira.jpg"
+              }
+              alt={
+                isAdrian || activeTab === "barbeiro-adrian"
+                  ? "Adrian Santos"
+                  : "Noah Ferreira"
+              }
+              fill
+              className="object-cover object-top"
+            />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#F5D799] bg-[#DFBA73]/15 border border-[#DFBA73]/30 px-2.5 py-0.5 rounded-full font-bold">
+                {isAdrian || activeTab === "barbeiro-adrian"
+                  ? "Comissão Fixa • 45%"
+                  : "Proprietário & Dono • 55%"}
+              </span>
+              <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+                Mês {monthLabel}
+              </span>
+            </div>
+            <h3 className="text-2xl font-serif text-white">
+              {isAdrian
+                ? "Adrian Santos — Saldo Líquido do Mês"
+                : activeTab === "barbeiro-adrian"
+                ? "Repasse Adrian Santos (Mês)"
+                : activeTab === "barbeiro-noah"
+                ? "Lucro Noah Ferreira (Dono · Mês)"
+                : "Lucro Líquido do Estúdio no Mês"}
+            </h3>
+            <p className="text-sm text-gray-400 mt-1 max-w-md font-light">
+              {isAdrian || activeTab === "barbeiro-adrian"
+                ? "Comissão de 45% acumulada no mês já descontando todos os vales e adiantamentos retirados."
+                : "Produção própria do Dono + 55% da produção de Adrian, já descontando despesas fixas e insumos lançados no mês."}
+            </p>
+          </div>
+        </div>
+
+        <div className="text-center md:text-right relative z-10 shrink-0">
+          <span className="text-xs font-mono uppercase tracking-widest text-[#DFBA73] block mb-1">
+            {isAdrian || activeTab === "barbeiro-adrian" ? "Líquido Acumulado no Mês" : "Lucro Líquido Real (Mês)"}
+          </span>
+          <h4 className={`text-4xl md:text-5xl font-serif ${monthNetProfit >= 0 ? "text-white" : "text-rose-400"}`}>
+            R$ {monthNetProfit.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+          </h4>
         </div>
       </div>
 

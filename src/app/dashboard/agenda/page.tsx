@@ -490,16 +490,24 @@ export default function AgendaPage() {
         </div>
       )}
 
-      {/* HEADER NOAH BARBER STUDIO STYLE */}
+      {/* HEADER PADRÃO LAS BARBER STUDIO COM IDENTIDADE NOAH BARBER STUDIO */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
-              <Shield className="w-3 h-3 text-[#DFBA73]" /> {isAdmin ? "AGENDA ADMINISTRATIVA DO GESTOR" : "MINHA AGENDA DE ATENDIMENTOS"}
+            <span className="text-[10px] bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono shadow-lg shadow-[#DFBA73]/20">
+              <Shield className="w-3 h-3" /> {isAdmin ? "AGENDA ADMINISTRATIVA DO GESTOR" : "MINHA AGENDA DE ATENDIMENTOS"}
             </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-serif text-white tracking-tight">
-            {isAdmin ? "Agenda Geral da Barbearia" : "Minha Agenda de Atendimentos"}
+            {isAdmin ? (
+              <>
+                Agenda Geral da <span className="text-[#F5D799] italic">Barbearia</span>
+              </>
+            ) : (
+              <>
+                Minha Agenda de <span className="text-[#F5D799] italic">Atendimentos</span>
+              </>
+            )}
           </h2>
           <p className="text-xs text-gray-400 mt-1 font-light">
             {isAdmin
@@ -572,9 +580,9 @@ export default function AgendaPage() {
       </div>
 
       {/* CARD 1: STATUS DO STUDIO / DISPONIBILIDADE NO SITE COM FOTO DO BARBEIRO */}
-      <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-xl">
+      <div className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-xl relative overflow-hidden">
         <div className="flex items-center gap-4">
-          <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shrink-0 shadow-md">
+          <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shrink-0 shadow-md">
             <Image
               src={isAdmin ? "/barbers/noah-ferreira.jpg" : "/barbers/adrian-santos.jpg"}
               alt={isAdmin ? "Noah Ferreira" : "Adrian Santos"}
@@ -927,10 +935,10 @@ export default function AgendaPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
-                    {/* Time Pill */}
-                    <div className="w-14 h-14 rounded-2xl bg-[#050608] border border-white/10 flex flex-col items-center justify-center font-mono shrink-0 shadow-md">
+                    {/* Time Pill (Padrão LAS) */}
+                    <div className="w-16 h-16 rounded-2xl bg-[#050608] border border-[#DFBA73]/30 flex flex-col items-center justify-center font-mono shrink-0 shadow-md">
                       <span className="text-[9px] text-gray-500 font-light">HORA</span>
-                      <span className="text-sm font-bold text-white">{aptTime}</span>
+                      <span className="text-sm font-bold text-[#F5D799]">{aptTime}</span>
                     </div>
 
                     <div className="min-w-0">
