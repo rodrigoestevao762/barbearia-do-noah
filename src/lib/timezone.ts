@@ -150,3 +150,13 @@ export function formatMonthLong(monthStr: string): string {
   const name = MONTHS_PT[(m || 1) - 1] || "";
   return `${name} De ${y}`;
 }
+
+/**
+ * Formata "YYYY-MM" para "Novembro / 2026" no padrão da aba Início.
+ */
+export function formatMonthSlash(monthStr: string): string {
+  if (!monthStr || !/^\d{4}-\d{2}$/.test(monthStr)) return monthStr || "";
+  const [y, m] = monthStr.split("-").map(Number);
+  const name = MONTHS_PT[(m || 1) - 1] || "";
+  return `${name} / ${y}`;
+}

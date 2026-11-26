@@ -270,6 +270,7 @@ export async function GET(req: Request) {
         where: {
           date: { gte: startOfMonth, lte: endOfMonth },
         },
+        orderBy: { date: "desc" },
       });
       monthExpensesList = (dbMonthExpenses || []).map(parseExpenseRecord);
     } catch (_) {
@@ -502,6 +503,7 @@ export async function GET(req: Request) {
           scheduledCount: adrianScheduledApts.length,
           ticketMedio: adrianMonthApts.length > 0 ? adrianMonthGross / adrianMonthApts.length : 0,
           expensesByCategory: adrianExpensesByCategory,
+          expensesList: adrianMonthValesList,
           dailyBreakdown: fullDailyBreakdown.map((d) => ({
             date: d.date,
             day: d.day,
@@ -587,6 +589,7 @@ export async function GET(req: Request) {
         totalCompletedCount: monthCompletedApts.length,
         totalScheduledCount: monthScheduledApts.length,
         expensesByCategory: studioExpensesByCategory,
+        expensesList: monthExpensesList,
         noah: {
           gross: noahMonthGross,
           expected: noahMonthExpected,

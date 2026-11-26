@@ -23,16 +23,20 @@ import {
   Coffee,
   Building,
   Plus,
+  TrendingDown,
+  Receipt,
+  Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { BARBERS } from "@/lib/barbers";
-import { getDisplayTime, formatMonthLong, getBrazilNow } from "@/lib/timezone";
+import { getDisplayTime, formatMonthLong, formatMonthSlash, getBrazilNow } from "@/lib/timezone";
 import { LunchBreakControl } from "@/components/LunchBreakControl";
 import { ExtraServiceModal } from "@/components/ExtraServiceModal";
 import WalkInModal from "@/components/WalkInModal";
+import ExpenseModal from "@/components/ExpenseModal";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -66,6 +70,8 @@ export default function DashboardPage() {
     setMounted(true);
   }, []);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [dailyFilter, setDailyFilter] = useState<"all" | "active">("all");
   const [extraServiceApt, setExtraServiceApt] = useState<any | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -261,6 +267,19 @@ export default function DashboardPage() {
         body: JSON.stringify({ id, status: newStatus }),
       });
       fetchDashboard();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDeleteExpense = async (id: string) => {
+    if (!confirm("Deseja remover este lançamento?")) return;
+    try {
+      const res = await fetch(`/api/expenses?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (res.ok) {
+        setToastMessage("Lançamento removido com sucesso.");
+        fetchDashboard();
+      }
     } catch (e) {
       console.error(e);
     }
@@ -1005,6 +1024,292 @@ export default function DashboardPage() {
                 </span>
               </div>
             )}
+
+            {/* ━━━ FATURAMENTO DIA A DIA — NOVEMBRO / 2026 (IGUAL ABA ÚNICO LAS BARBER STUDIO) ━━━ */}
+            {(() => {
+              const monthSlash = formatMonthSlash(activeMonth);
+              const todayBr = getBrazilNow().date;
+              const rawDays: any[] = ms.dailyBreakdown || [];
+              const mappedDays = rawDays.map((item: any) => {
+                if (isAdrian) {
+                  return {
+                    date: item.date,
+                    dayStr: item.dayStr,
+                    weekday: item.weekday,
+                    gross: item.gross ?? 0,
+                    expected: item.expectedCommission ?? item.expected ?? 0,
+                    expenses: item.expenses ?? 0,
+                    net: item.net ?? 0,
+                    netAccumulated: item.netAccumulated ?? 0,
+                    completedCount: item.completedCount ?? 0,
+                    scheduledCount: item.scheduledCount ?? 0,
+                  };
+                }
+                const slice =
+                  activeBarberFilter === "barbeiro-noah"
+                    ? item.noah
+                    : activeBarberFilter === "barbeiro-adrian"
+                    ? item.adrian
+                    : item.studio;
+                return {
+                  date: item.date,
+                  dayStr: item.dayStr,
+                  weekday: item.weekday,
+                  gross: slice?.gross ?? 0,
+                  expected: activeBarberFilter === "barbeiro-adrian" ? slice?.expectedCommission ?? 0 : slice?.expected ?? 0,
+                  expenses: activeBarberFilter === "barbeiro-adrian" ? slice?.vales ?? 0 : slice?.expenses ?? 0,
+                  net: slice?.net ?? 0,
+                  netAccumulated: slice?.netAccumulated ?? 0,
+                  completedCount: slice?.completedCount ?? 0,
+                  scheduledCount: slice?.scheduledCount ?? 0,
+                };
+              });
+
+              const lastDayPadded = String(ms.daysInMonth || mappedDays.length || 30).padStart(2, "0");
+              const visibleDays =
+                dailyFilter === "active"
+                  ? mappedDays.filter(
+                      (d) =>
+                        d.gross > 0 ||
+                        d.expenses > 0 ||
+                        d.expected > 0 ||
+                        d.completedCount > 0 ||
+                        d.scheduledCount > 0
+                    )
+                  : mappedDays;
+
+              const rawExpenses: any[] = ms.expensesList || [];
+              const visibleExpenses = isAdrian
+                ? rawExpenses.filter((e) => e.barberId === "barbeiro-adrian")
+                : activeBarberFilter === "barbeiro-adrian"
+                ? rawExpenses.filter((e) => e.barberId === "barbeiro-adrian")
+                : activeBarberFilter === "barbeiro-noah"
+                ? rawExpenses.filter((e) => e.barberId !== "barbeiro-adrian")
+                : rawExpenses;
+
+              return (
+                <div className="space-y-6 pt-4 border-t border-white/10 relative z-10">
+                  {/* Cabeçalho Faturamento Dia a Dia */}
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="text-lg md:text-xl font-serif text-white">
+                        Faturamento Dia a Dia — <span className="text-[#F5D799] italic">{monthSlash}</span>
+                      </h4>
+                      <p className="text-xs text-gray-400 font-light mt-0.5">
+                        Acompanhamento de cada dia até somar o total do mês. Toque em um dia para abrir os atendimentos daquela data.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center bg-[#050608] border border-white/10 rounded-2xl p-1 self-start lg:self-auto shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setDailyFilter("all")}
+                        className={`px-3.5 py-1.5 rounded-xl text-[11px] font-mono font-bold transition-all cursor-pointer ${
+                          dailyFilter === "all"
+                            ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow"
+                            : "text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        Todos os dias (01–{lastDayPadded})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDailyFilter("active")}
+                        className={`px-3.5 py-1.5 rounded-xl text-[11px] font-mono font-bold transition-all cursor-pointer ${
+                          dailyFilter === "active"
+                            ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black shadow"
+                            : "text-gray-400 hover:text-white"
+                        }`}
+                      >
+                        Com movimento
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Lista clicável dos dias */}
+                  {visibleDays.length === 0 ? (
+                    <div className="py-8 text-center text-gray-500 text-xs italic bg-white/[0.01] border border-white/5 rounded-2xl">
+                      Nenhum dia com movimentação registrada neste mês.
+                    </div>
+                  ) : (
+                    <div className="max-h-[420px] overflow-y-auto pr-1 space-y-2">
+                      {visibleDays.map((day) => {
+                        const isSelected = day.date === selectedDate;
+                        const isToday = day.date === todayBr;
+                        const hasActivity =
+                          day.gross > 0 || day.expenses > 0 || day.expected > 0 || day.completedCount > 0;
+
+                        return (
+                          <button
+                            key={day.date}
+                            type="button"
+                            onClick={() => {
+                              setSelectedDate(day.date);
+                              const target = document.getElementById("atendimentos-do-dia");
+                              if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }}
+                            className={`w-full text-left p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer ${
+                              isSelected
+                                ? "bg-[#DFBA73]/15 border-[#DFBA73] shadow-lg shadow-[#DFBA73]/10"
+                                : isToday
+                                ? "bg-[#DFBA73]/10 border-[#DFBA73]/40 hover:border-[#DFBA73]"
+                                : hasActivity
+                                ? "bg-white/[0.03] border-white/10 hover:border-[#DFBA73]/40"
+                                : "bg-white/[0.01] border-white/5 opacity-60 hover:opacity-100 hover:border-white/20"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center font-mono shrink-0 border ${
+                                  isSelected || isToday
+                                    ? "bg-[#DFBA73] text-black border-[#DFBA73] font-bold"
+                                    : "bg-[#050608] text-[#F5D799] border-[#DFBA73]/25"
+                                }`}
+                              >
+                                <span className="text-xs font-bold leading-none">{day.dayStr.split("/")[0]}</span>
+                                <span
+                                  className={`text-[9px] uppercase mt-0.5 ${
+                                    isSelected || isToday ? "text-black/80" : "text-gray-400"
+                                  }`}
+                                >
+                                  {day.weekday}
+                                </span>
+                              </div>
+
+                              <div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-xs sm:text-sm font-serif text-white font-semibold">
+                                    Dia {day.dayStr}
+                                  </span>
+                                  {isToday && (
+                                    <span className="text-[9px] font-mono uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                      HOJE
+                                    </span>
+                                  )}
+                                  {day.completedCount > 0 && (
+                                    <span className="text-[10px] font-mono text-gray-300 bg-white/5 px-2 py-0.5 rounded-full">
+                                      {day.completedCount} {day.completedCount === 1 ? "corte" : "cortes"}
+                                    </span>
+                                  )}
+                                  {day.expected > 0 && (
+                                    <span className="text-[10px] font-mono text-[#F5D799] bg-[#DFBA73]/15 border border-[#DFBA73]/30 px-2 py-0.5 rounded-full">
+                                      Previsto: R$ {day.expected.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3 sm:gap-5 text-left sm:text-right font-mono shrink-0">
+                              <div>
+                                <span className="text-[9px] uppercase text-gray-500 block">Dia</span>
+                                <span className="text-xs font-bold text-white">
+                                  R$ {day.gross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-[9px] uppercase text-gray-500 block">Gastos</span>
+                                <span className={`text-xs font-bold ${day.expenses > 0 ? "text-rose-400" : "text-gray-500"}`}>
+                                  {day.expenses > 0
+                                    ? `- R$ ${day.expenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                                    : "R$ 0,00"}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-[9px] uppercase text-[#DFBA73] block">Acumulado</span>
+                                <span
+                                  className={`text-xs font-bold ${
+                                    day.netAccumulated >= 0 ? "text-[#F5D799]" : "text-rose-400"
+                                  }`}
+                                >
+                                  R$ {day.netAccumulated.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                </span>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* LANÇAMENTOS DE DESPESAS & VALES EM NOVEMBRO / 2026 + NOVO LANÇAMENTO */}
+                  <div className="pt-5 border-t border-white/10 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                          <Receipt className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="text-base md:text-lg font-serif text-white">
+                            {isAdrian
+                              ? `Meus Vales & Gastos em ${monthSlash}`
+                              : `Lançamentos de Despesas & Vales em ${monthSlash}`}
+                          </h4>
+                          <p className="text-[11px] text-gray-400 font-light">
+                            {visibleExpenses.length}{" "}
+                            {visibleExpenses.length === 1 ? "lançamento registrado" : "lançamentos registrados"} no mês
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsExpenseModalOpen(true)}
+                        className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:brightness-110 transition-all cursor-pointer shadow-lg shadow-[#DFBA73]/20 shrink-0"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Novo lançamento</span>
+                      </button>
+                    </div>
+
+                    {visibleExpenses.length === 0 ? (
+                      <div className="py-6 text-center text-gray-500 text-xs italic bg-white/[0.01] border border-white/5 rounded-2xl">
+                        {isAdrian
+                          ? "Nenhum vale ou gasto lançado para você neste mês."
+                          : "Nenhuma despesa ou vale lançado neste mês."}
+                      </div>
+                    ) : (
+                      <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        {visibleExpenses.map((exp: any) => (
+                          <div
+                            key={exp.id}
+                            className="bg-white/[0.02] border border-white/5 hover:border-white/15 rounded-2xl p-3.5 flex items-center justify-between gap-4 transition-all"
+                          >
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-white text-xs sm:text-sm font-medium">{exp.description}</span>
+                                <span className="text-[9px] font-mono uppercase px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/25">
+                                  {exp.category} {exp.barberName ? `• ${exp.barberName}` : ""}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-gray-500 font-mono mt-0.5">
+                                {new Date(exp.date).toLocaleDateString("pt-BR")}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="text-rose-400 font-serif font-bold text-sm">
+                                - R$ {Number(exp.amount || 0).toFixed(2)}
+                              </span>
+                              {(isAdmin || exp.barberId === "barbeiro-adrian") && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteExpense(exp.id)}
+                                  className="p-1.5 text-gray-500 hover:text-red-400 transition-colors cursor-pointer"
+                                  title="Remover lançamento"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         );
       })()}
@@ -1089,7 +1394,7 @@ export default function DashboardPage() {
       )}
 
       {/* LISTA DE ATENDIMENTOS DO DIA COM TAG DE COMISSÃO */}
-      <div className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl space-y-5">
+      <div id="atendimentos-do-dia" className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl space-y-5">
         <div className="flex justify-between items-center pb-4 border-b border-white/5">
           <div>
             <h3 className="text-xl font-serif text-white">
@@ -1224,6 +1529,21 @@ export default function DashboardPage() {
       <ExtraServiceModal
         appointment={extraServiceApt}
         onClose={() => setExtraServiceApt(null)}
+        onSuccess={(msg) => {
+          setToastMessage(msg);
+          fetchDashboard();
+        }}
+      />
+
+      {/* MODAL NOVO LANÇAMENTO DE DESPESA / VALE */}
+      <ExpenseModal
+        isOpen={isExpenseModalOpen}
+        onClose={() => setIsExpenseModalOpen(false)}
+        isAdmin={isAdmin}
+        selectedDate={selectedDate}
+        selectedMonth={selectedDate.slice(0, 7)}
+        defaultCategory={isAdmin && activeBarberFilter !== "barbeiro-adrian" ? "FIXA" : "VALE"}
+        defaultBarberName={activeBarberFilter === "barbeiro-noah" ? "Noah Ferreira" : "Adrian Santos"}
         onSuccess={(msg) => {
           setToastMessage(msg);
           fetchDashboard();
