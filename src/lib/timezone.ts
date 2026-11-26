@@ -125,3 +125,28 @@ export function isDateTimeInFuture(dateStr: string, timeStr: string): boolean {
   // dateStr === brazilNow.date
   return timeStr > brazilNow.time;
 }
+
+const MONTHS_PT = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+/**
+ * Formata "YYYY-MM" para "Novembro De 2026" no padrão do painel.
+ */
+export function formatMonthLong(monthStr: string): string {
+  if (!monthStr || !/^\d{4}-\d{2}$/.test(monthStr)) return monthStr || "";
+  const [y, m] = monthStr.split("-").map(Number);
+  const name = MONTHS_PT[(m || 1) - 1] || "";
+  return `${name} De ${y}`;
+}

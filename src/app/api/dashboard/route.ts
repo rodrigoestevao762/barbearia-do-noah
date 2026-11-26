@@ -12,7 +12,7 @@ import {
   getStoredAppointmentById,
   getLocalDateString 
 } from '@/lib/appointments-store';
-import { parseBrazilDateTime } from '@/lib/timezone';
+import { parseBrazilDateTime, getBrazilDateAndTimeString } from '@/lib/timezone';
 import { parseExpenseRecord } from '@/lib/expenses';
 
 export const dynamic = 'force-dynamic';
@@ -232,27 +232,27 @@ export async function GET(req: Request) {
     const isOwner = userRole === "ADMIN" && userEmail !== "adriansantos@gmail.com";
     const isAdrian = userRole === "BARBER" || userEmail === "adriansantos@gmail.com" || userBarberId === "barbeiro-adrian";
 
-    // CÁLCULO MENSAL INDIVIDUALIZADO (PRODUÇÃO BRUTA, LÍQUIDA, DESPESAS E LUCRO DO MÊS)
+    // CÁLCULO MENSAL COMPLETO + DIA A DIA (PRODUÇÃO BRUTA, PREVISTO, DESPESAS POR CATEGORIA E LUCRO ACUMULADO)
     const monthParam = (searchParams.get("month") || dateParam.slice(0, 7));
     const [mYear, mMonth] = monthParam.split("-").map(Number);
     const lastDayOfMonth = new Date(mYear, mMonth, 0).getDate();
     const startOfMonth = new Date(`${monthParam}-01T00:00:00-03:00`);
     const endOfMonth = new Date(`${monthParam}-${String(lastDayOfMonth).padStart(2, "0")}T23:59:59-03:00`);
 
-    let monthCompletedApts: any[] = [];
+    let monthAllApts: any[] = [];
     let monthExpensesList: ReturnType<typeof parseExpenseRecord>[] = [];
 
     try {
       const dbMonthApts = await prisma.appointment.findMany({
         where: {
           date: { gte: startOfMonth, lte: endOfMonth },
-          status: "COMPLETED",
+          status: { in: ["COMPLETED", "CONFIRMED", "PENDING", "RESCHEDULE_REQUESTED"] },
         },
         include: { service: true },
       });
 
       const memMonthApts = getAllStoredAppointments().filter((a: any) => {
-        if (a.status !== "COMPLETED") return false;
+        if (!["COMPLETED", "CONFIRMED", "PENDING", "RESCHEDULE_REQUESTED"].includes(a.status)) return false;
         const d = new Date(a.date);
         return d >= startOfMonth && d <= endOfMonth;
       });
@@ -262,7 +262,7 @@ export async function GET(req: Request) {
       (memMonthApts || []).forEach((a: any) => {
         if (!monthMap.has(a.id)) monthMap.set(a.id, a);
       });
-      monthCompletedApts = Array.from(monthMap.values()).filter(
+      monthAllApts = Array.from(monthMap.values()).filter(
         (a: any) => !a.id?.includes("almir") && !a.user?.name?.toLowerCase().includes("almir")
       );
 
@@ -273,39 +273,166 @@ export async function GET(req: Request) {
       });
       monthExpensesList = (dbMonthExpenses || []).map(parseExpenseRecord);
     } catch (_) {
-      monthCompletedApts = getAllStoredAppointments().filter((a: any) => {
-        if (a.status !== "COMPLETED") return false;
+      monthAllApts = getAllStoredAppointments().filter((a: any) => {
+        if (!["COMPLETED", "CONFIRMED", "PENDING", "RESCHEDULE_REQUESTED"].includes(a.status)) return false;
         const d = new Date(a.date);
         return d >= startOfMonth && d <= endOfMonth && !a.id?.includes("almir") && !a.user?.name?.toLowerCase().includes("almir");
       });
     }
 
-    const noahMonthApts = monthCompletedApts.filter(
-      (apt) => apt.barberId === "barbeiro-noah" || apt.barberId === "barbeiro-dono" || !apt.barberId
-    );
-    const adrianMonthApts = monthCompletedApts.filter((apt) => apt.barberId === "barbeiro-adrian");
+    const monthCompletedApts = monthAllApts.filter((a: any) => a.status === "COMPLETED");
+    const monthScheduledApts = monthAllApts.filter((a: any) => a.status !== "COMPLETED");
 
-    const noahMonthGross = Math.round(noahMonthApts.reduce((acc, a) => acc + (a.service?.price || 0), 0) * 100) / 100;
-    const adrianMonthGross = Math.round(adrianMonthApts.reduce((acc, a) => acc + (a.service?.price || 0), 0) * 100) / 100;
-    const adrianMonthCommission = Math.round(adrianMonthGross * ADRIAN_RATE * 100) / 100;
-    const adrianMonthHouseShare = Math.round(adrianMonthGross * OWNER_RATE * 100) / 100;
+    const isNoahApt = (apt: any) => apt.barberId === "barbeiro-noah" || apt.barberId === "barbeiro-dono" || !apt.barberId;
+    const isAdrianApt = (apt: any) => apt.barberId === "barbeiro-adrian";
 
-    const studioMonthExpenses = Math.round(
-      monthExpensesList
-        .filter((e) => e.barberId !== "barbeiro-adrian")
-        .reduce((acc, e) => acc + e.amount, 0) * 100
-    ) / 100;
-    const adrianMonthVales = Math.round(
-      monthExpensesList
-        .filter((e) => e.barberId === "barbeiro-adrian")
-        .reduce((acc, e) => acc + e.amount, 0) * 100
-    ) / 100;
+    const noahMonthApts = monthCompletedApts.filter(isNoahApt);
+    const adrianMonthApts = monthCompletedApts.filter(isAdrianApt);
+    const noahScheduledApts = monthScheduledApts.filter(isNoahApt);
+    const adrianScheduledApts = monthScheduledApts.filter(isAdrianApt);
 
-    const studioMonthGross = Math.round((noahMonthGross + adrianMonthGross) * 100) / 100;
-    const noahMonthNetProduction = Math.round((noahMonthGross + adrianMonthHouseShare) * 100) / 100;
-    const studioMonthNetProfit = Math.round((noahMonthNetProduction - studioMonthExpenses) * 100) / 100;
-    const noahOwnNetProfit = Math.round((noahMonthGross - studioMonthExpenses) * 100) / 100;
-    const adrianMonthNetProfit = Math.round((adrianMonthCommission - adrianMonthVales) * 100) / 100;
+    const round2 = (n: number) => Math.round(n * 100) / 100;
+
+    const noahMonthGross = round2(noahMonthApts.reduce((acc, a) => acc + (a.service?.price || 0), 0));
+    const adrianMonthGross = round2(adrianMonthApts.reduce((acc, a) => acc + (a.service?.price || 0), 0));
+    const adrianMonthCommission = round2(adrianMonthGross * ADRIAN_RATE);
+    const adrianMonthHouseShare = round2(adrianMonthGross * OWNER_RATE);
+
+    const noahMonthExpected = round2(noahScheduledApts.reduce((acc, a) => acc + (a.service?.price || 0), 0));
+    const adrianMonthExpected = round2(adrianScheduledApts.reduce((acc, a) => acc + (a.service?.price || 0), 0));
+    const adrianMonthExpectedCommission = round2(adrianMonthExpected * ADRIAN_RATE);
+    const studioMonthExpected = round2(noahMonthExpected + adrianMonthExpected);
+    const noahMonthExpectedNet = round2(noahMonthExpected + adrianMonthExpected * OWNER_RATE);
+
+    const studioMonthExpensesList = monthExpensesList.filter((e) => e.barberId !== "barbeiro-adrian");
+    const adrianMonthValesList = monthExpensesList.filter((e) => e.barberId === "barbeiro-adrian");
+
+    const sumCategories = (list: ReturnType<typeof parseExpenseRecord>[]) => ({
+      INSUMOS: round2(list.filter((e) => e.category === "INSUMOS").reduce((a, e) => a + e.amount, 0)),
+      FIXA: round2(list.filter((e) => e.category === "FIXA").reduce((a, e) => a + e.amount, 0)),
+      VALE: round2(list.filter((e) => e.category === "VALE").reduce((a, e) => a + e.amount, 0)),
+      OUTROS: round2(list.filter((e) => e.category === "OUTROS").reduce((a, e) => a + e.amount, 0)),
+    });
+
+    const studioExpensesByCategory = sumCategories(studioMonthExpensesList);
+    const adrianExpensesByCategory = sumCategories(adrianMonthValesList);
+
+    const studioMonthExpenses = round2(studioMonthExpensesList.reduce((acc, e) => acc + e.amount, 0));
+    const adrianMonthVales = round2(adrianMonthValesList.reduce((acc, e) => acc + e.amount, 0));
+
+    const studioMonthGross = round2(noahMonthGross + adrianMonthGross);
+    const noahMonthNetProduction = round2(noahMonthGross + adrianMonthHouseShare);
+    const studioMonthNetProfit = round2(noahMonthNetProduction - studioMonthExpenses);
+    const noahOwnNetProfit = round2(noahMonthGross - studioMonthExpenses);
+    const adrianMonthNetProfit = round2(adrianMonthCommission - adrianMonthVales);
+
+    // Construção do Faturamento Dia a Dia (01 até o último dia do mês com acumulado)
+    const WEEKDAYS_PT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    const aptsByDay = new Map<string, any[]>();
+    monthAllApts.forEach((apt: any) => {
+      const dStr = getBrazilDateAndTimeString(apt.date).date;
+      if (!aptsByDay.has(dStr)) aptsByDay.set(dStr, []);
+      aptsByDay.get(dStr)!.push(apt);
+    });
+
+    const expensesByDay = new Map<string, ReturnType<typeof parseExpenseRecord>[]>();
+    monthExpensesList.forEach((exp) => {
+      const dStr = getBrazilDateAndTimeString(exp.date).date;
+      if (!expensesByDay.has(dStr)) expensesByDay.set(dStr, []);
+      expensesByDay.get(dStr)!.push(exp);
+    });
+
+    let accStudioGross = 0;
+    let accStudioNet = 0;
+    let accNoahGross = 0;
+    let accNoahNet = 0;
+    let accAdrianGross = 0;
+    let accAdrianNet = 0;
+
+    const fullDailyBreakdown = Array.from({ length: lastDayOfMonth }, (_, idx) => {
+      const dayNum = idx + 1;
+      const dayPadded = String(dayNum).padStart(2, "0");
+      const dateStr = `${monthParam}-${dayPadded}`;
+      const weekday = WEEKDAYS_PT[new Date(`${dateStr}T12:00:00-03:00`).getDay()];
+
+      const dayApts = aptsByDay.get(dateStr) || [];
+      const dayExps = expensesByDay.get(dateStr) || [];
+
+      const comp = dayApts.filter((a: any) => a.status === "COMPLETED");
+      const sched = dayApts.filter((a: any) => a.status !== "COMPLETED");
+
+      const nComp = comp.filter(isNoahApt);
+      const aComp = comp.filter(isAdrianApt);
+      const nSched = sched.filter(isNoahApt);
+      const aSched = sched.filter(isAdrianApt);
+
+      const nGross = round2(nComp.reduce((acc, a) => acc + (a.service?.price || 0), 0));
+      const aGross = round2(aComp.reduce((acc, a) => acc + (a.service?.price || 0), 0));
+      const aComm = round2(aGross * ADRIAN_RATE);
+      const aHouse = round2(aGross * OWNER_RATE);
+
+      const nExp = round2(nSched.reduce((acc, a) => acc + (a.service?.price || 0), 0));
+      const aExp = round2(aSched.reduce((acc, a) => acc + (a.service?.price || 0), 0));
+
+      const sOutflows = round2(dayExps.filter((e) => e.barberId !== "barbeiro-adrian").reduce((acc, e) => acc + e.amount, 0));
+      const aVales = round2(dayExps.filter((e) => e.barberId === "barbeiro-adrian").reduce((acc, e) => acc + e.amount, 0));
+
+      const sGross = round2(nGross + aGross);
+      const nProd = round2(nGross + aHouse);
+      const sNet = round2(nProd - sOutflows);
+      const nNet = round2(nProd - sOutflows);
+      const aNet = round2(aComm - aVales);
+
+      accStudioGross = round2(accStudioGross + sGross);
+      accStudioNet = round2(accStudioNet + sNet);
+      accNoahGross = round2(accNoahGross + nGross);
+      accNoahNet = round2(accNoahNet + nNet);
+      accAdrianGross = round2(accAdrianGross + aGross);
+      accAdrianNet = round2(accAdrianNet + aNet);
+
+      return {
+        date: dateStr,
+        day: dayNum,
+        dayStr: `${dayPadded}/${String(mMonth).padStart(2, "0")}`,
+        weekday,
+        studio: {
+          gross: sGross,
+          expected: round2(nExp + aExp),
+          adrianCommission: aComm,
+          noahProduction: nProd,
+          expenses: sOutflows,
+          net: sNet,
+          grossAccumulated: accStudioGross,
+          netAccumulated: accStudioNet,
+          completedCount: comp.length,
+          scheduledCount: sched.length,
+        },
+        noah: {
+          gross: nGross,
+          expected: nExp,
+          houseShareFromAdrian: aHouse,
+          netProduction: nProd,
+          expenses: sOutflows,
+          net: nNet,
+          grossAccumulated: accNoahGross,
+          netAccumulated: accNoahNet,
+          completedCount: nComp.length,
+          scheduledCount: nSched.length,
+        },
+        adrian: {
+          gross: aGross,
+          expected: aExp,
+          expectedCommission: round2(aExp * ADRIAN_RATE),
+          commission: aComm,
+          vales: aVales,
+          net: aNet,
+          grossAccumulated: accAdrianGross,
+          netAccumulated: accAdrianNet,
+          completedCount: aComp.length,
+          scheduledCount: aSched.length,
+        },
+      };
+    });
 
     // PROTEÇÃO ESTREITA DE PRIVACIDADE:
     // Se o usuário for o funcionário Adrian Santos:
@@ -364,12 +491,33 @@ export async function GET(req: Request) {
         // Resumo Mensal Exclusivo do Adrian
         monthlySummary: {
           month: monthParam,
+          daysInMonth: lastDayOfMonth,
           grossRevenue: adrianMonthGross,
+          expectedRevenue: adrianMonthExpected,
+          expectedNetRevenue: adrianMonthExpectedCommission,
           netProduction: adrianMonthCommission,
           expenses: adrianMonthVales,
           netProfit: adrianMonthNetProfit,
           completedCount: adrianMonthApts.length,
+          scheduledCount: adrianScheduledApts.length,
           ticketMedio: adrianMonthApts.length > 0 ? adrianMonthGross / adrianMonthApts.length : 0,
+          expensesByCategory: adrianExpensesByCategory,
+          dailyBreakdown: fullDailyBreakdown.map((d) => ({
+            date: d.date,
+            day: d.day,
+            dayStr: d.dayStr,
+            weekday: d.weekday,
+            gross: d.adrian.gross,
+            expected: d.adrian.expected,
+            expectedCommission: d.adrian.expectedCommission,
+            netProduction: d.adrian.commission,
+            expenses: d.adrian.vales,
+            net: d.adrian.net,
+            grossAccumulated: d.adrian.grossAccumulated,
+            netAccumulated: d.adrian.netAccumulated,
+            completedCount: d.adrian.completedCount,
+            scheduledCount: d.adrian.scheduledCount,
+          })),
         },
       });
     }
@@ -426,32 +574,44 @@ export async function GET(req: Request) {
       barberBreakdown: breakdown,
       barbersList: BARBERS,
 
-      // Resumo Mensal Completo do Dono + Individualizado (Noah & Adrian)
+      // Resumo Mensal Completo do Dono + Individualizado (Noah & Adrian) + Dia a Dia
       monthlySummary: {
         month: monthParam,
+        daysInMonth: lastDayOfMonth,
         studioGross: studioMonthGross,
+        studioExpected: studioMonthExpected,
+        noahExpectedNet: noahMonthExpectedNet,
         noahNetProduction: noahMonthNetProduction,
         studioExpenses: studioMonthExpenses,
         studioNetProfit: studioMonthNetProfit,
         totalCompletedCount: monthCompletedApts.length,
+        totalScheduledCount: monthScheduledApts.length,
+        expensesByCategory: studioExpensesByCategory,
         noah: {
           gross: noahMonthGross,
+          expected: noahMonthExpected,
           netProduction: noahMonthGross,
           ownPlusHouseShare: noahMonthNetProduction,
           expenses: studioMonthExpenses,
           netProfit: noahOwnNetProfit,
           completedCount: noahMonthApts.length,
+          scheduledCount: noahScheduledApts.length,
           ticketMedio: noahMonthApts.length > 0 ? noahMonthGross / noahMonthApts.length : 0,
         },
         adrian: {
           gross: adrianMonthGross,
+          expected: adrianMonthExpected,
+          expectedCommission: adrianMonthExpectedCommission,
           commission: adrianMonthCommission,
           houseShare: adrianMonthHouseShare,
           vales: adrianMonthVales,
           netProfit: adrianMonthNetProfit,
           completedCount: adrianMonthApts.length,
+          scheduledCount: adrianScheduledApts.length,
           ticketMedio: adrianMonthApts.length > 0 ? adrianMonthGross / adrianMonthApts.length : 0,
+          expensesByCategory: adrianExpensesByCategory,
         },
+        dailyBreakdown: fullDailyBreakdown,
       },
     });
   } catch (error) {

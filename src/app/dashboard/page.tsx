@@ -28,11 +28,11 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { BARBERS, BarberData, BARBER_COMMISSION_RATE, HOUSE_COMMISSION_RATE } from "@/lib/barbers";
-import { OFFICIAL_SERVICES, ServiceItem } from "@/lib/services";
-import { getDisplayTime } from "@/lib/timezone";
+import { BARBERS } from "@/lib/barbers";
+import { getDisplayTime, formatMonthLong, getBrazilNow } from "@/lib/timezone";
 import { LunchBreakControl } from "@/components/LunchBreakControl";
 import { ExtraServiceModal } from "@/components/ExtraServiceModal";
+import WalkInModal from "@/components/WalkInModal";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -60,40 +60,19 @@ export default function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
 
-  // Modal de cliente balcão
+  // Modal de cliente balcão & Serviço Extra
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [services] = useState<ServiceItem[]>(OFFICIAL_SERVICES);
-  const [selectedServiceId, setSelectedServiceId] = useState<string>("corte-cabelo");
-  const [walkInBarberId, setWalkInBarberId] = useState<string>(() => (isAdrian ? "barbeiro-adrian" : "barbeiro-noah"));
-  const [walkInClientName, setWalkInClientName] = useState<string>("Cliente Balcão");
-  const [walkInClientPhone, setWalkInClientPhone] = useState<string>("");
-  const [walkInDate, setWalkInDate] = useState<string>(() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  });
-  const [walkInTime, setWalkInTime] = useState<string>("");
-  const [walkInStatus, setWalkInStatus] = useState<"COMPLETED" | "CONFIRMED">("COMPLETED");
-  const [walkInBookedSlots, setWalkInBookedSlots] = useState<string[]>([]);
-  const [walkInAvailableSlots, setWalkInAvailableSlots] = useState<string[]>([]);
-  const [walkInClosedReason, setWalkInClosedReason] = useState<string | null>(null);
-  const [walkInError, setWalkInError] = useState<string | null>(null);
-  const [isLoadingWalkInSlots, setIsLoadingWalkInSlots] = useState(false);
-
-  // Modal de Serviço Extra (adicionar serviço adicional em atendimento já agendado)
   const [extraServiceApt, setExtraServiceApt] = useState<any | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string>("PIX");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAdrian) {
       setActiveBarberFilter("barbeiro-adrian");
       setControlledBarberId("barbeiro-adrian");
-      setWalkInBarberId("barbeiro-adrian");
     }
   }, [isAdrian]);
 
@@ -112,57 +91,6 @@ export default function DashboardPage() {
     const day = String(d.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   });
-
-  const ALL_AGENDA_SLOTS = [
-    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-    "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
-    "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
-    "18:00", "18:30", "19:00", "19:30",
-  ];
-
-  const todayBrazilStr = new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
-  const nowBrazilTimeStr = new Date().toLocaleTimeString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-
-  // Sincroniza data mínima ao abrir o Modal de Cliente Balcão
-  useEffect(() => {
-    if (!isModalOpen) return;
-    setWalkInError(null);
-    setWalkInDate(selectedDate < todayBrazilStr ? todayBrazilStr : selectedDate);
-  }, [isModalOpen, selectedDate, todayBrazilStr]);
-
-  // Busca horários realmente disponíveis (sem horários passados ou já ocupados) para o Modal Cliente Balcão
-  useEffect(() => {
-    if (!isModalOpen || !walkInDate) return;
-    setIsLoadingWalkInSlots(true);
-    setWalkInError(null);
-    Promise.all([
-      fetch(`/api/appointments/available?date=${walkInDate}&barberId=${walkInBarberId}&t=${Date.now()}`, { cache: "no-store" }).then((r) => r.json()),
-      fetch(`/api/dashboard?date=${walkInDate}&barberId=${walkInBarberId}&t=${Date.now()}`, { cache: "no-store" }).then((r) => r.json()),
-    ])
-      .then(([availData, dashData]) => {
-        const freeSlots: string[] = Array.isArray(availData?.availableTimes) ? availData.availableTimes : [];
-        const apts: any[] = dashData?.appointments || [];
-        const occupied = apts
-          .filter((a) => a.status !== "CANCELLED")
-          .map((a) => getDisplayTime(a.date));
-
-        setWalkInBookedSlots(occupied);
-        setWalkInAvailableSlots(freeSlots);
-        setWalkInClosedReason(availData?.isClosed ? availData.reason || "Agenda fechada nesta data." : null);
-
-        setWalkInTime((prev) => (freeSlots.includes(prev) ? prev : freeSlots[0] || ""));
-      })
-      .catch(() => {
-        setWalkInBookedSlots([]);
-        setWalkInAvailableSlots([]);
-      })
-      .finally(() => setIsLoadingWalkInSlots(false));
-  }, [isModalOpen, walkInDate, walkInBarberId]);
 
   // Disponibilidade e Almoço
   const [controlledBarberId, setControlledBarberId] = useState<string>(() => (isAdrian ? "barbeiro-adrian" : "barbeiro-noah"));
@@ -335,54 +263,6 @@ export default function DashboardPage() {
       fetchDashboard();
     } catch (e) {
       console.error(e);
-    }
-  };
-
-  const submitWalkIn = async () => {
-    if (!walkInTime || !walkInAvailableSlots.includes(walkInTime)) {
-      setWalkInError("Selecione um horário disponível e futuro na agenda.");
-      return;
-    }
-    setIsSubmitting(true);
-    setWalkInError(null);
-    try {
-      const chosenService = OFFICIAL_SERVICES.find((s) => s.id === selectedServiceId) || OFFICIAL_SERVICES[0];
-      const targetDate = walkInDate || selectedDate;
-      const targetTime = walkInTime;
-      const res = await fetch("/api/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          serviceId: chosenService.id,
-          barberId: walkInBarberId,
-          date: `${targetDate}T${targetTime}:00-03:00`,
-          isWalkIn: true,
-          status: walkInStatus,
-          clientName: walkInClientName.trim() || "Cliente Balcão",
-          clientPhone: walkInClientPhone.trim(),
-          paymentMethod,
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setIsModalOpen(false);
-        setWalkInClientName("Cliente Balcão");
-        setWalkInClientPhone("");
-        await fetchDashboard();
-        const attendantName = BARBERS.find((b) => b.id === walkInBarberId)?.name || "Noah Ferreira";
-        const dateBr = targetDate.split("-").reverse().join("/");
-        setToastMessage(
-          `Cliente Balcão (${chosenService.name}) registrado para ${attendantName} em ${dateBr} às ${targetTime}. Horário bloqueado na agenda!`
-        );
-      } else {
-        setWalkInError(data.error || "Não foi possível registrar neste horário.");
-      }
-    } catch (e) {
-      console.error("Erro ao registrar balcão:", e);
-      setWalkInError("Erro de conexão ao registrar Cliente Balcão.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -950,101 +830,181 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ━━━ RESUMO MENSAL INDIVIDUALIZADO (PRODUÇÃO BRUTA, LÍQUIDA, DESPESAS E LUCRO DO MÊS) ━━━ */}
+      {/* ━━━ CONTROLE MENSAL • PADRÃO LAS BARBER STUDIO (PRODUÇÃO BRUTA, PREVISTO, DESPESAS E LUCRO LÍQUIDO) ━━━ */}
       {dashboardData?.monthlySummary && (() => {
         const ms = dashboardData.monthlySummary;
-        const monthFormatted = (ms.month || selectedDate.slice(0, 7)).split("-").reverse().join("/");
+        const activeMonth = ms.month || selectedDate.slice(0, 7);
+        const monthLong = formatMonthLong(activeMonth);
+        const currentBrazilMonth = getBrazilNow().date.slice(0, 7);
+        const isCurrentMonth = activeMonth === currentBrazilMonth;
+
         let mGross = 0;
         let mNetProd = 0;
         let mExpenses = 0;
         let mNetProfit = 0;
-        let mTitle = "";
+        let mExpected = 0;
+        let mCompletedCount = 0;
+        let mModelSubtitle = "";
 
         if (isAdrian) {
           mGross = ms.grossRevenue ?? 0;
           mNetProd = ms.netProduction ?? 0;
           mExpenses = ms.expenses ?? 0;
           mNetProfit = ms.netProfit ?? 0;
-          mTitle = `Meu Fechamento do Mês (${monthFormatted})`;
+          mExpected = ms.expectedNetRevenue ?? ms.expectedRevenue ?? 0;
+          mCompletedCount = ms.completedCount ?? 0;
+          mModelSubtitle = "Minha Comissão (45%) • Controle de Produção e Vales";
         } else if (activeBarberFilter === "barbeiro-noah") {
           mGross = ms.noah?.gross ?? 0;
           mNetProd = ms.noah?.ownPlusHouseShare ?? 0;
           mExpenses = ms.noah?.expenses ?? 0;
           mNetProfit = ms.studioNetProfit ?? 0;
-          mTitle = `Balanço Mensal Noah Dono (${monthFormatted})`;
+          mExpected = ms.noah?.expected ?? 0;
+          mCompletedCount = ms.noah?.completedCount ?? 0;
+          mModelSubtitle = "Noah Ferreira (Dono · 55% Adrian + 100% próprios) • Controle de Produção e Custos";
         } else if (activeBarberFilter === "barbeiro-adrian") {
           mGross = ms.adrian?.gross ?? 0;
           mNetProd = ms.adrian?.commission ?? 0;
           mExpenses = ms.adrian?.vales ?? 0;
           mNetProfit = ms.adrian?.netProfit ?? 0;
-          mTitle = `Balanço Mensal Adrian 45% (${monthFormatted})`;
+          mExpected = ms.adrian?.expectedCommission ?? 0;
+          mCompletedCount = ms.adrian?.completedCount ?? 0;
+          mModelSubtitle = "Adrian Santos (Funcionário · 45%) • Controle de Comissão e Vales";
         } else {
           mGross = ms.studioGross ?? 0;
           mNetProd = ms.noahNetProduction ?? 0;
           mExpenses = ms.studioExpenses ?? 0;
           mNetProfit = ms.studioNetProfit ?? 0;
-          mTitle = `Balanço Mensal do Estúdio (${monthFormatted})`;
+          mExpected = ms.studioExpected ?? 0;
+          mCompletedCount = ms.totalCompletedCount ?? 0;
+          mModelSubtitle = "Equipe: 55% Noah (Dono) / 45% Adrian • Controle de Produção e Custos";
         }
 
+        const displayGrossForFormula = isAdrian || activeBarberFilter === "barbeiro-adrian" ? mNetProd : activeBarberFilter === "all" ? mNetProd : mNetProd;
+
         return (
-          <div className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 md:p-7 shadow-2xl space-y-5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#DFBA73]/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 relative z-10">
+          <div className="bg-gradient-to-br from-[#0B0E14] via-[#080A0E] to-[#050608] border border-[#DFBA73]/30 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 relative overflow-hidden">
+            <div className="absolute -right-8 -top-8 w-48 h-48 bg-[#DFBA73]/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-5 relative z-10">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#DFBA73] font-bold">
-                  CONTROLE MENSAL INDIVIDUALIZADO
-                </span>
-                <h3 className="text-xl font-serif text-white mt-0.5">{mTitle}</h3>
+                <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-black bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] px-3 py-1 rounded-full font-bold shadow-md shadow-[#DFBA73]/20">
+                    CONTROLE MENSAL • {monthLong.toUpperCase()}
+                  </span>
+                  <span className="text-[10px] font-mono text-gray-400 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+                    {mCompletedCount} {mCompletedCount === 1 ? "corte concluído" : "cortes concluídos"}
+                  </span>
+                </div>
+                <h3 className="text-xl md:text-2xl font-serif text-white">
+                  {isCurrentMonth ? "Fechamento Parcial" : "Fechamento Mensal"} •{" "}
+                  <span className="text-[#F5D799] italic">{monthLong}</span>
+                </h3>
+                <p className="text-xs text-gray-400 font-light mt-0.5">{mModelSubtitle}</p>
               </div>
-              <Link
-                href="/dashboard/financeiro"
-                className="px-4 py-2 rounded-xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#DFBA73] hover:text-black border border-[#DFBA73]/30 text-[11px] font-mono font-bold uppercase tracking-wider transition-all text-center shrink-0"
-              >
-                {isAdmin ? "Gerenciar Despesas & Lucro →" : "Ver Meu Caixa & Vales →"}
-              </Link>
+
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <div className="px-4 py-2 rounded-2xl bg-[#DFBA73]/10 border border-[#DFBA73]/30 text-xs font-mono">
+                  <span className="text-gray-400">Previsto: </span>
+                  <strong className="text-[#F5D799]">
+                    R$ {mExpected.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  </strong>
+                </div>
+                <Link
+                  href="/dashboard/financeiro"
+                  className="px-4 py-2.5 rounded-2xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#F5D799] hover:text-black border border-[#DFBA73]/40 text-[11px] font-mono font-bold uppercase tracking-wider transition-all text-center shrink-0"
+                >
+                  {isAdmin ? "Gestão Financeira Completa →" : "Ver Meu Caixa & Vales →"}
+                </Link>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-10">
-              <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-4">
-                <span className="text-[10px] font-mono uppercase text-gray-400 block mb-1">
-                  Produção Bruta (Mês)
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
+              {/* (+) PRODUÇÃO BRUTA */}
+              <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-5 flex flex-col justify-between">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-bold">
+                  (+) PRODUÇÃO BRUTA
                 </span>
-                <p className="text-lg sm:text-xl font-serif text-white font-bold">
+                <p className="text-2xl md:text-3xl font-serif font-bold text-white mt-2">
                   R$ {mGross.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </p>
-              </div>
-
-              <div className="bg-[#DFBA73]/10 border border-[#DFBA73]/30 rounded-2xl p-4">
-                <span className="text-[10px] font-mono uppercase text-[#F5D799] block mb-1">
+                <p className="text-[11px] text-gray-400 mt-2 pt-2 border-t border-white/5 font-light">
                   {isAdrian || activeBarberFilter === "barbeiro-adrian"
-                    ? "Produção Líquida (45%)"
-                    : "Produção Líquida (Dono)"}
-                </span>
-                <p className="text-lg sm:text-xl font-serif text-[#DFBA73] font-bold">
-                  R$ {mNetProd.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    ? `Sua parte líquida (45%): R$ ${mNetProd.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                    : activeBarberFilter === "all"
+                    ? `Parte Dono Noah (c/ 55% Adrian): R$ ${displayGrossForFormula.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                    : `Produção Dono + 55% Adrian: R$ ${mNetProd.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
                 </p>
               </div>
 
-              <div className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-4">
-                <span className="text-[10px] font-mono uppercase text-rose-300 block mb-1">
-                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
-                    ? "Meus Vales / Gastos (Mês)"
-                    : "Despesa Mensal"}
+              {/* (-) GASTOS NO MÊS */}
+              <div className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-5 flex flex-col justify-between">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-rose-300 font-bold">
+                  (-) {isAdrian || activeBarberFilter === "barbeiro-adrian" ? "VALES / GASTOS NO MÊS" : "GASTOS NO MÊS"}
                 </span>
-                <p className="text-lg sm:text-xl font-serif text-rose-400 font-bold">
-                  - R$ {mExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                <p className="text-2xl md:text-3xl font-serif font-bold text-rose-400 mt-2">
+                  R$ {mExpenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+                <p className="text-[11px] text-rose-300/75 mt-2 pt-2 border-t border-rose-500/20 font-light">
+                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
+                    ? "Total de vales e adiantamentos retirados no mês."
+                    : "Insumos, custos fixos e outros gastos lançados no mês."}
                 </p>
               </div>
 
-              <div className={`${mNetProfit >= 0 ? "bg-emerald-500/10 border-emerald-500/30" : "bg-rose-500/15 border-rose-500/35"} border rounded-2xl p-4`}>
-                <span className={`text-[10px] font-mono uppercase block mb-1 ${mNetProfit >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
-                  Lucro Líquido (Mês)
+              {/* (=) LUCRO LÍQUIDO */}
+              <div
+                className={`${
+                  mNetProfit >= 0
+                    ? "bg-emerald-500/10 border-emerald-500/35"
+                    : "bg-rose-500/15 border-rose-500/40"
+                } border rounded-2xl p-5 flex flex-col justify-between`}
+              >
+                <span
+                  className={`text-[10px] font-mono uppercase tracking-widest font-bold ${
+                    mNetProfit >= 0 ? "text-emerald-300" : "text-rose-300"
+                  }`}
+                >
+                  (=) {isAdrian || activeBarberFilter === "barbeiro-adrian" ? "LÍQUIDO A RECEBER" : "LUCRO LÍQUIDO"}
                 </span>
-                <p className={`text-lg sm:text-xl font-serif font-bold ${mNetProfit >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                <p
+                  className={`text-2xl md:text-3xl font-serif font-bold mt-2 ${
+                    mNetProfit >= 0 ? "text-emerald-400" : "text-rose-400"
+                  }`}
+                >
                   R$ {mNetProfit.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+                <p
+                  className={`text-[11px] mt-2 pt-2 border-t font-light ${
+                    mNetProfit >= 0 ? "text-emerald-300/80 border-emerald-500/20" : "text-rose-300/80 border-rose-500/20"
+                  }`}
+                >
+                  {isAdrian || activeBarberFilter === "barbeiro-adrian"
+                    ? "Comissão de 45% menos os vales retirados no mês."
+                    : "Receita líquida do estúdio após despesas do mês."}
                 </p>
               </div>
             </div>
+
+            {isAdmin && activeBarberFilter === "all" && (
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs font-mono text-gray-400 relative z-10">
+                <span>
+                  ✂️ Noah Ferreira (Dono · próprios + 55%):{" "}
+                  <strong className="text-emerald-400">
+                    R$ {(ms.noah?.ownPlusHouseShare ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  </strong>
+                </span>
+                <span>
+                  ✂️ Adrian Santos (Funcionário · 45%):{" "}
+                  <strong className="text-[#F5D799]">
+                    R$ {(ms.adrian?.commission ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  </strong>{" "}
+                  <span className="text-rose-400">
+                    (Vales: - R$ {(ms.adrian?.vales ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })})
+                  </span>
+                </span>
+              </div>
+            )}
           </div>
         );
       })()}
@@ -1248,215 +1208,17 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* MODAL CLIENTE BALCÃO */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[92dvh] overflow-y-auto shadow-2xl relative font-sans"
-            >
-              <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-white cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-
-              <h3 className="text-xl font-serif text-white mb-1">Registrar Cliente Balcão</h3>
-              <p className="text-xs text-gray-400 mb-5">
-                Escolha o horário na agenda para indisponibilizá-lo no site automaticamente.
-              </p>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Barbeiro que Atendeu</label>
-                  {isAdmin ? (
-                    <select
-                      value={walkInBarberId}
-                      onChange={(e) => setWalkInBarberId(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none"
-                    >
-                      {BARBERS.map((b) => (
-                        <option key={b.id} value={b.id}>
-                          {b.name} {b.isOwner ? "(Dono)" : ""}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <div className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-[#DFBA73] font-mono text-xs font-semibold">
-                      ✂️ Adrian Santos (Você)
-                    </div>
-                  )}
-                </div>
-
-                {/* Data e Situação */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Data na Agenda</label>
-                    <input
-                      type="date"
-                      min={todayBrazilStr}
-                      value={walkInDate}
-                      onChange={(e) => setWalkInDate(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-xs font-mono outline-none focus:border-[#DFBA73] [&::-webkit-calendar-picker-indicator]:invert"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Situação</label>
-                    <select
-                      value={walkInStatus}
-                      onChange={(e) => setWalkInStatus(e.target.value as "COMPLETED" | "CONFIRMED")}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none"
-                    >
-                      <option value="COMPLETED">Concluído (Lançar no Caixa)</option>
-                      <option value="CONFIRMED">Na Cadeira / Confirmado</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Seletor Visual de Horário na Agenda (Bloqueia passados e já ocupados) */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-[11px] font-mono uppercase text-gray-400">
-                      Horário Disponível na Agenda
-                    </label>
-                    <span className="text-[10px] font-mono text-[#DFBA73]">
-                      {isLoadingWalkInSlots
-                        ? "Verificando..."
-                        : walkInTime
-                        ? `Selecionado: ${walkInTime}`
-                        : "Sem vagas livres"}
-                    </span>
-                  </div>
-
-                  {walkInClosedReason ? (
-                    <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-300 text-xs font-mono">
-                      {walkInClosedReason}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-1.5 max-h-44 overflow-y-auto pr-1 bg-[#050608] border border-white/10 rounded-2xl p-2.5">
-                      {ALL_AGENDA_SLOTS.map((slot) => {
-                        const isOccupied = walkInBookedSlots.includes(slot);
-                        const isPast =
-                          walkInDate < todayBrazilStr ||
-                          (walkInDate === todayBrazilStr && slot <= nowBrazilTimeStr);
-                        const isAvailable = walkInAvailableSlots.includes(slot) && !isOccupied && !isPast;
-                        const isSelected = walkInTime === slot && isAvailable;
-                        return (
-                          <button
-                            key={slot}
-                            type="button"
-                            disabled={!isAvailable}
-                            onClick={() => setWalkInTime(slot)}
-                            className={`py-2 px-1 rounded-xl text-[11px] font-mono font-bold transition-all border relative ${
-                              isSelected
-                                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black border-[#DFBA73] shadow-md cursor-pointer"
-                                : isOccupied
-                                ? "bg-red-500/10 border-red-500/20 text-red-300/40 line-through cursor-not-allowed"
-                                : !isAvailable
-                                ? "bg-white/[0.01] border-white/5 text-gray-600 line-through cursor-not-allowed"
-                                : "bg-white/[0.03] border-white/10 text-gray-200 hover:border-[#DFBA73]/60 cursor-pointer"
-                            }`}
-                            title={
-                              isOccupied
-                                ? `Horário ${slot} já está agendado`
-                                : isPast
-                                ? `Horário ${slot} já passou`
-                                : !isAvailable
-                                ? `Horário ${slot} indisponível`
-                                : `Selecionar ${slot}`
-                            }
-                          >
-                            {slot}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {!isLoadingWalkInSlots && !walkInClosedReason && walkInAvailableSlots.length === 0 && (
-                    <p className="text-[11px] text-amber-300 font-mono mt-1.5">
-                      Nenhum horário disponível restante para esta data/profissional. Selecione outro dia ou barbeiro.
-                    </p>
-                  )}
-
-                  {walkInError && (
-                    <p className="text-[11px] text-red-400 font-mono mt-1.5">{walkInError}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Serviço Realizado</label>
-                  <select
-                    value={selectedServiceId}
-                    onChange={(e) => setSelectedServiceId(e.target.value)}
-                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none"
-                  >
-                    {OFFICIAL_SERVICES.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name} — R$ {s.price.toFixed(2)} {walkInBarberId === "barbeiro-adrian" ? `(Comissão 45%: R$ ${(s.price * 0.45).toFixed(2)})` : ""}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Nome do Cliente (Opcional)</label>
-                    <input
-                      type="text"
-                      placeholder="Cliente Balcão"
-                      value={walkInClientName}
-                      onChange={(e) => setWalkInClientName(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-[#DFBA73]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">WhatsApp (Opcional)</label>
-                    <input
-                      type="tel"
-                      placeholder="(27) 99999-9999"
-                      value={walkInClientPhone}
-                      onChange={(e) => setWalkInClientPhone(e.target.value)}
-                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-[#DFBA73]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Forma de Pagamento</label>
-                  <select
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none"
-                  >
-                    <option value="PIX">PIX</option>
-                    <option value="CARTAO_CREDITO">Cartão de Crédito</option>
-                    <option value="CARTAO_DEBITO">Cartão de Débito</option>
-                    <option value="DINHEIRO">Dinheiro</option>
-                  </select>
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    onClick={submitWalkIn}
-                    disabled={isSubmitting || !walkInTime || !walkInAvailableSlots.includes(walkInTime)}
-                    className="w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase font-mono tracking-wider text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    {isSubmitting
-                      ? "Salvando & Bloqueando Horário..."
-                      : !walkInTime
-                      ? "Sem horário disponível"
-                      : walkInStatus === "COMPLETED"
-                      ? `Confirmar (${walkInTime}) & Lançar no Caixa`
-                      : `Confirmar & Bloquear Horário (${walkInTime})`}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* MODAL CLIENTE BALCÃO COMPARTILHADO */}
+      <WalkInModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        isAdmin={isAdmin}
+        defaultDate={selectedDate}
+        onSuccess={(msg) => {
+          setToastMessage(msg);
+          fetchDashboard();
+        }}
+      />
 
       {/* MODAL ADICIONAR SERVIÇO EXTRA */}
       <ExtraServiceModal
