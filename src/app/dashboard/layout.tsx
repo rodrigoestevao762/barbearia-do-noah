@@ -287,7 +287,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </nav>
 
       {/* Desktop Top Header */}
-      <header className="hidden md:flex pl-36 pr-12 pt-10 justify-between items-end relative z-40">
+      <header className="hidden md:flex pl-36 pr-12 pt-10 justify-between items-end relative z-20">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10px] bg-[#DFBA73]/15 border border-[#DFBA73]/30 text-[#DFBA73] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 font-mono">
@@ -359,8 +359,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="md:pl-36 md:pr-12 px-4 pt-6 pb-32 md:pb-16 relative z-10 w-full min-h-[calc(100vh-5rem)]">
+      {/* Main Content Area (sem z-index próprio para não prender modais abaixo do header/nav) */}
+      <main className="md:pl-36 md:pr-12 px-4 pt-6 pb-32 md:pb-16 relative w-full min-h-[calc(100vh-5rem)]">
         {children}
       </main>
 
