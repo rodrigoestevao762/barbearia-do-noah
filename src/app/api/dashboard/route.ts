@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { BARBERS, getBarberById } from '@/lib/barbers';
+import { OFFICIAL_SERVICES } from '@/lib/services';
 import { 
   getAppointmentsForDate, 
   getAllStoredAppointments, 
@@ -460,11 +461,110 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Acesso não autorizado." }, { status: 401 });
+    }
+
+    const userRole = (session.user as any)?.role || "CLIENT";
+    const userEmail = session.user.email?.toLowerCase();
+    const userBarberId = (session.user as any)?.barberId;
+    const isAdrian = userRole === "BARBER" || userEmail === "adriansantos@gmail.com" || userBarberId === "barbeiro-adrian";
+
+    if (userRole !== "ADMIN" && userRole !== "BARBER") {
+      return NextResponse.json({ error: "Permissão insuficiente." }, { status: 403 });
+    }
+
     const body = await req.json();
-    const { id, status, date, time, serviceId, action } = body;
+    const { id, status, date, time, serviceId, action, extraServiceId } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID do agendamento é obrigatório" }, { status: 400 });
+    }
+
+    if (action === "ADD_EXTRA_SERVICE") {
+      if (!extraServiceId) {
+        return NextResponse.json({ error: "Selecione o serviço extra para adicionar." }, { status: 400 });
+      }
+
+      const extraService = OFFICIAL_SERVICES.find((s) => s.id === extraServiceId);
+      if (!extraService) {
+        return NextResponse.json({ error: "Serviço extra não encontrado." }, { status: 404 });
+      }
+
+      let dbApt: any = null;
+      try {
+        dbApt = await prisma.appointment.findUnique({
+          where: { id },
+          include: { service: true },
+        });
+      } catch (_) {}
+
+      const storedApt = getStoredAppointmentById(id);
+      const currentApt = dbApt || storedApt;
+
+      if (!currentApt) {
+        return NextResponse.json({ error: "Agendamento não encontrado." }, { status: 404 });
+      }
+
+      if (isAdrian && currentApt.barberId !== "barbeiro-adrian") {
+        return NextResponse.json(
+          { error: "Você só pode alterar serviços dos seus próprios agendamentos." },
+          { status: 403 }
+        );
+      }
+
+      const baseName = currentApt.service?.name || storedApt?.service?.name || "Serviço";
+      const basePrice = Number(currentApt.service?.price ?? storedApt?.service?.price ?? 0);
+      const baseDuration = Number(currentApt.service?.duration ?? storedApt?.service?.duration ?? 30);
+
+      const newName = `${baseName} + ${extraService.name}`;
+      const newPrice = Math.round((basePrice + extraService.price) * 100) / 100;
+      const newDuration = baseDuration + extraService.duration;
+      const customServiceId = `extra-${id}`;
+
+      const updatedServiceObj = {
+        id: customServiceId,
+        name: newName,
+        price: newPrice,
+        duration: newDuration,
+      };
+
+      updateStoredAppointment(id, { service: updatedServiceObj });
+
+      try {
+        if (dbApt) {
+          await prisma.service.upsert({
+            where: { id: customServiceId },
+            create: {
+              id: customServiceId,
+              name: newName,
+              description: `Atendimento com serviço extra (${extraService.name})`,
+              price: newPrice,
+              duration: newDuration,
+            },
+            update: {
+              name: newName,
+              description: `Atendimento com serviço extra (${extraService.name})`,
+              price: newPrice,
+              duration: newDuration,
+            },
+          });
+
+          await prisma.appointment.update({
+            where: { id },
+            data: { serviceId: customServiceId },
+          });
+        }
+      } catch (dbErr) {
+        console.warn("Aviso ao salvar serviço extra no banco:", dbErr);
+      }
+
+      return NextResponse.json({
+        success: true,
+        service: updatedServiceObj,
+        message: `Serviço extra "${extraService.name}" adicionado! Novo total: R$ ${newPrice.toFixed(2)}.`,
+      });
     }
 
     if (action === "APPROVE_RESCHEDULE") {

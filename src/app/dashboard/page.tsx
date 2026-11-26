@@ -22,6 +22,7 @@ import {
   Scissors,
   Coffee,
   Building,
+  Plus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -31,6 +32,7 @@ import { BARBERS, BarberData, BARBER_COMMISSION_RATE, HOUSE_COMMISSION_RATE } fr
 import { OFFICIAL_SERVICES, ServiceItem } from "@/lib/services";
 import { getDisplayTime } from "@/lib/timezone";
 import { LunchBreakControl } from "@/components/LunchBreakControl";
+import { ExtraServiceModal } from "@/components/ExtraServiceModal";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -69,6 +71,20 @@ export default function DashboardPage() {
   const [walkInBarberId, setWalkInBarberId] = useState<string>(() => (isAdrian ? "barbeiro-adrian" : "barbeiro-noah"));
   const [walkInClientName, setWalkInClientName] = useState<string>("Cliente Balcão");
   const [walkInClientPhone, setWalkInClientPhone] = useState<string>("");
+  const [walkInDate, setWalkInDate] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  });
+  const [walkInTime, setWalkInTime] = useState<string>("");
+  const [walkInStatus, setWalkInStatus] = useState<"COMPLETED" | "CONFIRMED">("COMPLETED");
+  const [walkInBookedSlots, setWalkInBookedSlots] = useState<string[]>([]);
+  const [walkInAvailableSlots, setWalkInAvailableSlots] = useState<string[]>([]);
+  const [walkInClosedReason, setWalkInClosedReason] = useState<string | null>(null);
+  const [walkInError, setWalkInError] = useState<string | null>(null);
+  const [isLoadingWalkInSlots, setIsLoadingWalkInSlots] = useState(false);
+
+  // Modal de Serviço Extra (adicionar serviço adicional em atendimento já agendado)
+  const [extraServiceApt, setExtraServiceApt] = useState<any | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>("PIX");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -96,6 +112,57 @@ export default function DashboardPage() {
     const day = String(d.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   });
+
+  const ALL_AGENDA_SLOTS = [
+    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+    "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
+    "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
+    "18:00", "18:30", "19:00", "19:30",
+  ];
+
+  const todayBrazilStr = new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
+  const nowBrazilTimeStr = new Date().toLocaleTimeString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  // Sincroniza data mínima ao abrir o Modal de Cliente Balcão
+  useEffect(() => {
+    if (!isModalOpen) return;
+    setWalkInError(null);
+    setWalkInDate(selectedDate < todayBrazilStr ? todayBrazilStr : selectedDate);
+  }, [isModalOpen, selectedDate, todayBrazilStr]);
+
+  // Busca horários realmente disponíveis (sem horários passados ou já ocupados) para o Modal Cliente Balcão
+  useEffect(() => {
+    if (!isModalOpen || !walkInDate) return;
+    setIsLoadingWalkInSlots(true);
+    setWalkInError(null);
+    Promise.all([
+      fetch(`/api/appointments/available?date=${walkInDate}&barberId=${walkInBarberId}&t=${Date.now()}`, { cache: "no-store" }).then((r) => r.json()),
+      fetch(`/api/dashboard?date=${walkInDate}&barberId=${walkInBarberId}&t=${Date.now()}`, { cache: "no-store" }).then((r) => r.json()),
+    ])
+      .then(([availData, dashData]) => {
+        const freeSlots: string[] = Array.isArray(availData?.availableTimes) ? availData.availableTimes : [];
+        const apts: any[] = dashData?.appointments || [];
+        const occupied = apts
+          .filter((a) => a.status !== "CANCELLED")
+          .map((a) => getDisplayTime(a.date));
+
+        setWalkInBookedSlots(occupied);
+        setWalkInAvailableSlots(freeSlots);
+        setWalkInClosedReason(availData?.isClosed ? availData.reason || "Agenda fechada nesta data." : null);
+
+        setWalkInTime((prev) => (freeSlots.includes(prev) ? prev : freeSlots[0] || ""));
+      })
+      .catch(() => {
+        setWalkInBookedSlots([]);
+        setWalkInAvailableSlots([]);
+      })
+      .finally(() => setIsLoadingWalkInSlots(false));
+  }, [isModalOpen, walkInDate, walkInBarberId]);
 
   // Disponibilidade e Almoço
   const [controlledBarberId, setControlledBarberId] = useState<string>(() => (isAdrian ? "barbeiro-adrian" : "barbeiro-noah"));
@@ -272,36 +339,48 @@ export default function DashboardPage() {
   };
 
   const submitWalkIn = async () => {
+    if (!walkInTime || !walkInAvailableSlots.includes(walkInTime)) {
+      setWalkInError("Selecione um horário disponível e futuro na agenda.");
+      return;
+    }
     setIsSubmitting(true);
+    setWalkInError(null);
     try {
       const chosenService = OFFICIAL_SERVICES.find((s) => s.id === selectedServiceId) || OFFICIAL_SERVICES[0];
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:00`;
+      const targetDate = walkInDate || selectedDate;
+      const targetTime = walkInTime;
       const res = await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           serviceId: chosenService.id,
           barberId: walkInBarberId,
-          date: `${selectedDate}T${timeStr}-03:00`,
+          date: `${targetDate}T${targetTime}:00-03:00`,
           isWalkIn: true,
-          status: "COMPLETED",
+          status: walkInStatus,
           clientName: walkInClientName.trim() || "Cliente Balcão",
-          clientPhone: walkInClientPhone.trim() || "27992693638",
+          clientPhone: walkInClientPhone.trim(),
           paymentMethod,
         }),
       });
 
+      const data = await res.json();
       if (res.ok) {
         setIsModalOpen(false);
         setWalkInClientName("Cliente Balcão");
         setWalkInClientPhone("");
         await fetchDashboard();
         const attendantName = BARBERS.find((b) => b.id === walkInBarberId)?.name || "Noah Ferreira";
-        setToastMessage(`Atendimento de R$ ${chosenService.price.toFixed(2)} registrado para ${attendantName}!`);
+        const dateBr = targetDate.split("-").reverse().join("/");
+        setToastMessage(
+          `Cliente Balcão (${chosenService.name}) registrado para ${attendantName} em ${dateBr} às ${targetTime}. Horário bloqueado na agenda!`
+        );
+      } else {
+        setWalkInError(data.error || "Não foi possível registrar neste horário.");
       }
     } catch (e) {
       console.error("Erro ao registrar balcão:", e);
+      setWalkInError("Erro de conexão ao registrar Cliente Balcão.");
     } finally {
       setIsSubmitting(false);
     }
@@ -904,6 +983,12 @@ export default function DashboardPage() {
                 </a>
               )}
               <button
+                onClick={() => setExtraServiceApt(nextApt)}
+                className="px-4 py-3 rounded-2xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#F5D799] hover:text-black border border-[#DFBA73]/40 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" /> Serviço Extra
+              </button>
+              <button
                 onClick={() => updateStatus(nextApt.id, "COMPLETED")}
                 className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold text-xs uppercase font-mono tracking-wider shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 flex items-center gap-2 cursor-pointer"
               >
@@ -1071,7 +1156,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                     <span
                       className={`text-[10px] font-mono uppercase font-bold tracking-wider px-3 py-1 rounded-xl border ${
                         apt.status === "COMPLETED"
@@ -1083,6 +1168,16 @@ export default function DashboardPage() {
                     >
                       {apt.status === "COMPLETED" ? "CONCLUÍDO" : apt.status === "CANCELLED" ? "CANCELADO" : "CONFIRMADO"}
                     </span>
+
+                    {apt.status !== "CANCELLED" && (
+                      <button
+                        onClick={() => setExtraServiceApt(apt)}
+                        className="px-3 py-1.5 rounded-xl bg-[#DFBA73]/15 hover:bg-[#DFBA73] text-[#F5D799] hover:text-black border border-[#DFBA73]/30 text-xs font-mono font-bold transition-all flex items-center gap-1 cursor-pointer"
+                        title="Adicionar serviço extra neste atendimento"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Serviço Extra
+                      </button>
+                    )}
 
                     {apt.status !== "COMPLETED" && apt.status !== "CANCELLED" && (
                       <button
@@ -1117,14 +1212,16 @@ export default function DashboardPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative font-sans"
+              className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[92dvh] overflow-y-auto shadow-2xl relative font-sans"
             >
-              <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-white">
+              <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-gray-400 hover:text-white cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
 
               <h3 className="text-xl font-serif text-white mb-1">Registrar Cliente Balcão</h3>
-              <p className="text-xs text-gray-400 mb-6">Lançamento de atendimento imediato com comissão automática (45%).</p>
+              <p className="text-xs text-gray-400 mb-5">
+                Escolha o horário na agenda para indisponibilizá-lo no site automaticamente.
+              </p>
 
               <div className="space-y-4">
                 <div>
@@ -1148,6 +1245,102 @@ export default function DashboardPage() {
                   )}
                 </div>
 
+                {/* Data e Situação */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Data na Agenda</label>
+                    <input
+                      type="date"
+                      min={todayBrazilStr}
+                      value={walkInDate}
+                      onChange={(e) => setWalkInDate(e.target.value)}
+                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-xs font-mono outline-none focus:border-[#DFBA73] [&::-webkit-calendar-picker-indicator]:invert"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Situação</label>
+                    <select
+                      value={walkInStatus}
+                      onChange={(e) => setWalkInStatus(e.target.value as "COMPLETED" | "CONFIRMED")}
+                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-3.5 py-2.5 text-white text-xs outline-none"
+                    >
+                      <option value="COMPLETED">Concluído (Lançar no Caixa)</option>
+                      <option value="CONFIRMED">Na Cadeira / Confirmado</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Seletor Visual de Horário na Agenda (Bloqueia passados e já ocupados) */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-[11px] font-mono uppercase text-gray-400">
+                      Horário Disponível na Agenda
+                    </label>
+                    <span className="text-[10px] font-mono text-[#DFBA73]">
+                      {isLoadingWalkInSlots
+                        ? "Verificando..."
+                        : walkInTime
+                        ? `Selecionado: ${walkInTime}`
+                        : "Sem vagas livres"}
+                    </span>
+                  </div>
+
+                  {walkInClosedReason ? (
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-300 text-xs font-mono">
+                      {walkInClosedReason}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-1.5 max-h-44 overflow-y-auto pr-1 bg-[#050608] border border-white/10 rounded-2xl p-2.5">
+                      {ALL_AGENDA_SLOTS.map((slot) => {
+                        const isOccupied = walkInBookedSlots.includes(slot);
+                        const isPast =
+                          walkInDate < todayBrazilStr ||
+                          (walkInDate === todayBrazilStr && slot <= nowBrazilTimeStr);
+                        const isAvailable = walkInAvailableSlots.includes(slot) && !isOccupied && !isPast;
+                        const isSelected = walkInTime === slot && isAvailable;
+                        return (
+                          <button
+                            key={slot}
+                            type="button"
+                            disabled={!isAvailable}
+                            onClick={() => setWalkInTime(slot)}
+                            className={`py-2 px-1 rounded-xl text-[11px] font-mono font-bold transition-all border relative ${
+                              isSelected
+                                ? "bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black border-[#DFBA73] shadow-md cursor-pointer"
+                                : isOccupied
+                                ? "bg-red-500/10 border-red-500/20 text-red-300/40 line-through cursor-not-allowed"
+                                : !isAvailable
+                                ? "bg-white/[0.01] border-white/5 text-gray-600 line-through cursor-not-allowed"
+                                : "bg-white/[0.03] border-white/10 text-gray-200 hover:border-[#DFBA73]/60 cursor-pointer"
+                            }`}
+                            title={
+                              isOccupied
+                                ? `Horário ${slot} já está agendado`
+                                : isPast
+                                ? `Horário ${slot} já passou`
+                                : !isAvailable
+                                ? `Horário ${slot} indisponível`
+                                : `Selecionar ${slot}`
+                            }
+                          >
+                            {slot}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {!isLoadingWalkInSlots && !walkInClosedReason && walkInAvailableSlots.length === 0 && (
+                    <p className="text-[11px] text-amber-300 font-mono mt-1.5">
+                      Nenhum horário disponível restante para esta data/profissional. Selecione outro dia ou barbeiro.
+                    </p>
+                  )}
+
+                  {walkInError && (
+                    <p className="text-[11px] text-red-400 font-mono mt-1.5">{walkInError}</p>
+                  )}
+                </div>
+
                 <div>
                   <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Serviço Realizado</label>
                   <select
@@ -1157,21 +1350,33 @@ export default function DashboardPage() {
                   >
                     {OFFICIAL_SERVICES.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.name} — R$ {s.price.toFixed(2)} (Comissão: R$ {(s.price * 0.45).toFixed(2)})
+                        {s.name} — R$ {s.price.toFixed(2)} {walkInBarberId === "barbeiro-adrian" ? `(Comissão 45%: R$ ${(s.price * 0.45).toFixed(2)})` : ""}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Nome do Cliente (Opcional)</label>
-                  <input
-                    type="text"
-                    placeholder="Cliente Balcão"
-                    value={walkInClientName}
-                    onChange={(e) => setWalkInClientName(e.target.value)}
-                    className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-[#DFBA73]"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">Nome do Cliente (Opcional)</label>
+                    <input
+                      type="text"
+                      placeholder="Cliente Balcão"
+                      value={walkInClientName}
+                      onChange={(e) => setWalkInClientName(e.target.value)}
+                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-[#DFBA73]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">WhatsApp (Opcional)</label>
+                    <input
+                      type="tel"
+                      placeholder="(27) 99999-9999"
+                      value={walkInClientPhone}
+                      onChange={(e) => setWalkInClientPhone(e.target.value)}
+                      className="w-full bg-[#050608] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs outline-none focus:border-[#DFBA73]"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -1191,10 +1396,16 @@ export default function DashboardPage() {
                 <div className="pt-2">
                   <button
                     onClick={submitWalkIn}
-                    disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase font-mono tracking-wider text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 cursor-pointer"
+                    disabled={isSubmitting || !walkInTime || !walkInAvailableSlots.includes(walkInTime)}
+                    className="w-full bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black font-bold uppercase font-mono tracking-wider text-xs py-3.5 rounded-xl transition-all shadow-lg shadow-[#DFBA73]/25 hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    {isSubmitting ? "Lançando..." : "Confirmar & Lançar no Caixa"}
+                    {isSubmitting
+                      ? "Salvando & Bloqueando Horário..."
+                      : !walkInTime
+                      ? "Sem horário disponível"
+                      : walkInStatus === "COMPLETED"
+                      ? `Confirmar (${walkInTime}) & Lançar no Caixa`
+                      : `Confirmar & Bloquear Horário (${walkInTime})`}
                   </button>
                 </div>
               </div>
@@ -1202,6 +1413,16 @@ export default function DashboardPage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* MODAL ADICIONAR SERVIÇO EXTRA */}
+      <ExtraServiceModal
+        appointment={extraServiceApt}
+        onClose={() => setExtraServiceApt(null)}
+        onSuccess={(msg) => {
+          setToastMessage(msg);
+          fetchDashboard();
+        }}
+      />
 
       {/* MODAL CANCELAMENTO */}
       <AnimatePresence>
