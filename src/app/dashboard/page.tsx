@@ -448,7 +448,7 @@ export default function DashboardPage() {
             <Image
               src={
                 controlledBarberId === "barbeiro-adrian" || isAdrian
-                  ? "/barbers/adrian-santos.jpg"
+                  ? "/barbers/adrian-santos-v2.jpg"
                   : "/barbers/noah-ferreira.jpg"
               }
               alt={

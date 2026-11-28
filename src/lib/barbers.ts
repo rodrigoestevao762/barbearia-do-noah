@@ -39,7 +39,7 @@ export const BARBERS: BarberData[] = [
     phoneDisplay: "(27) 99269-3638",
     role: "BARBER",
     specialty: "Cortes Modernos, Degradê & Barboterapia",
-    avatar: "/barbers/adrian-santos.jpg",
+    avatar: "/barbers/adrian-santos-v2.jpg",
     bio: "Barbeiro profissional especialista em cortes contemporâneos, acabamentos finos e barboterapia.",
     commissionRate: 0.45,
     isOwner: false,

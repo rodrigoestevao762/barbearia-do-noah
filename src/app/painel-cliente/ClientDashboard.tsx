@@ -538,7 +538,7 @@ export default function ClientDashboard() {
                       <Image
                         src={
                           (upcomingApt.barberId === "barbeiro-adrian" || upcomingApt.barber?.id === "barbeiro-adrian")
-                            ? "/barbers/adrian-santos.jpg"
+                            ? "/barbers/adrian-santos-v2.jpg"
                             : "/barbers/noah-ferreira.jpg"
                         }
                         alt={upcomingApt.barber?.name || "Noah Ferreira"}
@@ -627,7 +627,7 @@ export default function ClientDashboard() {
                     <Image
                       src={
                         (lastApt.barberId === "barbeiro-adrian" || lastApt.barber?.id === "barbeiro-adrian")
-                          ? "/barbers/adrian-santos.jpg"
+                          ? "/barbers/adrian-santos-v2.jpg"
                           : "/barbers/noah-ferreira.jpg"
                       }
                       alt={lastApt.barber?.name || "Noah Ferreira"}

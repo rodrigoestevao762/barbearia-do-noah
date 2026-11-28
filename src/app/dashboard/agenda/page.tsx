@@ -585,7 +585,7 @@ export default function AgendaPage() {
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#DFBA73] shrink-0 shadow-md">
             <Image
-              src={isAdmin ? "/barbers/noah-ferreira.jpg" : "/barbers/adrian-santos.jpg"}
+              src={isAdmin ? "/barbers/noah-ferreira.jpg" : "/barbers/adrian-santos-v2.jpg"}
               alt={isAdmin ? "Noah Ferreira" : "Adrian Santos"}
               fill
               className="object-cover object-top"
@@ -711,7 +711,7 @@ export default function AgendaPage() {
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#DFBA73] shrink-0 shadow-md">
                 <Image
-                  src={currentControlledBarber.id === "barbeiro-adrian" ? "/barbers/adrian-santos.jpg" : "/barbers/noah-ferreira.jpg"}
+                  src={currentControlledBarber.id === "barbeiro-adrian" ? "/barbers/adrian-santos-v2.jpg" : "/barbers/noah-ferreira.jpg"}
                   alt={currentControlledBarber.name}
                   fill
                   className="object-cover object-top"

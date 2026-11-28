@@ -453,7 +453,7 @@ export async function GET(req: Request) {
         id: "barbeiro-adrian",
         name: "Adrian Santos",
         role: "Barbeiro da Equipe",
-        avatar: "/barbers/adrian-santos.jpg",
+        avatar: "/barbers/adrian-santos-v2.jpg",
         commissionRate: ADRIAN_RATE,
         isOwner: false,
         totalApts: adrianApts.length,

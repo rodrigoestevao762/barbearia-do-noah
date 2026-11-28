@@ -1,5 +1,5 @@
 // Service Worker para Noah Barber Studio PWA
-const CACHE_NAME = 'noah-barber-studio-v4';
+const CACHE_NAME = 'noah-barber-studio-v5';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',

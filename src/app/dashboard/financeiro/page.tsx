@@ -646,7 +646,7 @@ export default function FinanceiroPage() {
                   <Image
                     src={
                       isAdrian || activeTab === "barbeiro-adrian"
-                        ? "/barbers/adrian-santos.jpg"
+                        ? "/barbers/adrian-santos-v2.jpg"
                         : "/barbers/noah-ferreira.jpg"
                     }
                     alt={isAdrian || activeTab === "barbeiro-adrian" ? "Adrian Santos" : "Noah Ferreira"}
@@ -1135,7 +1135,7 @@ export default function FinanceiroPage() {
                 <Image
                   src={
                     isAdrian || activeTab === "barbeiro-adrian"
-                      ? "/barbers/adrian-santos.jpg"
+                      ? "/barbers/adrian-santos-v2.jpg"
                       : "/barbers/noah-ferreira.jpg"
                   }
                   alt={
