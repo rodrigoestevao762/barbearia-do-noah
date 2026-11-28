@@ -737,6 +737,10 @@ export async function PATCH(req: Request) {
       } catch (_) {}
 
       const storedApt = getStoredAppointmentById(id);
+      const effectiveApt = currentApt || storedApt;
+      if (isAdrian && effectiveApt && effectiveApt.barberId !== "barbeiro-adrian") {
+        return NextResponse.json({ error: "Você só pode aprovar agendamentos da sua própria agenda." }, { status: 403 });
+      }
       const effectiveRequestedDate = storedApt?.requestedDate || currentApt?.requestedDate || body.requestedDate;
 
       if (!currentApt && !storedApt) {
@@ -765,6 +769,17 @@ export async function PATCH(req: Request) {
     }
 
     if (action === "REJECT_RESCHEDULE") {
+      if (isAdrian) {
+        let existingApt: any = getStoredAppointmentById(id);
+        if (!existingApt) {
+          try {
+            existingApt = await prisma.appointment.findUnique({ where: { id } });
+          } catch (_) {}
+        }
+        if (existingApt && existingApt.barberId !== "barbeiro-adrian") {
+          return NextResponse.json({ error: "Você só pode alterar agendamentos da sua própria agenda." }, { status: 403 });
+        }
+      }
       try {
         const updated = await prisma.appointment.update({
           where: { id },
@@ -782,23 +797,27 @@ export async function PATCH(req: Request) {
 
     if (date && time) {
       const parsedNewDate = parseBrazilDateTime(date, time);
+      const targetBarberId = isAdrian ? "barbeiro-adrian" : body.barberId;
       try {
         const updated = await prisma.appointment.update({
           where: { id },
           data: {
             date: parsedNewDate,
             ...(serviceId ? { serviceId } : {}),
+            ...(targetBarberId ? { barberId: targetBarberId } : {}),
             status: status || "CONFIRMED",
           } as any,
         });
         updateStoredAppointment(id, {
           date: parsedNewDate.toISOString(),
+          ...(targetBarberId ? { barberId: targetBarberId } : {}),
           status: status || "CONFIRMED",
         });
         return NextResponse.json({ success: true, appointment: updated });
       } catch (dbErr) {
         updateStoredAppointment(id, {
           date: parsedNewDate.toISOString(),
+          ...(targetBarberId ? { barberId: targetBarberId } : {}),
           status: status || "CONFIRMED",
         });
         return NextResponse.json({ success: true, message: "Agendamento alterado com sucesso." });
@@ -806,6 +825,17 @@ export async function PATCH(req: Request) {
     }
 
     if (status) {
+      if (isAdrian) {
+        let existingApt: any = getStoredAppointmentById(id);
+        if (!existingApt) {
+          try {
+            existingApt = await prisma.appointment.findUnique({ where: { id } });
+          } catch (_) {}
+        }
+        if (existingApt && existingApt.barberId !== "barbeiro-adrian") {
+          return NextResponse.json({ error: "Você só pode alterar agendamentos da sua própria agenda." }, { status: 403 });
+        }
+      }
       try {
         const updated = await prisma.appointment.update({
           where: { id },

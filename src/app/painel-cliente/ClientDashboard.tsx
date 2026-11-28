@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BookingModal from "@/components/BookingModal";
+import { CenterModalPortal } from "@/components/CenterModalPortal";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { LogoLasBarber } from "@/components/LogoLasBarber";
@@ -23,6 +24,7 @@ export default function ClientDashboard() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string | undefined>(undefined);
+  const [selectedBarberId, setSelectedBarberId] = useState<string | undefined>(undefined);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("Olá");
@@ -152,6 +154,7 @@ export default function ClientDashboard() {
     } else {
       setSelectedServiceId(undefined);
     }
+    setSelectedBarberId(lastApt?.barberId || lastApt?.barber?.id || undefined);
     setIsModalOpen(true);
   };
 
@@ -173,7 +176,8 @@ export default function ClientDashboard() {
       }
 
       const barberId = rescheduleApt.barberId || rescheduleApt.barber?.id || "barbeiro-noah";
-      fetch(`/api/appointments/available?date=${newRescheduleDate}&barberId=${barberId}&t=${Date.now()}`, { cache: "no-store" })
+      const serviceParam = rescheduleApt.service?.id ? `&serviceId=${encodeURIComponent(rescheduleApt.service.id)}` : "";
+      fetch(`/api/appointments/available?date=${newRescheduleDate}&barberId=${barberId}${serviceParam}&t=${Date.now()}`, { cache: "no-store" })
         .then((res) => res.json())
         .then((data) => {
           if (Array.isArray(data.availableTimes)) {
@@ -406,21 +410,29 @@ export default function ClientDashboard() {
                   Agendamento Confirmado com Sucesso!
                 </h3>
                 <p className="text-xs text-gray-300 font-light mt-0.5">
-                  Bem-vindo ao seu Painel VIP! Seu horário já está garantido na agenda oficial de Noah Ferreira.
+                  Bem-vindo ao seu Painel VIP! Seu horário já está garantido na agenda oficial de{" "}
+                  <strong className="text-white">
+                    {upcomingApt?.barber?.name || getBarberById(upcomingApt?.barberId).name}
+                  </strong>.
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2.5 self-end sm:self-auto shrink-0">
-              {upcomingApt && (
-                <a
-                  href={`https://wa.me/5527992693638?text=${encodeURIComponent(`Olá, Noah! Sou ${clientName}. Meu agendamento para o dia ${new Date(upcomingApt.date).toLocaleDateString("pt-BR")} às ${getDisplayTime(upcomingApt.date)} já está garantido no painel!`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="bg-[#25D366] text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-[#128C7E] transition-all shadow-md shadow-[#25D366]/20 cursor-pointer"
-                >
-                  <MessageCircle className="w-4 h-4" /> Notificar Noah no WhatsApp
-                </a>
-              )}
+              {upcomingApt && (() => {
+                const upBarber = getBarberById(upcomingApt.barberId);
+                const upBarberName = upcomingApt.barber?.name || upBarber.name;
+                const upBarberPhone = upcomingApt.barber?.phone || upBarber.phone || BARBERS[0].phone;
+                return (
+                  <a
+                    href={`https://wa.me/${upBarberPhone}?text=${encodeURIComponent(`Olá, ${upBarberName}! Sou ${clientName}. Meu agendamento para o dia ${new Date(upcomingApt.date).toLocaleDateString("pt-BR")} às ${getDisplayTime(upcomingApt.date)} já está garantido no painel!`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="bg-[#25D366] text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-[#128C7E] transition-all shadow-md shadow-[#25D366]/20 cursor-pointer"
+                  >
+                    <MessageCircle className="w-4 h-4" /> Notificar {upBarberName.split(" ")[0]} no WhatsApp
+                  </a>
+                );
+              })()}
               <button
                 onClick={() => setNewBookingBanner(false)}
                 className="text-gray-400 hover:text-white p-1.5 rounded-lg cursor-pointer"
@@ -495,7 +507,7 @@ export default function ClientDashboard() {
                     {clientEmail && <span>· E-mail: <strong className="text-white">{clientEmail}</strong></span>}
                   </p>
                   <p className="text-[11px] text-[#DFBA73]/90 mt-1 font-light">
-                    Atendimento exclusivo individualizado com Master Barber Noah Ferreira
+                    Atendimento exclusivo individualizado no Noah Barber Studio
                   </p>
                 </div>
               </div>
@@ -503,6 +515,7 @@ export default function ClientDashboard() {
               <button
                 onClick={() => {
                   setSelectedServiceId(undefined);
+                  setSelectedBarberId(undefined);
                   setIsModalOpen(true);
                 }}
                 className="w-full sm:w-auto bg-gradient-to-r from-[#F5D799] via-[#DFBA73] to-[#B88B38] text-black hover:brightness-110 px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2.5 transition-all duration-300 shadow-lg shadow-[#DFBA73]/25 shrink-0 cursor-pointer relative z-10"
@@ -556,7 +569,7 @@ export default function ClientDashboard() {
                       </p>
 
                       <p className="text-xs text-gray-300 mt-2">
-                        Barbeiro responsável: <strong className="text-white">{upcomingApt.barber?.name || "Noah Ferreira (Master Barber)"}</strong> ·{" "}
+                        Barbeiro responsável: <strong className="text-white">{upcomingApt.barber?.name || getBarberById(upcomingApt.barberId).name}</strong> ·{" "}
                         <a
                           href="https://www.google.com/maps/search/?api=1&query=Noah+Barber+Studio+Av+Paulo+Pereira+Gomes+281+Morada+de+Laranjeiras+Serra+ES"
                           target="_blank"
@@ -684,7 +697,7 @@ export default function ClientDashboard() {
                               {getStatusBadge(apt.status)}
                             </div>
                             <p className="text-xs text-gray-400 mt-0.5">
-                              Barbeiro: <strong className="text-gray-300">{apt.barber?.name || "Noah Ferreira (Master Barber)"}</strong>
+                              Barbeiro: <strong className="text-gray-300">{apt.barber?.name || getBarberById(apt.barberId).name}</strong>
                             </p>
                           </div>
                         </div>
@@ -738,20 +751,13 @@ export default function ClientDashboard() {
       {/* ── MODAL DE REAGENDAMENTO DO CLIENTE ── */}
       <AnimatePresence>
         {rescheduleApt && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setRescheduleApt(null)}
-              className="absolute inset-0 bg-black/85 backdrop-blur-md"
-            />
-
+          <CenterModalPortal onBackdropClick={() => setRescheduleApt(null)}>
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-lg bg-[#080A0E] border border-[#DFBA73]/40 rounded-3xl p-6 sm:p-8 z-10 shadow-2xl max-h-[90vh] overflow-y-auto text-white"
+              onClick={(e) => e.stopPropagation()}
+              className="relative my-auto w-full max-w-lg bg-[#080A0E] border border-[#DFBA73]/40 rounded-3xl p-6 sm:p-8 z-10 shadow-2xl max-h-[calc(100dvh-7.5rem)] overflow-y-auto text-white"
             >
               <div className="flex justify-between items-center pb-4 border-b border-white/10">
                 <div>
@@ -877,28 +883,21 @@ export default function ClientDashboard() {
                 </div>
               </form>
             </motion.div>
-          </div>
+          </CenterModalPortal>
         )}
       </AnimatePresence>
 
       {/* ── MODAL OFICIAL DE CONFIRMAÇÃO & NOTIFICAÇÃO NO WHATSAPP (IGUAL AO AGENDAMENTO) ── */}
       <AnimatePresence>
         {actionSuccessModal && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-[#050608]/90 backdrop-blur-xl"
-              onClick={() => setActionSuccessModal(null)}
-            />
-
+          <CenterModalPortal onBackdropClick={() => setActionSuccessModal(null)}>
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-lg bg-[#080A0E] border border-[#DFBA73]/40 rounded-3xl p-6 sm:p-8 z-10 shadow-[0_25px_80px_rgba(0,0,0,0.95)] flex flex-col items-center text-center text-white"
+              onClick={(e) => e.stopPropagation()}
+              className="relative my-auto w-full max-w-lg bg-[#080A0E] border border-[#DFBA73]/40 rounded-3xl p-6 sm:p-8 z-10 shadow-[0_25px_80px_rgba(0,0,0,0.95)] max-h-[calc(100dvh-7.5rem)] overflow-y-auto flex flex-col items-center text-center text-white"
             >
               {/* Botão Fechar no Canto Superior */}
               <button
@@ -980,7 +979,7 @@ export default function ClientDashboard() {
                 Concluir & Fechar
               </button>
             </motion.div>
-          </div>
+          </CenterModalPortal>
         )}
       </AnimatePresence>
 
@@ -988,9 +987,11 @@ export default function ClientDashboard() {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
+          setSelectedBarberId(undefined);
           loadDashboardData();
         }}
         initialServiceId={selectedServiceId}
+        initialBarberId={selectedBarberId}
         initialUserData={clientData}
       />
     </div>

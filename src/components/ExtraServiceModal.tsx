@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { OFFICIAL_SERVICES } from "@/lib/services";
+import { CenterModalPortal } from "@/components/CenterModalPortal";
 
 interface ExtraServiceModalProps {
   appointment: any | null;
@@ -56,12 +57,13 @@ export function ExtraServiceModal({
   return (
     <AnimatePresence>
       {appointment && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <CenterModalPortal onBackdropClick={onClose}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-[#080A0E] border border-[#DFBA73]/40 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[90dvh] overflow-y-auto shadow-2xl relative font-sans"
+            onClick={(e) => e.stopPropagation()}
+            className="my-auto bg-[#080A0E] border border-[#DFBA73]/40 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
           >
             <button
               type="button"
@@ -134,7 +136,7 @@ export function ExtraServiceModal({
               </button>
             </div>
           </motion.div>
-        </div>
+        </CenterModalPortal>
       )}
     </AnimatePresence>
   );

@@ -27,6 +27,7 @@ import { OFFICIAL_SERVICES, ServiceItem } from "@/lib/services";
 import { getDisplayTime } from "@/lib/timezone";
 import { checkDayStatus } from "@/lib/holidays";
 import { ExtraServiceModal } from "@/components/ExtraServiceModal";
+import { CenterModalPortal } from "@/components/CenterModalPortal";
 
 export default function AgendaPage() {
   const { data: session } = useSession();
@@ -99,7 +100,7 @@ export default function AgendaPage() {
   useEffect(() => {
     if (!isModalOpen || !selectedDate) return;
     setIsLoadingModalTimes(true);
-    fetch(`/api/appointments/available?date=${selectedDate}&barberId=${newBarberId || "barbeiro-noah"}&t=${Date.now()}`, { cache: "no-store" })
+    fetch(`/api/appointments/available?date=${selectedDate}&barberId=${newBarberId || "barbeiro-noah"}&serviceId=${encodeURIComponent(newServiceId || "")}&t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         const times: string[] = Array.isArray(data?.availableTimes) ? data.availableTimes : [];
@@ -108,7 +109,7 @@ export default function AgendaPage() {
       })
       .catch(() => setModalAvailableTimes([]))
       .finally(() => setIsLoadingModalTimes(false));
-  }, [isModalOpen, selectedDate, newBarberId]);
+  }, [isModalOpen, selectedDate, newBarberId, newServiceId]);
 
   // Modal Alterar / Editar Agendamento
   const [editingApt, setEditingApt] = useState<any | null>(null);
@@ -1061,12 +1062,13 @@ export default function AgendaPage() {
       {/* MODAL NOVO AGENDAMENTO */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <CenterModalPortal onBackdropClick={() => setIsModalOpen(false)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative font-sans"
+              onClick={(e) => e.stopPropagation()}
+              className="my-auto bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
             >
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -1181,19 +1183,20 @@ export default function AgendaPage() {
                 </div>
               </form>
             </motion.div>
-          </div>
+          </CenterModalPortal>
         )}
       </AnimatePresence>
 
       {/* MODAL EDITAR AGENDAMENTO */}
       <AnimatePresence>
         {editingApt && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <CenterModalPortal onBackdropClick={() => setEditingApt(null)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative font-sans"
+              onClick={(e) => e.stopPropagation()}
+              className="my-auto bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
             >
               <button
                 onClick={() => setEditingApt(null)}
@@ -1290,7 +1293,7 @@ export default function AgendaPage() {
                 </div>
               </form>
             </motion.div>
-          </div>
+          </CenterModalPortal>
         )}
       </AnimatePresence>
 
@@ -1307,12 +1310,13 @@ export default function AgendaPage() {
       {/* MODAL CANCELAMENTO COM WHATSAPP */}
       <AnimatePresence>
         {cancellingApt && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <CenterModalPortal onBackdropClick={() => setCancellingApt(null)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative font-sans"
+              onClick={(e) => e.stopPropagation()}
+              className="my-auto bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
             >
               <button
                 onClick={() => setCancellingApt(null)}
@@ -1385,7 +1389,7 @@ export default function AgendaPage() {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </CenterModalPortal>
         )}
       </AnimatePresence>
     </div>

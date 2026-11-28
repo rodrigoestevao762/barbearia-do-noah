@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { BARBERS } from "@/lib/barbers";
 import { OFFICIAL_SERVICES } from "@/lib/services";
 import { getDisplayTime } from "@/lib/timezone";
+import { CenterModalPortal } from "@/components/CenterModalPortal";
 
 const ALL_AGENDA_SLOTS = [
   "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
@@ -37,7 +38,7 @@ export default function WalkInModal({
     hour12: false,
   });
 
-  const [selectedServiceId, setSelectedServiceId] = useState<string>("corte-cabelo");
+  const [selectedServiceId, setSelectedServiceId] = useState<string>("corte");
   const [walkInBarberId, setWalkInBarberId] = useState<string>(() => (isAdmin ? "barbeiro-noah" : "barbeiro-adrian"));
   const [walkInClientName, setWalkInClientName] = useState<string>("Cliente Balcão");
   const [walkInClientPhone, setWalkInClientPhone] = useState<string>("");
@@ -71,9 +72,12 @@ export default function WalkInModal({
     setIsLoadingWalkInSlots(true);
     setWalkInError(null);
     Promise.all([
-      fetch(`/api/appointments/available?date=${walkInDate}&barberId=${walkInBarberId}&t=${Date.now()}`, {
-        cache: "no-store",
-      }).then((r) => r.json()),
+      fetch(
+        `/api/appointments/available?date=${walkInDate}&barberId=${walkInBarberId}&serviceId=${selectedServiceId}&t=${Date.now()}`,
+        {
+          cache: "no-store",
+        }
+      ).then((r) => r.json()),
       fetch(`/api/dashboard?date=${walkInDate}&barberId=${walkInBarberId}&t=${Date.now()}`, {
         cache: "no-store",
       }).then((r) => r.json()),
@@ -95,7 +99,7 @@ export default function WalkInModal({
         setWalkInAvailableSlots([]);
       })
       .finally(() => setIsLoadingWalkInSlots(false));
-  }, [isOpen, walkInDate, walkInBarberId]);
+  }, [isOpen, walkInDate, walkInBarberId, selectedServiceId]);
 
   const submitWalkIn = async () => {
     if (!walkInTime || !walkInAvailableSlots.includes(walkInTime)) {
@@ -146,12 +150,13 @@ export default function WalkInModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <CenterModalPortal onBackdropClick={onClose}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[92dvh] overflow-y-auto shadow-2xl relative font-sans"
+            onClick={(e) => e.stopPropagation()}
+            className="my-auto bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
           >
             <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-white cursor-pointer">
               <X className="w-5 h-5" />
@@ -346,7 +351,7 @@ export default function WalkInModal({
               </div>
             </div>
           </motion.div>
-        </div>
+        </CenterModalPortal>
       )}
     </AnimatePresence>
   );

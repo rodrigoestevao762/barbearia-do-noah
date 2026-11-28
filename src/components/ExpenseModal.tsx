@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { CenterModalPortal } from "@/components/CenterModalPortal";
 
 interface ExpenseModalProps {
   isOpen: boolean;
@@ -87,12 +88,13 @@ export default function ExpenseModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <CenterModalPortal onBackdropClick={onClose}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative font-sans"
+            onClick={(e) => e.stopPropagation()}
+            className="my-auto bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
           >
             <button
               onClick={onClose}
@@ -209,7 +211,7 @@ export default function ExpenseModal({
               </div>
             </form>
           </motion.div>
-        </div>
+        </CenterModalPortal>
       )}
     </AnimatePresence>
   );

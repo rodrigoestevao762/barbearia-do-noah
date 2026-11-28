@@ -24,6 +24,7 @@ import {
 import { BARBERS, BARBER_COMMISSION_RATE, HOUSE_COMMISSION_RATE } from "@/lib/barbers";
 import { formatMonthLong, getBrazilNow } from "@/lib/timezone";
 import WalkInModal from "@/components/WalkInModal";
+import { CenterModalPortal } from "@/components/CenterModalPortal";
 import { useSession } from "next-auth/react";
 
 interface StoredExpenseItem {
@@ -1368,12 +1369,13 @@ export default function FinanceiroPage() {
       {/* MODAL: REGISTRAR SAÍDA OU VALE */}
       <AnimatePresence>
         {isExpenseModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <CenterModalPortal onBackdropClick={() => setIsExpenseModalOpen(false)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative font-sans"
+              onClick={(e) => e.stopPropagation()}
+              className="my-auto bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
             >
               <button
                 onClick={() => setIsExpenseModalOpen(false)}
@@ -1482,19 +1484,20 @@ export default function FinanceiroPage() {
                 </div>
               </form>
             </motion.div>
-          </div>
+          </CenterModalPortal>
         )}
       </AnimatePresence>
 
       {/* MODAL: DESPESAS FIXAS DA BARBEARIA */}
       <AnimatePresence>
         {isFixedExpenseModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <CenterModalPortal onBackdropClick={() => setIsFixedExpenseModalOpen(false)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative font-sans"
+              onClick={(e) => e.stopPropagation()}
+              className="my-auto bg-[#080A0E] border border-[#DFBA73]/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
             >
               <button
                 onClick={() => setIsFixedExpenseModalOpen(false)}
@@ -1590,7 +1593,7 @@ export default function FinanceiroPage() {
                 </button>
               </form>
             </motion.div>
-          </div>
+          </CenterModalPortal>
         )}
       </AnimatePresence>
       <WalkInModal

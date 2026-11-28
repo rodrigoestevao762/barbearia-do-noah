@@ -36,7 +36,14 @@ export async function POST(req: Request) {
       const userRole = (session.user as any)?.role;
       const userId = (session.user as any)?.id;
       const userEmail = session.user?.email?.toLowerCase();
-      const isOwner = userRole === "ADMIN" || apt.userId === userId || (apt.user?.email && apt.user.email.toLowerCase() === userEmail);
+      const userPhone = (session.user as any)?.phone?.replace(/\D/g, "");
+      const aptPhone = apt.user?.phone?.replace(/\D/g, "");
+      const isOwner =
+        userRole === "ADMIN" ||
+        userRole === "BARBER" ||
+        apt.userId === userId ||
+        (apt.user?.email && apt.user.email.toLowerCase() === userEmail) ||
+        (userPhone && aptPhone && (aptPhone.includes(userPhone) || userPhone.includes(aptPhone)));
       if (!isOwner) {
         return NextResponse.json({ error: "Você não tem permissão para cancelar este agendamento." }, { status: 403 });
       }

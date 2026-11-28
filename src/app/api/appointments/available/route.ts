@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { BARBERS } from "@/lib/barbers";
 import { getAppointmentsForDate } from "@/lib/appointments-store";
 import { getBrazilNow, formatAptTimeToHHMM } from "@/lib/timezone";
 import { checkDayStatus } from "@/lib/holidays";
 import { isBarberAvailable, getBarberLunchBreakTime, parseLunchBreakSlots } from "@/lib/barber-availability";
 import { getDayScheduleDB, getBarberDayScheduleDB } from "@/lib/studio-schedule";
+import { getServiceById } from "@/lib/services";
+import { OPERATING_HOURS, toBusyInterval, hasIntervalConflict, BusyInterval } from "@/lib/scheduling";
 
 export const dynamic = "force-dynamic";
 
@@ -16,34 +17,6 @@ function jsonNoStore(body: unknown, status = 200) {
   });
 }
 
-// Horários Oficiais do Noah Barber Studio:
-// - Segunda a Sábado: 09:00 às 20:00
-// - Domingo: Fechado
-const OPERATING_HOURS = [
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "13:00",
-  "13:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-  "17:30",
-  "18:00",
-  "18:30",
-  "19:00",
-  "19:30",
-];
-
 const WEEKDAY_HOURS = OPERATING_HOURS;
 const SATURDAY_HOURS = OPERATING_HOURS;
 
@@ -52,6 +25,9 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const dateParam = searchParams.get("date");
     const barberId = searchParams.get("barberId") || "barbeiro-noah";
+    const serviceId = searchParams.get("serviceId");
+    const candidateService = getServiceById(serviceId);
+    const candidateDuration = candidateService?.duration || 30;
 
     if (!dateParam) {
       return NextResponse.json({ error: "Data não informada" }, { status: 400 });
@@ -103,6 +79,7 @@ export async function GET(req: Request) {
         isSunday: false,
         isHoliday: false,
         isStudioClosed: false,
+        isBarberOff: true,
         reason: `${barberName} não estará atendendo nesta data selecionada.`,
       });
     }
@@ -126,9 +103,7 @@ export async function GET(req: Request) {
     const lunchBreakSlots = barberSchedule.lunchBreakSlots.length > 0
       ? barberSchedule.lunchBreakSlots
       : parseLunchBreakSlots(barberLunchTime);
-    if (lunchBreakSlots.length > 0) {
-      baseHours = baseHours.filter((time) => !lunchBreakSlots.includes(time));
-    }
+    const lunchBusyIntervals: BusyInterval[] = lunchBreakSlots.map((slot) => toBusyInterval(slot, 60));
 
     // 5. Se for o dia de hoje, remove horários que já passaram
     if (cleanDateStr === brazilNow.date) {
@@ -140,7 +115,7 @@ export async function GET(req: Request) {
     const endOfDay = new Date(`${cleanDateStr}T23:59:59-03:00`);
 
     try {
-      // 6. Busca agendamentos ocupados no banco de dados para este profissional específico
+      // 6. Busca agendamentos ocupados no banco de dados para este profissional específico (com duração para bloqueio de sobreposição)
       const bookedAppointments = await prisma.appointment.findMany({
         where: {
           date: { gte: startOfDay, lte: endOfDay },
@@ -150,25 +125,32 @@ export async function GET(req: Request) {
             ...(barberId === "barbeiro-noah" ? [{ barberId: null }] : []),
           ],
         },
+        include: { service: true },
       });
 
-      const bookedTimes = (bookedAppointments || []).map((apt) => formatAptTimeToHHMM(apt.date));
+      const busyIntervals: BusyInterval[] = [...lunchBusyIntervals];
+      const seenAptIds = new Set<string>();
+
+      (bookedAppointments || []).forEach((apt) => {
+        seenAptIds.add(apt.id);
+        busyIntervals.push(toBusyInterval(formatAptTimeToHHMM(apt.date), apt.service?.duration));
+      });
 
       // Também verifica no store em memória para contingência
       const storedApts = getAppointmentsForDate(cleanDateStr, barberId);
       storedApts
-        .filter((apt) => apt.status !== "CANCELLED")
+        .filter((apt) => apt.status !== "CANCELLED" && !seenAptIds.has(apt.id))
         .forEach((apt) => {
-          const t = formatAptTimeToHHMM(apt.date);
-          if (!bookedTimes.includes(t)) {
-            bookedTimes.push(t);
-          }
+          busyIntervals.push(toBusyInterval(formatAptTimeToHHMM(apt.date), apt.service?.duration));
         });
 
-      const availableTimes = baseHours.filter((time) => !bookedTimes.includes(time));
+      const availableTimes = baseHours.filter(
+        (time) => !hasIntervalConflict(time, candidateDuration, busyIntervals)
+      );
 
       return jsonNoStore({
         availableTimes,
+        bookedTimes: busyIntervals.map((b) => b.startTime),
         isSaturday: dayOfWeek === 6,
         earlyClosingTime: earlyClosingTime || null,
         lunchBreakTime: barberLunchTime || null,
@@ -177,14 +159,20 @@ export async function GET(req: Request) {
     } catch (dbErr) {
       // Fallback em memória
       const storedApts = getAppointmentsForDate(cleanDateStr, barberId);
-      const bookedTimes = storedApts
-        .filter((apt) => apt.status !== "CANCELLED")
-        .map((apt) => formatAptTimeToHHMM(apt.date));
+      const busyIntervals: BusyInterval[] = [
+        ...lunchBusyIntervals,
+        ...storedApts
+          .filter((apt) => apt.status !== "CANCELLED")
+          .map((apt) => toBusyInterval(formatAptTimeToHHMM(apt.date), apt.service?.duration)),
+      ];
 
-      const availableTimes = baseHours.filter((time) => !bookedTimes.includes(time));
+      const availableTimes = baseHours.filter(
+        (time) => !hasIntervalConflict(time, candidateDuration, busyIntervals)
+      );
 
       return jsonNoStore({
         availableTimes,
+        bookedTimes: busyIntervals.map((b) => b.startTime),
         isSaturday: dayOfWeek === 6,
         earlyClosingTime: earlyClosingTime || null,
         lunchBreakTime: barberLunchTime || null,

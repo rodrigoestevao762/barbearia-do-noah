@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { BARBERS, getBarberById } from '@/lib/barbers';
-import { OFFICIAL_SERVICES } from '@/lib/services';
+import { OFFICIAL_SERVICES, getServiceById } from '@/lib/services';
 import { addStoredAppointment, getAllStoredAppointments, getAppointmentsForDate } from '@/lib/appointments-store';
 import { upsertStoredUser } from '@/lib/users-store';
 import { getBrazilNow, getBrazilDateAndTimeString, parseBrazilDateTime, formatAptTimeToHHMM } from '@/lib/timezone';
 import { checkDayStatusDB, getDayScheduleDB, getBarberDayScheduleDB } from '@/lib/studio-schedule';
 import { isBarberAvailable } from '@/lib/barber-availability';
 import { sendAppointmentConfirmationEmail, sendNewBookingNotificationToBarber } from '@/lib/resend';
+import { toBusyInterval, hasIntervalConflict, BusyInterval } from '@/lib/scheduling';
 
 export async function POST(req: Request) {
   try {
@@ -35,10 +36,8 @@ export async function POST(req: Request) {
       barberId = assignedBarber.id;
     }
 
-    // 2. Identifica o serviço oficial correspondente
-    const matchedService = OFFICIAL_SERVICES.find(
-      (s) => s.id === serviceId || s.name.toLowerCase() === String(serviceId).toLowerCase()
-    ) || OFFICIAL_SERVICES[0];
+    // 2. Identifica o serviço oficial correspondente (suporta IDs novos e legados)
+    const matchedService = getServiceById(serviceId) || OFFICIAL_SERVICES[0];
 
     // Validação estrita no fuso horário do Brasil (para online e Cliente Balcão)
     const appointmentDate = parseBrazilDateTime(date);
@@ -50,7 +49,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: dayCheck.reason }, { status: 400 });
     }
 
-    // 2.2 Validação de Folga, Saída Antecipada e Pausa para Almoço individual no Banco PostgreSQL
+    // 2.2 Validação de Folga, Saída Antecipada e Pausa para Almoço individual no Banco PostgreSQL (com duração)
     const barberDaySchedule = await getBarberDayScheduleDB(assignedBarber.id, requestedBrazil.date);
     if (!isBarberAvailable(assignedBarber.id, requestedBrazil.date) || barberDaySchedule.isClosed) {
       return NextResponse.json(
@@ -67,9 +66,12 @@ export async function POST(req: Request) {
       );
     }
 
-    if (barberDaySchedule.lunchBreakSlots.includes(requestedBrazil.time)) {
+    const lunchIntervals: BusyInterval[] = barberDaySchedule.lunchBreakSlots.map((slot) =>
+      toBusyInterval(slot, 60)
+    );
+    if (hasIntervalConflict(requestedBrazil.time, matchedService.duration, lunchIntervals)) {
       return NextResponse.json(
-        { error: `O horário das ${requestedBrazil.time} está reservado para pausa de almoço.` },
+        { error: `O horário das ${requestedBrazil.time} conflita com a pausa de almoço.` },
         { status: 400 }
       );
     }
@@ -87,13 +89,17 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2.3 Proteção contra duplo agendamento no mesmo horário/barbeiro (online e Cliente Balcão)
+    // 2.3 Proteção matemática contra duplo agendamento / sobreposição de duração no mesmo barbeiro
     const dayStart = new Date(`${requestedBrazil.date}T00:00:00-03:00`);
     const dayEnd = new Date(`${requestedBrazil.date}T23:59:59-03:00`);
-    const memConflict = getAppointmentsForDate(requestedBrazil.date, assignedBarber.id).some(
-      (apt) => apt.status !== "CANCELLED" && formatAptTimeToHHMM(apt.date) === requestedBrazil.time
+    const memAptsDay = getAppointmentsForDate(requestedBrazil.date, assignedBarber.id).filter(
+      (apt) => apt.status !== "CANCELLED"
     );
-    let dbConflict = false;
+    const busyIntervals: BusyInterval[] = memAptsDay.map((apt) =>
+      toBusyInterval(formatAptTimeToHHMM(apt.date), apt.service?.duration)
+    );
+    const seenIds = new Set(memAptsDay.map((a) => a.id));
+
     try {
       const dbDayApts = await prisma.appointment.findMany({
         where: {
@@ -104,15 +110,18 @@ export async function POST(req: Request) {
             ...(assignedBarber.id === "barbeiro-noah" ? [{ barberId: null }] : []),
           ],
         },
+        include: { service: true },
       });
-      dbConflict = (dbDayApts || []).some(
-        (apt) => formatAptTimeToHHMM(apt.date) === requestedBrazil.time
-      );
+      (dbDayApts || []).forEach((apt) => {
+        if (!seenIds.has(apt.id)) {
+          busyIntervals.push(toBusyInterval(formatAptTimeToHHMM(apt.date), apt.service?.duration));
+        }
+      });
     } catch (_) {}
 
-    if (memConflict || dbConflict) {
+    if (hasIntervalConflict(requestedBrazil.time, matchedService.duration, busyIntervals)) {
       return NextResponse.json(
-        { error: `O horário das ${requestedBrazil.time} já está ocupado na agenda de ${assignedBarber.name}. Por favor, escolha outro horário.` },
+        { error: `O horário das ${requestedBrazil.time} conflita com outro agendamento na agenda de ${assignedBarber.name}. Por favor, escolha outro horário.` },
         { status: 409 }
       );
     }

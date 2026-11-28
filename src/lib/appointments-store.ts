@@ -1,5 +1,5 @@
 import { BARBERS } from "@/lib/barbers";
-import { OFFICIAL_SERVICES } from "@/lib/services";
+import { OFFICIAL_SERVICES, getServiceById } from "@/lib/services";
 import { getBrazilDateAndTimeString } from "@/lib/timezone";
 import fs from "fs";
 import path from "path";
@@ -123,8 +123,8 @@ export function addStoredAppointment(aptData: Partial<StoredAppointment>): Store
   const barber = BARBERS.find((b) => b.id === aptData.barberId) || BARBERS[0];
 
   const service =
-    OFFICIAL_SERVICES.find((s) => s.id === aptData.service?.id) ||
-    OFFICIAL_SERVICES.find((s) => s.id === "corte-cabelo") ||
+    getServiceById(aptData.service?.id || aptData.service?.name) ||
+    getServiceById("corte") ||
     OFFICIAL_SERVICES[0];
 
   const newApt: StoredAppointment = {

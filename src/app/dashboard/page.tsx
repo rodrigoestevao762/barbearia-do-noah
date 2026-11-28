@@ -37,6 +37,7 @@ import { LunchBreakControl } from "@/components/LunchBreakControl";
 import { ExtraServiceModal } from "@/components/ExtraServiceModal";
 import WalkInModal from "@/components/WalkInModal";
 import ExpenseModal from "@/components/ExpenseModal";
+import { CenterModalPortal } from "@/components/CenterModalPortal";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -1553,12 +1554,13 @@ export default function DashboardPage() {
       {/* MODAL CANCELAMENTO */}
       <AnimatePresence>
         {cancellingApt && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <CenterModalPortal onBackdropClick={() => setCancellingApt(null)}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative font-sans"
+              onClick={(e) => e.stopPropagation()}
+              className="my-auto bg-[#080A0E] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full max-h-[calc(100dvh-7.5rem)] overflow-y-auto shadow-2xl relative font-sans text-white"
             >
               <button onClick={() => setCancellingApt(null)} className="absolute top-6 right-6 text-gray-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -1597,7 +1599,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </CenterModalPortal>
         )}
       </AnimatePresence>
     </div>

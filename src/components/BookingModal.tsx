@@ -55,7 +55,7 @@ export default function BookingModal({
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
-  const [dayClosedInfo, setDayClosedInfo] = useState<{ isClosed: boolean; reason: string | null } | null>(null);
+  const [dayClosedInfo, setDayClosedInfo] = useState<{ isClosed: boolean; reason: string | null; isBarberOff?: boolean } | null>(null);
   
   // Dados do Cliente para Agendamento & Criação Simultânea da Conta VIP
   const [clientName, setClientName] = useState("");
@@ -72,20 +72,14 @@ export default function BookingModal({
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const getTodayStr = () => {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+    return new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
   };
 
   const getTomorrowStr = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+    const todayBr = getTodayStr();
+    const [y, m, d] = todayBr.split("-").map(Number);
+    const next = new Date(Date.UTC(y, m - 1, d + 1, 12, 0, 0));
+    return next.toISOString().substring(0, 10);
   };
 
   const isLoggedIn = status === "authenticated" || !!initialUserData?.name || !!(session as any)?.user?.name;
@@ -183,16 +177,25 @@ export default function BookingModal({
     }
     setDayClosedInfo(null);
 
-    const now = new Date();
     const todayStr = getTodayStr();
-    const nowTimeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    const nowTimeStr = new Date().toLocaleTimeString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
 
     const barberId = selectedBarber?.id || "barbeiro-noah";
-    fetch(`/api/appointments/available?date=${selectedDate}&barberId=${barberId}&t=${Date.now()}`, { cache: "no-store" })
+    const serviceParam = selectedService?.id ? `&serviceId=${encodeURIComponent(selectedService.id)}` : "";
+    fetch(`/api/appointments/available?date=${selectedDate}&barberId=${barberId}${serviceParam}&t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (data.isClosed) {
-          setDayClosedInfo({ isClosed: true, reason: data.reason });
+          setDayClosedInfo({
+            isClosed: true,
+            reason: data.reason,
+            isBarberOff: Boolean(data.isBarberOff),
+          });
           setAvailableTimes([]);
           setSelectedTime("");
           return;
@@ -227,7 +230,7 @@ export default function BookingModal({
         }
         setSelectedTime("");
       });
-  }, [selectedDate, isOpen, selectedBarber?.id]);
+  }, [selectedDate, isOpen, selectedBarber?.id, selectedService?.id]);
 
   // Submissão do Agendamento + Criação da Conta VIP + Login Automático
   const handleBookingSubmit = async (e?: React.FormEvent) => {
@@ -359,7 +362,7 @@ export default function BookingModal({
   };
 
   const dateFormatted = selectedDate ? selectedDate.split("-").reverse().join("/") : "";
-  const whatsappMsg = `Olá! Acabei de agendar um ${selectedService?.name || "serviço"} (R$ ${selectedService?.price}) no Noah Barber Studio para o dia ${dateFormatted} às ${selectedTime}.\n\nMeus dados:\nNome: ${clientName}\nE-mail: ${clientEmail}\nWhatsApp: ${clientPhone}\nForma de Pagamento: ${paymentMethod}\n\nPoderia me confirmar?`;
+  const whatsappMsg = `Olá! Acabei de agendar um ${selectedService?.name || "serviço"} (R$ ${selectedService?.price}) no Noah Barber Studio com ${selectedBarber?.name || "Noah Ferreira"} para o dia ${dateFormatted} às ${selectedTime}.\n\nMeus dados:\nNome: ${clientName}\nE-mail: ${clientEmail}\nWhatsApp: ${clientPhone}\nForma de Pagamento: ${paymentMethod}\n\nPoderia me confirmar?`;
   const whatsappUrl = `https://wa.me/${selectedBarber?.phone || "5527992693638"}?text=${encodeURIComponent(whatsappMsg)}`;
 
   // CRÍTICO: Se o modal NÃO estiver aberto ou não estiver montado no browser, NÃO RENDERIZA NADA!
@@ -368,24 +371,24 @@ export default function BookingModal({
 
   return createPortal(
     <div 
-      className="fixed inset-0 z-[999] flex items-center justify-center p-2.5 sm:p-4 overflow-hidden overscroll-contain"
-      style={{ overscrollBehavior: "contain" }}
+      className="fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto px-3 sm:px-5 pt-[max(calc(env(safe-area-inset-top,0px)+1.5rem),3.75rem)] pb-[max(calc(env(safe-area-inset-bottom,0px)+1.5rem),2.5rem)] overscroll-contain"
+      style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}
     >
       {/* Backdrop luxuoso com blur que fecha ao clicar */}
       <motion.div 
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-[#050608]/90 backdrop-blur-xl"
+        className="fixed inset-0 bg-[#050608]/90 backdrop-blur-xl"
         onClick={onClose}
       />
       
-      {/* Container Principal do Modal */}
+      {/* Container Principal do Modal (Sempre centralizado dentro da área segura do App/Site) */}
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-3xl bg-[#080A0E] border border-[#DFBA73]/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 z-10 shadow-[0_25px_80px_rgba(0,0,0,0.95),0_0_30px_rgba(223,186,115,0.15)] max-h-[94vh] flex flex-col overflow-hidden text-white overscroll-contain"
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        className="relative my-auto w-full max-w-3xl bg-[#080A0E] border border-[#DFBA73]/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 z-10 shadow-[0_25px_80px_rgba(0,0,0,0.95),0_0_30px_rgba(223,186,115,0.15)] max-h-[calc(100dvh-7.5rem)] flex flex-col overflow-hidden text-white overscroll-contain"
         style={{ overscrollBehavior: "contain", touchAction: "auto" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -525,12 +528,12 @@ export default function BookingModal({
                 </p>
               </div>
 
-              {/* Card de Envio Oficial no WhatsApp de Noah Ferreira */}
+              {/* Card de Envio Oficial no WhatsApp do Profissional Escolhido */}
               <div className="w-full max-w-md bg-white/[0.03] border border-[#25D366]/40 rounded-2xl p-5 mb-5 text-left shadow-xl">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-3 h-3 rounded-full bg-[#25D366] animate-pulse" />
                   <p className="text-xs font-semibold text-[#25D366] uppercase tracking-wider font-mono">
-                    Notificar Noah Ferreira no WhatsApp
+                    Notificar {selectedBarber.name} no WhatsApp
                   </p>
                 </div>
                 <p className="text-xs text-gray-400 leading-relaxed mb-4">
@@ -541,7 +544,7 @@ export default function BookingModal({
                   onClick={handleNotifyWhatsappAndRedirect}
                   className="w-full bg-[#25D366] text-white py-3.5 px-4 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-[#128C7E] transition-all duration-300 shadow-lg shadow-[#25D366]/20 hover:scale-[1.02] cursor-pointer"
                 >
-                  <span>Enviar para WhatsApp de Noah</span>
+                  <span>Enviar para WhatsApp de {selectedBarber.name.split(" ")[0]}</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -931,16 +934,28 @@ export default function BookingModal({
                           />
                         </div>
 
-                        {/* Aviso se Fechado / Feriado */}
+                        {/* Aviso se Fechado / Feriado ou Folga Individual do Barbeiro */}
                         {dayClosedInfo?.isClosed ? (
-                          <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs space-y-1">
+                          <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs space-y-2.5">
                             <div className="flex items-center gap-1.5 font-bold text-red-200">
                               <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-                              <span>Estúdio Fechado</span>
+                              <span>{dayClosedInfo.isBarberOff ? "Barbeiro em Folga na Data" : "Estúdio Fechado"}</span>
                             </div>
                             <p className="leading-relaxed">
-                              {dayClosedInfo.reason || "Não funcionamos aos domingos e feriados."}
+                              {dayClosedInfo.reason || "Não funcionamos aos domingos."}
                             </p>
+                            {dayClosedInfo.isBarberOff && BARBERS.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const other = BARBERS.find((b) => b.id !== selectedBarber?.id) || BARBERS[0];
+                                  setSelectedBarber(other);
+                                }}
+                                className="px-3 py-1.5 rounded-lg bg-[#DFBA73] text-black font-mono text-[11px] font-bold uppercase tracking-wider hover:brightness-110 transition-all cursor-pointer"
+                              >
+                                Verificar horários com {(BARBERS.find((b) => b.id !== selectedBarber?.id) || BARBERS[0]).name.split(" ")[0]}
+                              </button>
+                            )}
                           </div>
                         ) : (
                           /* Grade de Horários */
